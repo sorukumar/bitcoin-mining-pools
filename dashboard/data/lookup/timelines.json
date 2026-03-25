@@ -1,0 +1,67 @@
+[
+  {
+    "date": "2009-01-03",
+    "event": "Genesis Block & CPU Era",
+    "description": "Satoshi Nakamoto mines the first block. Mining is performed using standard CPUs on personal computers, representing the ultimate period of hobbyist decentralization."
+  },
+  {
+    "date": "2010-09-18",
+    "event": "First GPU Mining Software",
+    "description": "Public release of GPU mining software. Miners discover that Graphics Processing Units (GPUs) are significantly more efficient at parallel hash calculations than CPUs, marking the first major hardware leap."
+  },
+  {
+    "date": "2010-11-27",
+    "event": "Slush Pool Launch",
+    "description": "The first mining pool, Slush Pool, is launched. It introduces the concept of pooled mining to reduce payout variance for individual participants as network difficulty begins to rise."
+  },
+  {
+    "date": "2011-06-01",
+    "event": "FPGA Transition",
+    "description": "The brief FPGA (Field-Programmable Gate Array) era begins. These chips offer better energy efficiency than GPUs but serve primarily as a bridge to specialized hardware."
+  },
+  {
+    "date": "2012-12-01",
+    "event": "Stratum V1 Implementation",
+    "description": "The original Stratum protocol is introduced to replace 'getwork,' improving communication efficiency between miners and pools and becoming the industry standard for the next decade."
+  },
+  {
+    "date": "2013-01-01",
+    "event": "The ASIC Revolution",
+    "description": "Canaan Creative ships the first ASIC (Application-Specific Integrated Circuit) miners. This permanently moves mining from general-purpose home hardware to specialized industrial machines."
+  },
+  {
+    "date": "2014-06-01",
+    "event": "GHash.io 51% Concern",
+    "description": "GHash.io briefly controls over 50% of the network hashrate, sparking intense community debate over pool centralization and leading to a voluntary reduction in their power."
+  },
+  {
+    "date": "2016-07-09",
+    "event": "The Rise of Bitmain",
+    "description": "Following the 2016 halving, Bitmain-affiliated pools (AntPool, BTC.com) begin to dominate. This era is defined by the rapid scaling of high-efficiency ASIC chips and pool consolidation."
+  },
+  {
+    "date": "2021-05-01",
+    "event": "The Great China Migration",
+    "description": "China's ban on mining triggers a massive global shift in hashrate. Miners migrate to North America and Kazakhstan, significantly increasing the market share of Western pools."
+  },
+  {
+    "date": "2021-11-01",
+    "event": "Foundry USA Dominance",
+    "description": "Foundry USA becomes the first North American pool to take the #1 global spot, signaling the entry of institutional capital and public companies into the mining sector."
+  },
+  {
+    "date": "2023-01-01",
+    "event": "Climate & ESG Focus",
+    "description": "Mining operations increasingly focus on sustainable energy and grid balancing. Reports highlight that over 50% of the network is now powered by sustainable sources as climate concerns influence policy."
+  },
+  {
+    "date": "2024-04-19",
+    "event": "2024 Halving & Stratum V2 Push",
+    "description": "Block rewards drop to 3.125 BTC. The network sees a renewed push for Stratum V2 adoption to allow miners to select their own transactions and decentralize pool power."
+  },
+  {
+    "date": "2026-03-01",
+    "event": "Institutional Diversification",
+    "description": "Leading pools like Foundry expand into multi-asset, institutional-grade services, offering compliance-first infrastructure for a wide range of decentralized protocols."
+  }
+]

@@ -1,0 +1,109 @@
+[
+  {
+    "name": "Foundry USA",
+    "country": "United States",
+    "industry_reputation": "The 'Wall Street' Monopoly",
+    "centralization_risk": "Critical (Jurisdictional)",
+    "the_scoop": "The 'foundry' of American dominance. Insiders whisper that Foundry is effectively a proxy for U.S. regulatory interests. In 2025, they were caught mining 8 blocks in a row with suspiciously low-fee transactions, leading to 'State-Level Transaction Filtering' theories. They are the ultimate 'Suits' of the mining world, backed by the DCG empire.",
+    "major_investors": "Digital Currency Group (Barry Silbert), Coinbase Ventures",
+    "notable_controversy": "The '6102 of Mining.' Rumors persist that in a national emergency, the US government could force Foundry to 'freeze' blocks containing specific UTXOs."
+  },
+  {
+    "name": "AntPool",
+    "country": "Global / Singapore",
+    "industry_reputation": "The Bitmain Shadow",
+    "centralization_risk": "High (Vertical Integration)",
+    "the_scoop": "The ghost of Jihan Wu. While AntPool claims to be independent, industry veterans know it’s the operational heart of Bitmain. The 'Stealth Centralization' theory suggests AntPool secretly provides the hashing backend for several other 'independent' pools to keep their public dominance below 50% and avoid a PR nightmare."
+  },
+  {
+    "name": "F2Pool",
+    "country": "Global",
+    "industry_reputation": "The Compliance Pioneer",
+    "centralization_risk": "Medium",
+    "the_scoop": "Founder Wang Chun is known for being 'unfiltered' on social media but 'highly filtered' on-chain. In late 2023, F2Pool became the first major pool to admit it was filtering OFAC-sanctioned transactions. Though they backtracked after a community 'revolt,' the gossip is that the code for filtering is still there—just waiting for the next legal threat."
+  },
+  {
+    "name": "MARA Pool",
+    "country": "United States",
+    "industry_reputation": "The Thiel Powerhouse",
+    "centralization_risk": "Medium (Publicly Listed)",
+    "the_scoop": "Managed by Fred Thiel, but the 'Peter Thiel' influence (via Founders Fund and institutional backers) gives it an aura of high-level political protection. They famously tried to mine 'Clean BTC' in 2021—blocks containing only non-criminal transactions—which miners called 'The Great Censure' before MARA pivot to 'Freedom Mining' after losing money on fees."
+  },
+  {
+    "name": "Ocean Pool",
+    "country": "Global (Decentralized)",
+    "industry_reputation": "The Dorsey Disruptor",
+    "centralization_risk": "Low (Template Control)",
+    "the_scoop": "The 'Anarchist' pool backed by Jack Dorsey. The gossip here is the 'Luke Dashjr Civil War.' While Ocean claims to decentralize the network, Lead Developer Luke Dashjr famously filters 'Ordinals' (NFTs) as 'spam,' leading to a massive rift between those who want 'Pure Bitcoin' and those who want an 'Open Ledger'."
+  },
+  {
+    "name": "Binance Pool",
+    "country": "Global / Seychelles",
+    "industry_reputation": "The Exchange Parasite",
+    "centralization_risk": "High (Economic)",
+    "the_scoop": "Binance is accused of using its exchange liquidity to offer 'Predatory 0% Fees' to kill off independent pools. Most industry experts believe Binance doesn't actually run its own nodes but 'white-labels' AntPool’s infrastructure, further concentrating power behind the scenes."
+  },
+  {
+    "name": "ViaBTC",
+    "country": "Hong Kong",
+    "industry_reputation": "The Block Size Vet",
+    "centralization_risk": "Medium",
+    "the_scoop": "ViaBTC is a survivor of the 2017 'Block Size Wars.' They were the first to support Bitcoin Cash (BCH), and the gossip is they still maintain a 'fail-safe' protocol to flip their hashrate to BCH if BTC fees ever become 'uneconomic' for their hardware."
+  },
+  {
+    "name": "Luxor",
+    "country": "United States",
+    "industry_reputation": "The Financializers",
+    "centralization_risk": "Low (Financial)",
+    "the_scoop": "Known as 'The Suits' of the West Coast. Luxor isn't just a pool; they are the kings of 'Hashrate Derivatives.' The industry talk is that Luxor is turning Bitcoin mining into a boring stock market commodity, which some purists say destroys the 'cypherpunk' spirit of the game."
+  },
+  {
+    "name": "Braiins Pool (Slush)",
+    "country": "Czech Republic",
+    "industry_reputation": "The OG Purists",
+    "centralization_risk": "Very Low",
+    "the_scoop": "As the first pool ever (Slush Pool), they are the 'Old Guard.' They are currently the only major pool 100% committed to Stratum V2, which gives power back to individual miners. The gossip? They are the 'Final Boss' of decentralization, standing against the US and China pools."
+  },
+  {
+    "name": "BTC.com",
+    "country": "Global",
+    "industry_reputation": "The Abandoned Heir",
+    "centralization_risk": "Medium",
+    "the_scoop": "Once the #1 pool in the world. After the Bitmain split, it was sold to a lottery company (500.com). The industry gossip is that it’s a 'Zombie Pool'—high hashrate, but very little active development or innovation."
+  },
+  {
+    "name": "Poolin",
+    "country": "Global",
+    "industry_reputation": "The Cautionary Tale",
+    "centralization_risk": "High (Liquidity)",
+    "the_scoop": "In 2022, Poolin 'rugged' its miners by freezing withdrawals during a liquidity crisis. The current industry talk is that they are still operating on a 'debt-repayment' model, and miners who stay there are taking a massive 'counterparty risk' every day."
+  },
+  {
+    "name": "SBI Crypto",
+    "country": "Japan",
+    "industry_reputation": "The Institutional Guardian",
+    "centralization_risk": "Low (Sovereign)",
+    "the_scoop": "Backed by Japan’s financial giant SBI. They are the 'Silent Miner.' Gossip suggests they are mining BTC not for profit, but as a strategic national reserve for the Japanese banking system, making them immune to market volatility."
+  },
+  {
+    "name": "BitFury",
+    "country": "Netherlands",
+    "industry_reputation": "The 'Spy' Pool",
+    "centralization_risk": "Medium (Surveillance)",
+    "the_scoop": "BitFury is famous for their 'Crystal' blockchain analytics software used by governments. The conspiracy theory is that BitFury mines blocks specifically to test their tracking algorithms, essentially 'snitching' on the network they help secure."
+  },
+  {
+    "name": "KuCoin Pool",
+    "country": "Seychelles",
+    "industry_reputation": "The Retail Magnet",
+    "centralization_risk": "Medium",
+    "the_scoop": "Like Binance, they use their exchange to lock in miners. The 'Scoop' is that KuCoin Pool is a play for 'Regulatory Arbitrage'—finding the jurisdictional holes where US/China rules don't apply."
+  },
+  {
+    "name": "Ultimus Pool",
+    "country": "United States",
+    "industry_reputation": "The New Vanguard",
+    "centralization_risk": "Medium",
+    "the_scoop": "A dark horse rising in the US. Ultimus is heavily focused on 'Energy Grid Balancing.' The gossip is they aren't a mining pool; they are an 'energy trading firm' that uses Bitcoin ASICs as a battery, representing the final evolution of mining."
+  }
+]
