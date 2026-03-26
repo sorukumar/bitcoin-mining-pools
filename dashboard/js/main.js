@@ -142,7 +142,7 @@ let profileRegistry = { detailed: [], standard: [] };
 function initProfileSelector() {
   const poolNamesSet = new Set();
   allBlocks.forEach(b => {
-      if (b.pool_name !== 'Unknown' && b.pool_name !== 'Other') poolNamesSet.add(b.pool_name);
+      if (b.pool_name && b.pool_name !== 'Unknown' && b.pool_name !== 'Other') poolNamesSet.add(b.pool_name);
   });
   
   const infoNames = new Set(poolsInfo.map(i => i.name));

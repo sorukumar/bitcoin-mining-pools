@@ -1,6 +1,6 @@
 """
 update_metrics.py
-Recreates ecosystem.json and updates pool_meta.json with accurate metrics
+Recreates pool_growth.json and updates pool_metrics.json with accurate metrics
 after merging new data. Reads from dashboard/data/blocks.parquet
 """
 
@@ -19,8 +19,11 @@ def main():
     df = pd.concat([df_pre, df_post], ignore_index=True)
     print(f"  {len(df):,} blocks loaded")
 
-    # Load existing pool_meta.json
-    with open(DASHBOARD_DATA / "pool_meta.json") as f:
+    # Convert date column to datetime
+    df["date"] = pd.to_datetime(df["date"])
+
+    # Load existing pool_metrics.json
+    with open(DASHBOARD_DATA / "pool_metrics.json") as f:
         pool_meta = json.load(f)
 
     print("Calculating pool metrics ...")
@@ -52,7 +55,7 @@ def main():
     with open(DASHBOARD_DATA / "lookup" / "lookup_slug_to_name.json") as f:
         slug_to_name = json.load(f)
     
-    # Update pool_meta.json
+    # Update pool_metrics.json
     for slug, row in grouped.iterrows():
         name = slug_to_name.get(slug, slug)
         if name not in pool_meta:
@@ -67,9 +70,9 @@ def main():
         share = last_month_share.get(slug, 0.0)
         pool_meta[name]["last_month_share_pct"] = float(share)
 
-    with open(DASHBOARD_DATA / "pool_meta.json", "w") as f:
+    with open(DASHBOARD_DATA / "pool_metrics.json", "w") as f:
         json.dump(pool_meta, f, separators=(",", ":"))
-    print(f"  Updated pool_meta.json with metrics for {len(grouped)} pools")
+    print(f"  Updated pool_metrics.json with metrics for {len(grouped)} pools")
 
     # Ecosystem Growth
     print("Calculating global ecosystem growth ...")
@@ -92,9 +95,9 @@ def main():
         "months": months,
         "cumulativePools": cumulative_counts
     }
-    with open(DASHBOARD_DATA / "ecosystem.json", "w") as f:
+    with open(DASHBOARD_DATA / "pool_growth.json", "w") as f:
         json.dump(ecosystem, f, separators=(",", ":"))
-    print(f"  Wrote ecosystem.json with {len(months)} months")
+    print(f"  Wrote pool_growth.json with {len(months)} months")
 
     print("Metrics update completed!")
 

@@ -1,10 +1,10 @@
 /**
  * data-loader.js
- * Loads blocks.parquet via hyparquet and pool_meta.json
+ * Loads blocks.parquet via hyparquet and pool_metrics.json
  * Returns a structured dataset ready for aggregation.
  */
 
-const POOL_META_URL = './data/pool_meta.json?v=3';
+const POOL_META_URL = './data/pool_metrics.json?v=3';
 const POOLS_INFO_URL = './data/lookup/pools_info.json';
 const TIMELINES_URL = './data/lookup/timelines.json';
 
@@ -13,8 +13,7 @@ const TIMELINES_URL = './data/lookup/timelines.json';
  * @property {number} height
  * @property {string} pool_slug
  * @property {string} pool_name
- * @property {number} epoch        – 0-4
- * @property {Date}   approx_date
+ * @property {Date}   date
  */
 
 /**
@@ -67,7 +66,7 @@ async function loadTimelines() {
 
 /** Fetch Global Ecosystem Growth JSON */
 async function loadEcosystem() {
-  const res = await fetch('./data/ecosystem.json?v=6');
+  const res = await fetch('./data/pool_growth.json?v=6');
   if (!res.ok) throw new Error(`Failed to fetch ecosystem: ${res.status}`);
   return res.json();
 }
@@ -83,14 +82,15 @@ export async function loadData(period = 'post') {
     loadEcosystem()
   ]);
 
-  // approx_date from hyparquet may be a timestamp number (ms) or a Date object
+  // date from hyparquet may be a timestamp number (ms) or a Date object
   // Normalise to JS Date
   for (const b of blocks) {
-    if (!(b.approx_date instanceof Date)) {
-      b.approx_date = new Date(
-        typeof b.approx_date === 'bigint'
-          ? Number(b.approx_date) / 1000   // parquet timestamps are in µs
-          : b.approx_date
+    b.height = Number(b.height);
+    if (!(b.date instanceof Date)) {
+      b.date = new Date(
+        typeof b.date === 'bigint'
+          ? Number(b.date) / 1000   // parquet timestamps are in µs
+          : b.date
       );
     }
   }
@@ -98,28 +98,25 @@ export async function loadData(period = 'post') {
   // Sort ascending by height (should already be, but guarantee it)
   blocks.sort((a, b) => a.height - b.height);
 
-  const minDate = blocks[0].approx_date;
-  const maxDate = blocks[blocks.length - 1].approx_date;
+  const minDate = blocks[0].date;
+  const maxDate = blocks[blocks.length - 1].date;
 
   return { blocks, poolMeta, poolsInfo, timelines, ecosystem, minDate, maxDate };
 }
 
 /**
  * Filter blocks by a time range string: '1M','3M','6M','1Y','2Y','ALL'
- * or by epoch number (0-4).
+ *
  */
-export function filterBlocks(blocks, { range = 'ALL', epoch = null } = {}) {
-  if (epoch !== null) {
-    return blocks.filter(b => b.epoch === epoch);
-  }
+export function filterBlocks(blocks, { range = 'ALL' } = {}) {
   if (range === 'ALL') return blocks;
 
-  const now   = blocks[blocks.length - 1].approx_date;
+  const now   = blocks[blocks.length - 1].date;
   const units = { '1M': 1, '3M': 3, '6M': 6, '1Y': 12, '2Y': 24 };
   const months = units[range] ?? 0;
   const cutoff = new Date(now);
   cutoff.setMonth(cutoff.getMonth() - months);
-  return blocks.filter(b => b.approx_date >= cutoff);
+  return blocks.filter(b => b.date >= cutoff);
 }
 
 /**
@@ -130,7 +127,7 @@ export function aggregateByPool(blocks) {
   const total = blocks.length;
   const counts = new Map();
   for (const b of blocks) {
-    const key = b.pool_name;
+    const key = b.pool_name || 'Unknown';
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
   return Array.from(counts.entries())
@@ -165,7 +162,7 @@ export function aggregateMonthly(blocks, topN = 12) {
   // First find top N pool names
   const totals = new Map();
   for (const b of blocks) {
-    totals.set(b.pool_name, (totals.get(b.pool_name) ?? 0) + 1);
+    totals.set(b.pool_name || 'Unknown', (totals.get(b.pool_name) ?? 0) + 1);
   }
   const topPools = Array.from(totals.entries())
     .sort((a, b) => b[1] - a[1])
@@ -176,10 +173,10 @@ export function aggregateMonthly(blocks, topN = 12) {
   // Build month → pool → count
   const monthMap = new Map();
   for (const b of blocks) {
-    const d = b.approx_date;
+    const d = b.date;
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     if (!monthMap.has(key)) monthMap.set(key, new Map());
-    const poolName = topSet.has(b.pool_name) ? b.pool_name : 'Other';
+    const poolName = topSet.has(b.pool_name || 'Unknown') ? (b.pool_name || 'Unknown') : 'Other';
     const m = monthMap.get(key);
     m.set(poolName, (m.get(poolName) ?? 0) + 1);
   }
