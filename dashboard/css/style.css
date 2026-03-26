@@ -519,3 +519,46 @@ footer {
   .card-value { font-size: 1.4rem; }
   .epoch-buttons { margin-left: 0; padding-left: 0; border-left: none; }
 }
+/* ── Top Miners Table ─────────────────────────────────────────── */
+#top-miners-table-container {
+  margin-top: 10px;
+}
+.top-miners-scroll {
+  overflow-x: auto;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border);
+}
+.top-miners-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.top-miners-table th {
+  text-align: left;
+  padding: 15px 15px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 2px solid var(--border);
+}
+.top-miners-table td {
+  padding: 14px 15px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.top-miners-table tr.pool-row {
+  transition: background-color 0.1s;
+  cursor: pointer;
+}
+.top-miners-table tr.pool-row:hover td {
+  background: rgba(226, 163, 74, 0.04);
+  color: var(--accent);
+}
+.top-miners-table tr:last-child td {
+  border-bottom: none;
+}
+.top-miners-table i {
+  color: var(--accent);
+}

@@ -97,12 +97,23 @@ export async function loadData(period = 'post') {
 
   const blocks = blocksData.flat();
 
-  // data from hyparquet may be a timestamp number (ms) or a Date object
   // Normalise to JS Date and map pool_name from slug
   for (const b of blocks) {
     b.height = Number(b.height);
-    // Lean parquet only has pool_slug, map it to pool_name
-    b.pool_name = lookup[b.pool_slug] || b.pool_slug || 'Unknown';
+    
+    // Attempt name lookup; if missing but slug exists, format and use the slug.
+    const slug = b.pool_slug;
+    const name = lookup[slug];
+    if (name) {
+      b.pool_name = name;
+    } else if (slug && slug.toLowerCase() !== 'unknown' && slug.toString().trim() !== '') {
+      // Capitalise slug: "mara-pool" -> "Mara Pool"
+      b.pool_name = slug.toString()
+        .replace(/[_-]/g, ' ')
+        .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+    } else {
+      b.pool_name = 'Unknown';
+    }
     
     if (!(b.date instanceof Date)) {
       b.date = new Date(
@@ -127,7 +138,17 @@ export async function loadParquetOnly(url, lookup) {
   const blocks = await loadParquet(url);
   for (const b of blocks) {
     b.height = Number(b.height);
-    b.pool_name = lookup[b.pool_slug] || b.pool_slug || 'Unknown';
+    const slug = b.pool_slug;
+    const name = lookup[slug];
+    if (name) {
+      b.pool_name = name;
+    } else if (slug && slug.toLowerCase() !== 'unknown' && slug.toString().trim() !== '') {
+      b.pool_name = slug.toString()
+        .replace(/[_-]/g, ' ')
+        .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+    } else {
+      b.pool_name = 'Unknown';
+    }
     if (!(b.date instanceof Date)) {
       b.date = new Date(typeof b.date === 'bigint' ? Number(b.date) / 1000 : b.date);
     }
@@ -144,7 +165,7 @@ export function filterBlocks(blocks, { range = 'ALL' } = {}) {
   if (range === 'ALL') return blocks;
 
   const now   = blocks[blocks.length - 1].date;
-  const daysMap = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, '2Y': 730 };
+  const daysMap = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, '2Y': 730, '3Y': 1095, '5Y': 1825 };
   const cutoff = new Date(now);
   
   if (daysMap[range]) {

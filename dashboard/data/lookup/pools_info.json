@@ -58,7 +58,7 @@
     "the_scoop": "Known as 'The Suits' of the West Coast. Luxor isn't just a pool; they are the kings of 'Hashrate Derivatives.' The industry talk is that Luxor is turning Bitcoin mining into a boring stock market commodity, which some purists say destroys the 'cypherpunk' spirit of the game."
   },
   {
-    "name": "Braiins Pool (Slush)",
+    "name": "Braiins Pool",
     "country": "Czech Republic",
     "industry_reputation": "The OG Purists",
     "centralization_risk": "Very Low",
@@ -281,5 +281,21 @@
     "centralization_risk": "High",
     "the_scoop": "Owned by Jiang Zhuoer, a legend of the 2017 fork wars. Today, it functions more as a private pool for a few massive industrial farms. The scoop is that they use their hashrate to aggressively 'arbitrage' fees during high-congestion periods.",
     "notable_controversy": "The 'Fee-Defense.' During the 2024 halving, BTC.TOP was accused of mining empty blocks specifically to force fee rates higher for the rest of the network."
+  },
+  {
+    "name": "NiceHash",
+    "country": "Switzerland",
+    "industry_reputation": "The Hashrate Marketplace",
+    "centralization_risk": "Medium (Marketplace)",
+    "the_scoop": "The 'eBay' of mining. They don't run pools; they auction your computer's power to the highest bidder. Headquartered in Zug, Switzerland, they are the gateway for millions of retail users to participate in the network's hash power without buying specialized hardware.",
+    "notable_controversy": "The 2017 'Phoenix' Hack—where 4,700 BTC were stolen, leading to a multi-year repayment plan that cemented their reputation for retail loyalty."
+  },
+  {
+    "name": "DPOOL",
+    "country": "China",
+    "industry_reputation": "The 'Altcoin' Heavyweight",
+    "centralization_risk": "High (Opaque)",
+    "the_scoop": "Based in Beijing, DPOOL is a survivor of the 2021 China crackdown. They are known for their efficiency in switching hash power between BTC and various altcoins. Industry rumors suggest they maintain deep ties with hardware distributors in the Shenzhen region.",
+    "notable_controversy": "The 'Shadow Migration'—the pool was one of the first to 'go dark' during the ban while maintaining stealth hashrate levels for months."
   }
 ]

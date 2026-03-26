@@ -99,6 +99,13 @@ export function renderDonut(poolData, poolMeta, poolsInfo) {
       data: items,
     }],
   }, true);
+
+  // Trigger profile lookup on slice click
+  donutChart.off('click');
+  donutChart.on('click', (p) => {
+    document.dispatchEvent(new CustomEvent('request-profile', { detail: p.data.name || p.name }));
+    document.getElementById('pool-profile-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
 }
 
 // ── Pool table (companion to donut) ──────────────────────────────────────────
@@ -138,6 +145,17 @@ export function renderPoolTable(poolData, poolMeta) {
         <tbody>${rows}</tbody>
       </table>
     </div>`;
+
+  // Add click listeners to rows to trigger profile lookup
+  el.querySelectorAll('.pool-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const pool = row.getAttribute('data-pool');
+      document.dispatchEvent(new CustomEvent('request-profile', { detail: pool }));
+      
+      // Optional: scroll to the profile card smoothly
+      document.getElementById('pool-profile-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
 }
 
 // ── Country Share chart ──────────────────────────────────────────────────────
@@ -753,6 +771,61 @@ export function renderConcentrationChart({ months, top3, top5 }) {
       }
     ]
   }, true);
+}
+
+// ── Top 30 Mining Pools Table ────────────────────────────────────────────────
+export function renderTopMinersTable(poolAgg, poolsInfo) {
+  const el = document.getElementById('top-miners-table-container');
+  if (!el) return;
+
+  const rows = poolAgg.slice(0, 30).map((p, i) => {
+    // Case-insensitive lookup for the pool metadata
+    const info = poolsInfo.find(info => info.name.toLowerCase() === p.name.toLowerCase());
+    
+    // Determine country - handle "Unknown" specifically
+    let country = info?.country;
+    if (!country) {
+      if (p.name === 'Unknown') country = 'Decentralized / Anonymous';
+      else country = 'Unknown / Unmapped';
+    }
+
+    return `
+      <tr class="pool-row" data-pool="${p.name}">
+        <td style="width: 40px; color: var(--text-secondary); font-size: 0.8rem;">${i + 1}</td>
+        <td style="font-weight: 600; color: var(--text-primary); min-width: 180px;">${p.name}</td>
+        <td style="color: var(--text-secondary); font-size: 0.85rem; min-width: 150px;">
+          <i class="fa-solid fa-earth-americas" style="font-size: 0.75rem; margin-right: 6px; opacity: 0.5;"></i>
+          ${country}
+        </td>
+        <td style="text-align: right; font-weight: 600; color: var(--accent); padding-right: 20px;">${p.pct.toFixed(2)}%</td>
+      </tr>
+    `;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="top-miners-scroll">
+      <table class="top-miners-table">
+        <thead>
+          <tr>
+            <th style="width: 40px;">#</th>
+            <th>Miner / Pool Identity</th>
+            <th>Base of Operations</th>
+            <th style="text-align: right; padding-right: 20px;">Block Share</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+  
+  // Attach listeners for profile lookup
+  el.querySelectorAll('.pool-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const pool = row.getAttribute('data-pool');
+      document.dispatchEvent(new CustomEvent('request-profile', { detail: pool }));
+      document.getElementById('pool-profile-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
 }
 
 // ── Resize all ────────────────────────────────────────────────────────────────

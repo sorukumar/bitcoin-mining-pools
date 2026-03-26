@@ -29,7 +29,7 @@ Both parquet files use the following schema, optimized for size and speed:
 ### 🔄 Automated Updates
 This is a **living dataset**. The reports and data files are updated:
 - **Monthly**: A GitHub Action scheduled refresh ensures all monthly trend lines are finalized.
-- **Node-Synced**: Real-time block data is pushed directly from our self-hosted Bitcoin node to keep the modern era current.
+- **Node-Synced**: block data is pushed monthly directly from our self-hosted Bitcoin node to keep the modern era current.
 
 ---
 

@@ -81,7 +81,7 @@
             <button class="filter-btn segmented-btn" data-range="1M">1M</button>
             <button class="filter-btn segmented-btn" data-range="3M">3M</button>
             <button class="filter-btn segmented-btn active" data-range="1Y">1Y</button>
-            <button class="filter-btn segmented-btn" data-range="ALL">ALL</button>
+            <button class="filter-btn segmented-btn" data-range="3Y">3Y</button>
           </div>
         </div>
         <div class="chart-body donut-layout">
@@ -100,7 +100,7 @@
             <button class="filter-btn segmented-btn" data-range="1M">1M</button>
             <button class="filter-btn segmented-btn" data-range="3M">3M</button>
             <button class="filter-btn segmented-btn active" data-range="1Y">1Y</button>
-            <button class="filter-btn segmented-btn" data-range="ALL">ALL</button>
+            <button class="filter-btn segmented-btn" data-range="3Y">3Y</button>
           </div>
         </div>
         <div id="chart-country" class="chart-el chart-el--donut" style="flex: 1; width: 100%;"></div>
@@ -157,6 +157,22 @@
         </div>
       </div>
     </div>
+    <!-- Section: Top Mining Pools Breakdown -->
+    <section class="card" style="margin-bottom: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <div>
+          <h3 style="margin: 0;">Top Mining Pools</h3>
+          <span class="chart-sub">Performance and identity breakdown of the top 30 network contributors</span>
+        </div>
+        <div class="segmented-control" id="top-pools-range-buttons">
+          <button class="segmented-btn active" data-range="1M">1M</button>
+          <button class="segmented-btn" data-range="3M">3M</button>
+          <button class="segmented-btn" data-range="1Y">1Y</button>
+          <button class="segmented-btn" data-range="3Y">3Y</button>
+        </div>
+      </div>
+      <div id="top-miners-table-container"></div>
+    </section>
 
     <footer>
       <p>Data: <a href="https://github.com/jlopp/bitcoin-blocks-by-mining-pool" target="_blank">jlopp/bitcoin-blocks-by-mining-pool</a> · Pool metadata: <a href="https://github.com/bitcoin-data/mining-pools" target="_blank">bitcoin-data/mining-pools</a></p>
@@ -179,7 +195,7 @@
     window.__echarts = echarts;
 
     // Bootstrap app after libs are ready
-    const { initApp } = await import('./js/main.js?v=13');
+    const { initApp } = await import('./js/main.js?v=23');
     initApp();
   </script>
 

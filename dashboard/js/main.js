@@ -4,7 +4,7 @@
  */
 
 import { loadData, loadParquetOnly, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
-import { renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, donutChart, growthChart } from './charts.js?v=13';
+import { renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, donutChart, growthChart } from './charts.js?v=13';
 
 let allBlocks   = [];
 let poolMeta    = {};
@@ -18,13 +18,36 @@ let fullHistoryBlocks = null;
 
 let activeRange = '1Y';
 let activeCountryRange = '1Y';
+let activeTopPoolsRange = '1M';
 let activePeriod = 'post'; // 'pre' or 'post'
 let barMetric   = 'blocks';
 
 const profileHandler = (e) => showProfileCard(e.detail);
 
 function showProfileCard(poolName) {
-  if (!poolName || poolName === 'Other' || poolName === 'Unknown') return;
+  if (!poolName || poolName === 'Other') return;
+  
+  if (poolName === 'Unknown') {
+     const input = document.getElementById('pool-search-input');
+     if (input) input.value = 'Unknown';
+     
+     document.getElementById('profile-link').style.display = 'none';
+     document.getElementById('profile-scoop').textContent = "Unknown blocks represent mining activity where the block's coinbase transaction does not contain a recognized pool identifier. This typically includes solo miners, newly emerging private pools, or legacy miners who have not yet identified themselves to the network.";
+     
+     const meta = poolMeta['Unknown'] || {};
+     const snapshotBlocks = post2020Blocks || allBlocks;
+     const last30Blocks = filterBlocks(snapshotBlocks, { range: '1M' });
+     const last30Agg = aggregateByPool(last30Blocks);
+     const poolEntry = last30Agg.find(p => p.name === 'Unknown');
+     const sharePct = poolEntry ? poolEntry.pct : 0;
+     
+     document.getElementById('profile-first-block').innerHTML = `2009-01-09<br><span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal;">Network Genesis</span>`;
+     document.getElementById('profile-blocks').textContent = (meta.lifetime_blocks || 0).toLocaleString();
+     document.getElementById('profile-share').textContent = sharePct.toFixed(2) + '%';
+     
+     document.getElementById('pool-profile-card').style.display = 'block';
+     return;
+  }
   const meta = poolMeta[poolName] || {};
   const info = poolsInfo.find(i => i.name === poolName) || {};
   
@@ -44,7 +67,9 @@ function showProfileCard(poolName) {
   document.getElementById('profile-scoop').textContent = info.the_scoop || 'No description available for this pool.';
   
   // Calculate dynamic share for the last 30 days based on the primary dataset
-  const last30Blocks = filterBlocks(allBlocks, { range: '1M' });
+  // Use post2020Blocks if available to stay consistent with the modern dashboard focus
+  const snapshotBlocks = post2020Blocks || allBlocks;
+  const last30Blocks = filterBlocks(snapshotBlocks, { range: '1M' });
   const last30Agg = aggregateByPool(last30Blocks);
   const poolEntry = last30Agg.find(p => p.name === poolName);
   const sharePct = poolEntry ? poolEntry.pct : 0;
@@ -89,8 +114,9 @@ function showError(msg) {
 function updateKPICards() {
   if (!allBlocks || allBlocks.length === 0) return;
   
-  // Use last 30 days for live KPIs
-  const last30Blocks = filterBlocks(allBlocks, { range: '1M' });
+  // Use post2020Blocks if available for KPIs to ensure they reflect the modern network
+  const snapshotBlocks = post2020Blocks || allBlocks;
+  const last30Blocks = filterBlocks(snapshotBlocks, { range: '1M' });
   const startD = last30Blocks[0].date;
   const endD   = last30Blocks[last30Blocks.length - 1].date;
 
@@ -123,9 +149,16 @@ function updateKPICards() {
 
 // ── Static Macro Charts (Unfiltered) ──────────────────────────────────────────
 function initStaticMacroCharts() {
-  const monthly = aggregateMonthly(allBlocks, 12);
-  const { months, series, poolNames } = monthly;
+  // 1. Dominance Area chart reflects the active toggled period (all-time or post-2020)
+  const monthlyArea = aggregateMonthly(allBlocks, 12);
+  renderAreaChart({ ...monthlyArea, timelines });
+
+  // 2. HHI and Concentration macro trends should ALWAYs remain focused on the modern era (Post-2020)
+  // regardless of how far back the historical dominance area chart expands.
+  const modernBlocks = post2020Blocks || allBlocks;
+  const monthlyModern = aggregateMonthly(modernBlocks, 12);
   
+  const { months, series, poolNames, hhi } = monthlyModern;
   const top3 = [];
   const top5 = [];
   
@@ -144,8 +177,9 @@ function initStaticMacroCharts() {
     top3.push(total > 0 ? (t3Sum / total * 100) : 0);
     top5.push(total > 0 ? (t5Sum / total * 100) : 0);
   }
-  renderAreaChart({ ...monthly, timelines });
-  renderHhiChart({ months, hhi: monthly.hhi });
+
+  // Render the static macro trend charts using modern data
+  renderHhiChart({ months, hhi });
   renderConcentrationChart({ months, top3, top5 });
 }
 
@@ -155,7 +189,7 @@ let profileRegistry = { detailed: [], standard: [] };
 function initProfileSelector() {
   const poolNamesSet = new Set();
   allBlocks.forEach(b => {
-      if (b.pool_name && b.pool_name !== 'Unknown' && b.pool_name !== 'Other') poolNamesSet.add(b.pool_name);
+      if (b.pool_name && b.pool_name !== 'Other') poolNamesSet.add(b.pool_name);
   });
   
   const infoNames = new Set(poolsInfo.map(i => i.name));
@@ -237,20 +271,28 @@ function renderProfileSearchList(query = '') {
 // }
 
 function renderAll() {
-  // 1. Snapshot charts (Donut, Table) respect the active timeframe scope (1M, 3M, etc.)
-  const filtered = filterBlocks(allBlocks, { range: activeRange });
+  // Snapshot charts (Donut, Table, Country) respect the active timeframe scope (1M, 3M, etc.)
+  // We use post2020Blocks (the modern dataset) to ensure these stay relevant to current mining
+  // regardless of whether the historical macro chart is showing the full 2009+ history.
+  const snapshotBlocks = post2020Blocks || allBlocks;
+  const filtered = filterBlocks(snapshotBlocks, { range: activeRange });
   
   const poolAgg = aggregateByPool(filtered);
   renderDonut(poolAgg, poolMeta, poolsInfo);
   renderPoolTable(poolAgg, poolMeta);
 
   // Snapshot for Country Share independently respects its active timeframe
-  const filteredCountry = filterBlocks(allBlocks, { range: activeCountryRange });
+  const filteredCountry = filterBlocks(snapshotBlocks, { range: activeCountryRange });
   const countryPoolAgg = aggregateByPool(filteredCountry);
   const countryAgg = aggregateByCountry(countryPoolAgg, poolsInfo);
   renderCountryShareChart(countryAgg);
 
-  // 2. Ecosystem chart uses entirely global data (spanning from genesis to present)
+  // 3. Top Mining Pools Table (Independent range filter)
+  const topPoolsFiltered = filterBlocks(snapshotBlocks, { range: activeTopPoolsRange });
+  const topPoolsAgg = aggregateByPool(topPoolsFiltered);
+  renderTopMinersTable(topPoolsAgg, poolsInfo);
+
+  // 4. Ecosystem chart uses entirely global data (spanning from genesis to present)
   renderEcosystemGrowthChart(ecosystem, poolMeta);
 
   // Handle custom request-profile events from the new search UI
@@ -269,10 +311,10 @@ function renderAll() {
   }
 
   // Update donut subtitle
-  const label = activeRange === 'ALL' ? 'All-time · Market share (blocks)' : `Last ${activeRange} · Market share (blocks)`;
+  const label = `Last ${activeRange} · Market share (blocks)`;
   document.getElementById('donut-subtitle').textContent = label;
 
-  const countryLabel = activeCountryRange === 'ALL' ? 'All-time · Geographic footprint' : `Last ${activeCountryRange} · Geographic footprint`;
+  const countryLabel = `Last ${activeCountryRange} · Geographic footprint`;
   document.getElementById('country-subtitle').textContent = countryLabel;
 }
 
@@ -304,15 +346,10 @@ function wireFilters() {
       document.querySelectorAll('#period-buttons .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      // Sync snapshot ranges
-      activeRange = (period === 'pre') ? 'ALL' : '1Y';
-      activeCountryRange = (period === 'pre') ? 'ALL' : '1Y';
-      document.querySelectorAll('#range-buttons .filter-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector(`#range-buttons .filter-btn[data-range="${activeRange}"]`).classList.add('active');
-      document.querySelectorAll('#country-range-buttons .filter-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector(`#country-range-buttons .filter-btn[data-range="${activeCountryRange}"]`).classList.add('active');
+      // Note: We no longer sync activeRange to 'ALL' when period changes.
+      // This allows the historical trend to expand without hijacking the snapshot charts.
       
-      // Full re-render with new dataset and synchronized range
+      // Full re-render with new dataset; snapshot charts remain on their chosen ranges
       updateKPICards();
       initStaticMacroCharts();
       renderAll();
@@ -342,6 +379,19 @@ function wireFilters() {
     btn.classList.add('active');
     renderAll();
   });
+
+  // Time range buttons (Top Mining Pools Table - Independent)
+  const topPoolsContainer = document.getElementById('top-pools-range-buttons');
+  if (topPoolsContainer) {
+    topPoolsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.segmented-btn');
+      if (!btn || btn.classList.contains('active')) return;
+      activeTopPoolsRange = btn.dataset.range;
+      topPoolsContainer.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAll();
+    });
+  }
 }
 
 // ── Load and render ───────────────────────────────────────────────────────────
@@ -364,10 +414,13 @@ async function loadAndRender(period) {
     // Cache the lookup table and blocks for background loading
     if (period === 'post') {
       post2020Blocks = allBlocks;
-      // We'd need to expose the lookup through loadData or fetch it separately
-      // For now, let's just use the fact that initApp calls this first.
     } else {
       fullHistoryBlocks = allBlocks;
+      // Guarantee post2020Blocks is set even if we somehow skipped the 'post' load
+      if (!post2020Blocks) {
+        const pivotDate = new Date('2020-01-01T00:00:00Z');
+        post2020Blocks = allBlocks.filter(b => b.date >= pivotDate);
+      }
     }
 
     updateKPICards();
