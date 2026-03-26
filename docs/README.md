@@ -11,6 +11,7 @@ Read these documents **in order** before making any change.
 | [04-adding-features.md](./04-adding-features.md) | Step-by-step patterns for the most common extension tasks |
 
 ## Project in one sentence
-A static Bitcoin mining pool dashboard hosted on GitHub Pages that reads a
-Parquet file in the browser via **hyparquet**, aggregates 869k blocks client-side,
-and renders four **ECharts** visualisations — no backend, no build step.
+A static Bitcoin mining pool dashboard hosted on GitHub Pages that reads
+**dual-parquet** files in the browser via **hyparquet**, aggregates 869k+ blocks client-side,
+and renders eight **ECharts** visualisations including market share, decentralization indices,
+and geographic distributions — no backend, no build step.

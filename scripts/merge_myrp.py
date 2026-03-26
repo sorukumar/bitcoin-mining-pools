@@ -48,18 +48,7 @@ def main():
         write_statistics=True,
     )
 
-    print("Updating blocks.parquet ...")
-    df_pre = pd.read_parquet(DASHBOARD_DATA / "blocks_pre_2020.parquet")
-    df_full = pd.concat([df_pre, df_post_merged], ignore_index=True)
-    table_full = pa.Table.from_pandas(df_full, preserve_index=False)
-    pq.write_table(
-        table_full,
-        DASHBOARD_DATA / "blocks.parquet",
-        compression="snappy",
-        use_dictionary=["pool_slug"],
-        write_statistics=True,
-    )
-    print(f"  Full blocks: {len(df_full)}")
+    print(f"  Merged post-2020 blocks: {len(df_post_merged)}")
 
 
 

@@ -16,12 +16,14 @@ by GitHub Pages.
 │   ├── data/           ← pre-built data files            │
 │   │   ├── blocks_post_2020.parquet (3.3 MB, Snappy)     │
 │   │   ├── blocks_pre_2020.parquet  (7.6 MB, Snappy)     │
-│   │   ├── pool_meta.json   (6.8 KB)                     │
+│   │   ├── pool_metrics.json   (30 KB)                   │
+│   │   ├── pool_growth.json   (2.7 KB)                   │
 │   │   └── lookup/                                       │
+│   │       ├── lookup_slug_to_name.json                  │
 │   │       ├── pools_info.json                           │
 │   │       └── timelines.json                            │
 │   └── js/                                               │
-│       ├── main.js          ← app bootstrap + state      │
+│       ├── main.js          ← app bootstrap + lazy loading│
 │       ├── data-loader.js   ← parquet parsing + aggs     │
 │       └── charts.js        ← all ECharts renderers      │
 └─────────────────────────────────────────────────────────┘
@@ -31,13 +33,18 @@ by GitHub Pages.
 │                                                          │
 │   data/raw/                                              │
 │   ├── blocks.csv       ← source from jlopp (869k rows)  │
-│   └── pools.json       ← pool metadata from bitcoin-data│
+│   ├── pools.json       ← pool metadata from bitcoin-data│
+│   └── bitcoin_miners_myrp.parquet ← new MYRP data       │
 │                                                          │
-│   scripts/prepare_data.py  ← CSV → Parquet pipeline     │
+│   scripts/                                               │
+│   ├── prepare_data.py  ← CSV → Parquet pipeline         │
+│   ├── merge_myrp.py    ← Merges MYRP data into parquets │
+│   └── update_metrics.py ← Calculates final metrics JSONs │
 │                                                          │
 │   data/processed/                                        │
 │   ├── blocks.parquet   ← master copy (source of truth)  │
-│   └── pool_meta.json   ← master copy                    │
+│   ├── pool_metrics.json ← master copy                    │
+│   └── pool_growth.json  ← master copy                    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -60,12 +67,15 @@ bitcoin-mining-pools/
 │   │   └── pools.json          ← pool name/link lookup from bitcoin-data/mining-pools
 │   ├── processed/
 │   │   ├── blocks.parquet      ← master processed parquet (source of truth)
-│   │   └── pool_meta.json      ← master pool metadata JSON
+│   │   ├── pool_metrics.json   ← master pool metadata/metrics JSON
+│   │   └── pool_growth.json    ← master ecosystem growth JSON
 │   └── geo/                    ← RESERVED: future geolocation data (empty now)
 │       └── .gitkeep
 │
 ├── scripts/
-│   └── prepare_data.py         ← only Python script; run to regenerate data files
+│   ├── prepare_data.py         ← processes legacy CSV and pools.json
+│   ├── merge_myrp.py           ← merges additional MYRP blocks
+│   └── update_metrics.py       ← calculates final metrics and ecosystem growth
 │
 ├── dashboard/                  ← GitHub Pages root (everything here is public)
 │   ├── index.html
@@ -73,8 +83,10 @@ bitcoin-mining-pools/
 │   ├── data/
 │   │   ├── blocks_post_2020.parquet
 │   │   ├── blocks_pre_2020.parquet
-│   │   ├── pool_meta.json      ← COPY of data/processed/pool_meta.json
+│   │   ├── pool_metrics.json   ← COPY of data/processed/pool_metrics.json
+│   │   ├── pool_growth.json    ← COPY of data/processed/pool_growth.json
 │   │   └── lookup/
+│   │       ├── lookup_slug_to_name.json
 │   │       ├── pools_info.json
 │   │       └── timelines.json
 │   ├── js/
@@ -91,10 +103,16 @@ bitcoin-mining-pools/
 ```
 
 > **Important:** `dashboard/data/` is a **copy** of `data/processed/`.
-> After running `prepare_data.py`, always copy both files:
+> 1. `python scripts/prepare_data.py`
+> 2. `python scripts/merge_myrp.py`
+> 3. `python scripts/update_metrics.py`
+> 4. Copy the resulting files:
 > ```bash
-> cp data/processed/blocks.parquet dashboard/data/blocks.parquet
-> cp data/processed/pool_meta.json  dashboard/data/pool_meta.json
+> cp data/processed/blocks_post_2020.parquet dashboard/data/blocks_post_2020.parquet
+> cp data/processed/blocks_pre_2020.parquet  dashboard/data/blocks_pre_2020.parquet
+> cp data/processed/pool_metrics.json      dashboard/data/pool_metrics.json
+> cp data/processed/pool_growth.json       dashboard/data/pool_growth.json
+> cp data/processed/lookup/lookup_slug_to_name.json dashboard/data/lookup/lookup_slug_to_name.json
 > ```
 
 ---
@@ -107,7 +125,7 @@ bitcoin-mining-pools/
 | Data processing | `pandas` | Fast CSV read, clean column ops |
 | Parquet write | `pyarrow` | Best-in-class parquet support |
 | Compression | **Snappy** | Only codec hyparquet supports natively in-browser |
-| Dictionary encoding | `use_dictionary=["pool_slug","pool_name"]` | Pool names repeat ~143 unique values across 869k rows → massive size saving |
+| Dictionary encoding | `use_dictionary=["pool_slug"]` | Slugs repeat ~143 unique values across 869k rows → massive size saving |
 
 ### Browser / Dashboard
 | Component | Choice | Version | Why |
@@ -135,10 +153,9 @@ circular import issues.
 
 | Source | URL | Used for |
 |---|---|---|
-| jlopp/bitcoin-blocks-by-mining-pool | https://github.com/jlopp/bitcoin-blocks-by-mining-pool | `blocks.csv` — 869k blocks, heights 0–869305 |
-| bitcoin-data/mining-pools (generated branch) | https://raw.githubusercontent.com/bitcoin-data/mining-pools/generated/pools.json | `pools.json` — pool name + link keyed by payout address and coinbase tag |
-| mempool.space API | https://mempool.space/api/v1/blocks/{height} | Future: fill gap from 869306 to tip, add timestamps/fees/difficulty |
-| Bitcoin node (self-hosted) | local RPC | Future Phase 2: richer data, no rate limits |
+| jlopp/bitcoin-blocks-by-mining-pool | [GitHub Repo](https://github.com/jlopp/bitcoin-blocks-by-mining-pool) | `blocks.csv` — Historical (heights 0–869305) |
+| bitcoin-data/mining-pools | [GitHub Repo (generated branch)](https://github.com/bitcoin-data/mining-pools/tree/generated) | `pools.json` — Mapping addresses/tags to pool names |
+| Bitcoin Node (self-hosted) | Local RPC | **Post-2024 Data** — real-time blocks, fees, and network tip |
 
 ---
 
@@ -171,6 +188,7 @@ circular import issues.
 | Phase | Status | Description |
 |---|---|---|
 | **V0** | ✅ Done | Static dashboard from jlopp CSV; 5 ECharts; HHI trend, pool concentration, pool share (donut), pool dominance (area), ecosystem growth (line), plus interactive miner profile |
-| **V1** | 🔜 Next | Fetch gap (869k → tip) from mempool API; add real timestamps, fees, difficulty |
-| **V2** | 🔮 Planned | Bitcoin node as data source; full block metadata; GitHub Actions scheduled refresh |
-| **V3** | 🔮 Planned | Geolocation layer; hash rate concentration by country; `data/geo/` populated |
+| **V1** | ✅ Done | **Dual-Parquet & Lazy Loading**: Split data at 2020 for fast TTI; background load full history; Live 30-day KPI cards; Geographic distribution (Country Share); Searchable Miner Lookup |
+| **V2** | 🔜 Next | Fetch gap (869k → tip) from mempool API; add real timestamps, fees, difficulty |
+| **V3** | 🔮 Planned | Bitcoin node as data source; full block metadata; GitHub Actions scheduled refresh |
+| **V4** | 🔮 Planned | Richer Geolocation layer; hash rate concentration by country; `data/geo/` populated |

@@ -3,15 +3,19 @@
  * App bootstrap — wires data loading, filters, and chart rendering.
  */
 
-import { loadData, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
+import { loadData, loadParquetOnly, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
 import { renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, donutChart, growthChart } from './charts.js?v=13';
 
-// ── State ─────────────────────────────────────────────────────────────────────
 let allBlocks   = [];
 let poolMeta    = {};
 let poolsInfo   = [];
 let timelines   = [];
+let lookupTable = {}; // Cached for background load
 let ecosystem   = null;
+
+let post2020Blocks = null;
+let fullHistoryBlocks = null;
+
 let activeRange = '1Y';
 let activeCountryRange = '1Y';
 let activePeriod = 'post'; // 'pre' or 'post'
@@ -39,15 +43,21 @@ function showProfileCard(poolName) {
   
   document.getElementById('profile-scoop').textContent = info.the_scoop || 'No description available for this pool.';
   
+  // Calculate dynamic share for the last 30 days based on the primary dataset
+  const last30Blocks = filterBlocks(allBlocks, { range: '1M' });
+  const last30Agg = aggregateByPool(last30Blocks);
+  const poolEntry = last30Agg.find(p => p.name === poolName);
+  const sharePct = poolEntry ? poolEntry.pct : 0;
+  
   // Use the static metadata generated from all blocks
   if (meta.first_block_mined) {
     document.getElementById('profile-first-block').innerHTML = `${meta.first_block_mined.toLocaleString()}<br><span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal;">${meta.first_seen_date}</span>`;
     document.getElementById('profile-blocks').textContent = meta.lifetime_blocks.toLocaleString();
-    document.getElementById('profile-share').textContent = meta.last_month_share_pct.toFixed(2) + '%';
+    document.getElementById('profile-share').textContent = sharePct.toFixed(2) + '%';
   } else {
     document.getElementById('profile-first-block').textContent = 'Unknown';
     document.getElementById('profile-blocks').textContent = '-';
-    document.getElementById('profile-share').textContent = '-';
+    document.getElementById('profile-share').textContent = sharePct.toFixed(2) + '%';
   }
   
   document.getElementById('pool-profile-card').style.display = 'block';
@@ -57,7 +67,10 @@ function showProfileCard(poolName) {
 function fmt(n)    { return n.toLocaleString(); }
 function fmtPct(n) { return n.toFixed(1) + '%'; }
 function fmtDate(d) {
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+function fmtDay(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
 
 function hideOverlay() {
@@ -71,36 +84,36 @@ function showError(msg) {
   el.innerHTML = `<p style="color:#f85149;font-size:.95rem;">⚠ ${msg}</p>`;
 }
 
-// ── Summary cards (Locked to Latest Month) ───────────────────────────────────
-function updateCardsLatestMonth() {
+
+// ── Summary cards (Last 30 Days) ─────────────────────────────────────────────
+function updateKPICards() {
   if (!allBlocks || allBlocks.length === 0) return;
-  const lastDate = new Date(allBlocks[allBlocks.length - 1].approx_date);
-  const targetYear = lastDate.getUTCFullYear();
-  const targetMonth = lastDate.getUTCMonth();
   
-  const lastMonthBlocks = allBlocks.filter(b => {
-    const d = new Date(b.approx_date);
-    return d.getUTCFullYear() === targetYear && d.getUTCMonth() === targetMonth;
-  });
+  // Use last 30 days for live KPIs
+  const last30Blocks = filterBlocks(allBlocks, { range: '1M' });
+  const startD = last30Blocks[0].date;
+  const endD   = last30Blocks[last30Blocks.length - 1].date;
 
   const poolNames = new Set();
-  let unknown = 0;
-  for (const b of lastMonthBlocks) {
-    if (b.pool_slug === 'unknown') unknown++;
-    poolNames.add(b.pool_name);
+  for (const b of last30Blocks) {
+    if (b.pool_name !== 'Unknown') poolNames.add(b.pool_name);
   }
-  const poolAgg = aggregateByPool(lastMonthBlocks.filter(b => b.pool_slug !== 'unknown'));
-  const top     = poolAgg[0];
+  
+  const poolAgg = aggregateByPool(last30Blocks);
+  const top     = poolAgg.find(p => p.name !== 'Unknown');
 
-  const top3Pct = poolAgg.slice(0, 3).reduce((s, p) => s + p.pct, 0);
+  // Share of top 3 known pools relative to ALL blocks in the slice
+  const top3Pct = poolAgg.filter(p => p.name !== 'Unknown').slice(0, 3).reduce((s, p) => s + p.pct, 0);
   const hhi = poolAgg.reduce((sum, p) => sum + (p.pct / 100) ** 2, 0) * 10000;
 
   let hhiLevel = 'Healthy';
   if (hhi > 2500) hhiLevel = 'At Risk';
   else if (hhi > 1500) hhiLevel = 'Moderate';
 
-  document.getElementById('val-latest-month').textContent = fmtDate(lastDate);
-  document.getElementById('val-unique-pools').textContent  = poolNames.size - (poolNames.has('Unknown') ? 1 : 0);
+  const rangeStr = `${fmtDay(startD)} — ${fmtDay(endD)}, ${endD.getUTCFullYear()}`;
+  document.getElementById('val-latest-month').textContent = rangeStr;
+  
+  document.getElementById('val-unique-pools').textContent  = poolNames.size;
   document.getElementById('val-top-pool').textContent      = top?.name ?? '—';
   document.getElementById('val-top-pool-pct').textContent  = top ? fmtPct(top.pct) + ' of blocks' : '';
   document.getElementById('val-concentration').textContent = fmtPct(top3Pct);
@@ -217,8 +230,8 @@ function renderProfileSearchList(query = '') {
 // ── Header date range ────────────────────────────────────────────────────────
 // function updateHeader(filtered) {
 //   // blocks are sorted ascending by height, so first/last = min/max date
-//   const minD = filtered[0].approx_date;
-//   const maxD = filtered[filtered.length - 1].approx_date;
+//   const minD = filtered[0].date;
+//   const maxD = filtered[filtered.length - 1].date;
 //   document.getElementById('data-range-label').textContent =
 //     `${fmtDate(minD)} – ${fmtDate(maxD)} · ${fmt(filtered.length)} blocks`;
 // }
@@ -268,25 +281,46 @@ function wireFilters() {
   // Period buttons
   document.getElementById('period-buttons').addEventListener('click', async (e) => {
     const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
+    if (!btn || btn.classList.contains('active')) return; 
+    
     const period = btn.dataset.period;
-    if (period === activePeriod) return; // No change
-    activePeriod = period;
-    document.querySelectorAll('#period-buttons .filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    // Update range filters based on period selection
-    activeRange = (period === 'pre') ? 'ALL' : '1Y';
-    activeCountryRange = (period === 'pre') ? 'ALL' : '1Y';
-    
-    document.querySelectorAll('#range-buttons .filter-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`#range-buttons .filter-btn[data-range="${activeRange}"]`).classList.add('active');
-    
-    document.querySelectorAll('#country-range-buttons .filter-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`#country-range-buttons .filter-btn[data-range="${activeCountryRange}"]`).classList.add('active');
-    
-    // Reload data
-    await loadAndRender(period);
+    const container = document.getElementById('period-buttons');
+    container.style.pointerEvents = 'none';
+    container.style.opacity = '0.7';
+
+    try {
+      // Instant switch if data is already cached
+      if (period === 'pre' && fullHistoryBlocks) {
+        allBlocks = fullHistoryBlocks;
+      } else if (period === 'post' && post2020Blocks) {
+        allBlocks = post2020Blocks;
+      } else {
+        // Fallback to loading
+        await loadAndRender(period);
+      }
+      
+      // Update state and active classes
+      activePeriod = period;
+      document.querySelectorAll('#period-buttons .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Sync snapshot ranges
+      activeRange = (period === 'pre') ? 'ALL' : '1Y';
+      activeCountryRange = (period === 'pre') ? 'ALL' : '1Y';
+      document.querySelectorAll('#range-buttons .filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`#range-buttons .filter-btn[data-range="${activeRange}"]`).classList.add('active');
+      document.querySelectorAll('#country-range-buttons .filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`#country-range-buttons .filter-btn[data-range="${activeCountryRange}"]`).classList.add('active');
+      
+      // Full re-render with new dataset and synchronized range
+      updateKPICards();
+      initStaticMacroCharts();
+      renderAll();
+      
+    } finally {
+      container.style.pointerEvents = 'auto';
+      container.style.opacity = '1';
+    }
   });
 
   // Time range buttons (Pool Share)
@@ -326,8 +360,17 @@ async function loadAndRender(period) {
     poolsInfo = dataset.poolsInfo;
     timelines = dataset.timelines;
     ecosystem = dataset.ecosystem;
+    
+    // Cache the lookup table and blocks for background loading
+    if (period === 'post') {
+      post2020Blocks = allBlocks;
+      // We'd need to expose the lookup through loadData or fetch it separately
+      // For now, let's just use the fact that initApp calls this first.
+    } else {
+      fullHistoryBlocks = allBlocks;
+    }
 
-    updateCardsLatestMonth();
+    updateKPICards();
     initStaticMacroCharts();
     initProfileSelector();
 
@@ -344,8 +387,26 @@ async function loadAndRender(period) {
   }
 }
 
+// ── Background Loading ───────────────────────────────────────────────────────
+async function lazyLoadHistory() {
+  try {
+    // Only need pre-2020 blocks to combine with already loaded post-2020
+    const res = await fetch('./data/lookup/lookup_slug_to_name.json');
+    const lookup = await res.json();
+    
+    const preBlocks = await loadParquetOnly('./data/blocks_pre_2020.parquet', lookup);
+    fullHistoryBlocks = [...preBlocks, ...post2020Blocks];
+    console.log("Historical data loaded in background.");
+  } catch (err) {
+    console.warn("Background load failed:", err);
+  }
+}
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 export async function initApp() {
   await loadAndRender('post');
   wireFilters();
+  
+  // Start lazy loading once the dashboard is interactive
+  setTimeout(lazyLoadHistory, 1000);
 }

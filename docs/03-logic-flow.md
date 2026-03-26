@@ -16,13 +16,16 @@ index.html parsed by browser
         ▼
 initApp()  [main.js]
   │
-  ├── loadData()  [data-loader.js]
-  │     ├── fetch('./data/blocks.parquet')  ─┐ parallel
-  │     ├── fetch('./data/pool_meta.json')  ─┘
+  ├── loadData('post') [data-loader.js]
+  │     ├── fetch('./data/blocks_post_2020.parquet') ─┐ parallel
+  │     ├── fetch('./data/pool_metrics.json')        ─┘
   │     ├── parquetRead({ file, rowFormat:'object', onComplete })
-  │     ├── normalise approx_date → JS Date
+  │     ├── normalise date → JS Date
   │     ├── sort blocks ascending by height
-  │     └── return { blocks, poolMeta, minDate, maxDate }
+  │     └── return { blocks, poolMeta, ..., maxDate }
+  │
+  ├── lazyLoadHistory() [main.js] (Begins in background)
+  │     └── fetch('./data/blocks_pre_2020.parquet')
   │
   ├── allBlocks  = dataset.blocks    ← stored in module-level state
   ├── poolMeta   = dataset.poolMeta  ← stored in module-level state
@@ -44,10 +47,10 @@ There is no state management library, no store, no reactive framework.
 ```js
 let allBlocks    = [];       // full dataset, never mutated after load
 let poolMeta     = {};       // { [poolName]: { link } }, never mutated
-let poolsInfo    = [];       // array of extended pool profiles
-let timelines    = [];       // timeline events
-let activeRange  = 'ALL';    // time range button: '1M'|'3M'|'6M'|'1Y'|'2Y'|'ALL'
-let activePeriod = 'post';   // active dataset period: 'pre' or 'post'
+let post2020Blocks   = null;   // cached after first load
+let fullHistoryBlocks = null;   // cached after background load finishes
+let activeRange       = '1Y';     // time range button: '1M'|'3M'|'6M'|'1Y'|'2Y'|'ALL'
+let activePeriod      = 'post';   // active dataset period: 'pre' or 'post'
 ```
 
 **Invariants:**
@@ -95,8 +98,8 @@ initApp() / loadAndRender(period)
     │
     ├── loadData(period)  → { blocks, poolMeta, poolsInfo, timelines }
     │
-    ├── updateCardsLatestMonth()
-    │       └── filters blocks to most recent month, calculates KPI stats & HHI
+    ├── updateKPICards()
+    │       └── filters blocks to last 30 days, calculates KPI stats & HHI
     │
     ├── initStaticMacroCharts()
     │       ├── aggregateMonthly(allBlocks, 12)  → returns { months, series, hhi }
@@ -111,6 +114,9 @@ initApp() / loadAndRender(period)
             ├── aggregateByPool(filtered)           → poolAgg[]
             │       ├── renderDonut(poolAgg, poolMeta, poolsInfo)
             │       └── renderPoolTable(poolAgg, poolMeta)
+            │
+            ├── aggregateByCountry(poolAgg, poolsInfo) → countryAgg[]
+            │       └── renderCountryShareChart(countryAgg)
             │
             ├── wire profile card click events
             │       └── attaches showProfileCard() to donut clicks and table rows
@@ -174,7 +180,7 @@ create (~50ms each). Creating them once and reusing avoids jank on filter change
 | `renderAll` | `() → void` | Full re-render triggered by any filter change. |
 | `wireFilters` | `() → void` | Attaches click listeners to all filter buttons. Called once. |
 | `initStaticMacroCharts` | `() → void` | Renders HHI and Concentration macro charts. |
-| `updateCardsLatestMonth` | `() → void` | Updates KPI cards based on the latest available month. |
+| `updateKPICards` | `() → void` | Updates KPI cards based on a rolling 30-day "Live" window. |
 | `showProfileCard` | `(poolName) → void` | Dynamically updates the profile UI and synchronizes dropdown. |
 | `hideOverlay` | `() → void` | Fades and removes the loading spinner. |
 | `showError` | `(msg: string) → void` | Replaces loading spinner with an error message. |
@@ -185,8 +191,9 @@ create (~50ms each). Creating them once and reusing avoids jank on filter change
 |---|---|---|
 | `loadData` | `async (period) → Dataset` | Fetches parquet and JSON files based on period. |
 | `filterBlocks` | `(blocks[], {range}) → blocks[]` | Returns a time-filtered subset. Pure function. |
-| `aggregateByPool` | `(blocks[]) → [{name, count, pct}]` | Pool block counts, sorted desc. Pure. |
-| `aggregateMonthly` | `(blocks[], topN) → {months, series, poolNames, hhi}` | Handles monthly distribution and HHI index. Pure. |
+| `aggregateByPool` | `(blocks[]) → [{name, pct, ...}]` | Pool block counts, sorted desc. |
+| `aggregateByCountry` | `(poolAgg, poolsInfo) → [{country, count}]` | Blocks by country. |
+| `aggregateMonthly` | `(blocks[], topN) → {months, series, hhi}` | Monthly distribution and HHI index. |
 | `aggregatePoolEntry` | `(blocks[]) → {months, cumulativePools}` | Ecosystem growth array. Pure. |
 
 ### `charts.js`

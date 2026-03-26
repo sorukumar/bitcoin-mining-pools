@@ -31,7 +31,7 @@ Use existing CSS classes — no new CSS needed for standard sizing:
 export function aggregateDifficulty(blocks) {
   const monthMap = new Map();
   for (const b of blocks) {
-    const d = b.approx_date;
+    const d = b.date;
     const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     if (!monthMap.has(key)) monthMap.set(key, { sum: 0, count: 0 });
     const m = monthMap.get(key);
@@ -128,25 +128,25 @@ pq.write_table(table, out_path,
 ### Step 2: Update `data-loader.js`
 
 Once `timestamp` is in the parquet, rows will have `b.timestamp` automatically.
-Replace the `approx_date` usage in time-sensitive functions:
+Replace the `date` usage in time-sensitive functions:
 
 ```js
 // In loadData(), after parquetRead:
 for (const b of blocks) {
-  // Use real timestamp if present, fall back to approx_date
+  // Use real timestamp if present, fall back to date
   b.date = b.timestamp
     ? new Date(b.timestamp * 1000)   // unix seconds → ms
-    : b.approx_date;
+    : b.date;
 }
 ```
 
-Update `filterBlocks` to use `b.date` instead of `b.approx_date`.
+Update `filterBlocks` to use `b.date` instead of `b.date`.
 
 ### Step 3: Update `aggregateMonthly` and `updateHeader`
 
-Replace all `b.approx_date` references with `b.date`.
+Replace all `b.date` references with `b.date`.
 
-> **Rule:** Never remove `approx_date` from the parquet for old blocks — it is
+> **Rule:** Never remove `date` from the parquet for old blocks — it is
 > the fallback for heights that predate the mempool API fetch. New blocks from
 > V1 onwards will have real timestamps.
 

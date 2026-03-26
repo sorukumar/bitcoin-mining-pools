@@ -7,6 +7,7 @@
 const POOL_META_URL = './data/pool_metrics.json?v=3';
 const POOLS_INFO_URL = './data/lookup/pools_info.json';
 const TIMELINES_URL = './data/lookup/timelines.json';
+const LOOKUP_SLUG_URL = './data/lookup/lookup_slug_to_name.json';
 
 /**
  * @typedef {Object} Block
@@ -64,6 +65,13 @@ async function loadTimelines() {
   return res.json();
 }
 
+/** Fetch slug-to-name lookup JSON */
+async function loadLookupSlugToName() {
+  const res = await fetch(LOOKUP_SLUG_URL);
+  if (!res.ok) throw new Error(`Failed to fetch lookup_slug_to_name: ${res.status}`);
+  return res.json();
+}
+
 /** Fetch Global Ecosystem Growth JSON */
 async function loadEcosystem() {
   const res = await fetch('./data/pool_growth.json?v=6');
@@ -73,19 +81,29 @@ async function loadEcosystem() {
 
 /** Main entry – returns a Dataset */
 export async function loadData(period = 'post') {
-  const parquetUrl = period === 'pre' ? './data/blocks.parquet' : './data/blocks_post_2020.parquet';
-  const [blocks, poolMeta, poolsInfo, timelines, ecosystem] = await Promise.all([
-    loadParquet(parquetUrl),
+  const isFullHistory = (period === 'pre');
+  const parquetUrls = isFullHistory 
+    ? ['./data/blocks_pre_2020.parquet', './data/blocks_post_2020.parquet']
+    : ['./data/blocks_post_2020.parquet'];
+
+  const [blocksData, poolMeta, poolsInfo, timelines, ecosystem, lookup] = await Promise.all([
+    Promise.all(parquetUrls.map(url => loadParquet(url))),
     loadPoolMeta(),
     loadPoolsInfo(),
     loadTimelines(),
-    loadEcosystem()
+    loadEcosystem(),
+    loadLookupSlugToName()
   ]);
 
-  // date from hyparquet may be a timestamp number (ms) or a Date object
-  // Normalise to JS Date
+  const blocks = blocksData.flat();
+
+  // data from hyparquet may be a timestamp number (ms) or a Date object
+  // Normalise to JS Date and map pool_name from slug
   for (const b of blocks) {
     b.height = Number(b.height);
+    // Lean parquet only has pool_slug, map it to pool_name
+    b.pool_name = lookup[b.pool_slug] || b.pool_slug || 'Unknown';
+    
     if (!(b.date instanceof Date)) {
       b.date = new Date(
         typeof b.date === 'bigint'
@@ -104,6 +122,20 @@ export async function loadData(period = 'post') {
   return { blocks, poolMeta, poolsInfo, timelines, ecosystem, minDate, maxDate };
 }
 
+/** Helper for background loading – just blocks, normalized and sorted */
+export async function loadParquetOnly(url, lookup) {
+  const blocks = await loadParquet(url);
+  for (const b of blocks) {
+    b.height = Number(b.height);
+    b.pool_name = lookup[b.pool_slug] || b.pool_slug || 'Unknown';
+    if (!(b.date instanceof Date)) {
+      b.date = new Date(typeof b.date === 'bigint' ? Number(b.date) / 1000 : b.date);
+    }
+  }
+  blocks.sort((a, b) => a.height - b.height);
+  return blocks;
+}
+
 /**
  * Filter blocks by a time range string: '1M','3M','6M','1Y','2Y','ALL'
  *
@@ -112,10 +144,12 @@ export function filterBlocks(blocks, { range = 'ALL' } = {}) {
   if (range === 'ALL') return blocks;
 
   const now   = blocks[blocks.length - 1].date;
-  const units = { '1M': 1, '3M': 3, '6M': 6, '1Y': 12, '2Y': 24 };
-  const months = units[range] ?? 0;
+  const daysMap = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, '2Y': 730 };
   const cutoff = new Date(now);
-  cutoff.setMonth(cutoff.getMonth() - months);
+  
+  if (daysMap[range]) {
+    cutoff.setUTCDate(cutoff.getUTCDate() - daysMap[range]);
+  }
   return blocks.filter(b => b.date >= cutoff);
 }
 
@@ -159,12 +193,15 @@ export function aggregateByCountry(poolAgg, poolsInfo) {
  * Only includes top N pools by total blocks; rest merged into "Other".
  */
 export function aggregateMonthly(blocks, topN = 12) {
-  // First find top N pool names
+  // First find top N pool names (excluding 'Other' bucket)
   const totals = new Map();
   for (const b of blocks) {
-    totals.set(b.pool_name || 'Unknown', (totals.get(b.pool_name) ?? 0) + 1);
+    const name = b.pool_name || 'Unknown';
+    totals.set(name, (totals.get(name) ?? 0) + 1);
   }
+  
   const topPools = Array.from(totals.entries())
+    .filter(([name]) => name !== 'Other') // Exclude generic 'Other' from top N selection
     .sort((a, b) => b[1] - a[1])
     .slice(0, topN)
     .map(([name]) => name);
@@ -174,14 +211,21 @@ export function aggregateMonthly(blocks, topN = 12) {
   const monthMap = new Map();
   for (const b of blocks) {
     const d = b.date;
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
     if (!monthMap.has(key)) monthMap.set(key, new Map());
     const poolName = topSet.has(b.pool_name || 'Unknown') ? (b.pool_name || 'Unknown') : 'Other';
     const m = monthMap.get(key);
     m.set(poolName, (m.get(poolName) ?? 0) + 1);
   }
 
-  const months = Array.from(monthMap.keys()).sort();
+  const allMonths = Array.from(monthMap.keys()).sort();
+  // Filter out partial months at the edges (threshold: ~1 week of blocks)
+  const months = allMonths.filter(m => {
+    const monthData = monthMap.get(m);
+    const total = Array.from(monthData.values()).reduce((s, v) => s + v, 0);
+    return total >= 500;
+  });
+
   const poolNames = [...topPools, 'Other'];
   const series = {};
   for (const p of poolNames) {

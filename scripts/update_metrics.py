@@ -13,6 +13,7 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 
 
 def main():
+    RAW = ROOT / "data" / "raw"
     print("Loading blocks_pre_2020.parquet and blocks_post_2020.parquet ...")
     df_pre = pd.read_parquet(DASHBOARD_DATA / "blocks_pre_2020.parquet")
     df_post = pd.read_parquet(DASHBOARD_DATA / "blocks_post_2020.parquet")
@@ -22,9 +23,20 @@ def main():
     # Convert date column to datetime
     df["date"] = pd.to_datetime(df["date"])
 
-    # Load existing pool_metrics.json
-    with open(DASHBOARD_DATA / "pool_metrics.json") as f:
-        pool_meta = json.load(f)
+    # Load links from pools.json
+    print("Loading links from pools.json ...")
+    with open(RAW / "pools.json") as f:
+        pools_raw = json.load(f)
+    
+    name_to_link = {}
+    for section in ("payout_addresses", "coinbase_tags"):
+        for entry in pools_raw.get(section, {}).values():
+            name = entry.get("name", "")
+            link = entry.get("link", "")
+            if name:
+                name_to_link[name] = link
+    
+    pool_meta = {name: {"link": link} for name, link in name_to_link.items()}
 
     print("Calculating pool metrics ...")
     # Calculate metrics
@@ -59,7 +71,7 @@ def main():
     for slug, row in grouped.iterrows():
         name = slug_to_name.get(slug, slug)
         if name not in pool_meta:
-            pool_meta[name] = {}
+            pool_meta[name] = {"link": ""}
             
         pool_meta[name]["first_block_mined"] = int(row["first_block_mined"])
         pool_meta[name]["first_seen_date"] = row["first_seen_date"]
@@ -72,7 +84,7 @@ def main():
 
     with open(DASHBOARD_DATA / "pool_metrics.json", "w") as f:
         json.dump(pool_meta, f, separators=(",", ":"))
-    print(f"  Updated pool_metrics.json with metrics for {len(grouped)} pools")
+    print(f"  Wrote pool_metrics.json with metrics for {len(grouped)} pools")
 
     # Ecosystem Growth
     print("Calculating global ecosystem growth ...")

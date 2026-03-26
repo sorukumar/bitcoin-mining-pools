@@ -1,2 +1,17 @@
-forref/
+# Local data files
 blocks.csv
+block.csv
+data/raw/blocks.csv
+data/raw/*.csv
+
+# Environment
+.venv/
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.DS_Store
+
+# Product reference
+forref/

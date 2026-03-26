@@ -59,21 +59,6 @@ def main():
         json.dump(slug_to_name, f, separators=(",", ":"))
     print(f"  lookup_slug_to_name.json written ({lookup_path.stat().st_size / 1024:.1f} KB)")
 
-    # Write pool_meta.json for links
-    name_to_link = {}
-    for section in ("payout_addresses", "coinbase_tags"):
-        for entry in pools_raw.get(section, {}).values():
-            name = entry.get("name", "")
-            link = entry.get("link", "")
-            if name:
-                name_to_link[name] = link
-
-    pool_meta = {name: {"link": link} for name, link in name_to_link.items()}
-    pool_meta_path = PROCESSED / "pool_meta.json"
-    with open(pool_meta_path, "w") as f:
-        json.dump(pool_meta, f, separators=(",", ":"))
-    print(f"  pool_meta.json written ({pool_meta_path.stat().st_size / 1024:.1f} KB)")
-
     # Split blocks into pre and post 2020 based on block height
     pre_2020 = blocks[blocks['height'] < 610683]
     post_2020 = blocks[blocks['height'] >= 610683]
@@ -105,20 +90,6 @@ def main():
     )
     size_mb_post = post_path.stat().st_size / 1_048_576
     print(f"  Done — {size_mb_post:.2f} MB")
-
-    # Write full parquet
-    full_path = PROCESSED / "blocks.parquet"
-    print(f"Writing {full_path} ...")
-    table_full = pa.Table.from_pandas(blocks, preserve_index=False)
-    pq.write_table(
-        table_full,
-        full_path,
-        compression="snappy",
-        use_dictionary=["pool_slug"],
-        write_statistics=True,
-    )
-    size_mb_full = full_path.stat().st_size / 1_048_576
-    print(f"  Done — {size_mb_full:.2f} MB")
 
     print(f"\nTotal blocks processed: {len(blocks)}")
 

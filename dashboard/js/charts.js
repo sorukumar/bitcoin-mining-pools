@@ -202,11 +202,13 @@ export function renderAreaChart({ months, series, poolNames, timelines = [] }) {
     window.addEventListener('resize', () => areaChart.resize());
   }
 
-  // Calculate totals to find Top 7
-  const poolTotals = poolNames.map(name => ({
-    name,
-    total: series[name].reduce((sum, v) => sum + (v || 0), 0)
-  })).sort((a, b) => b.total - a.total);
+  // Calculate totals to find Top 7 (excluding 'Other' bucket if present)
+  const poolTotals = poolNames
+    .filter(name => name !== 'Other')
+    .map(name => ({
+      name,
+      total: series[name].reduce((sum, v) => sum + (v || 0), 0)
+    })).sort((a, b) => b.total - a.total);
 
   const topNames = poolTotals.slice(0, 7).map(p => p.name);
   const topSet = new Set(topNames);
@@ -217,11 +219,8 @@ export function renderAreaChart({ months, series, poolNames, timelines = [] }) {
 
   for (let i = 0; i < poolNames.length; i++) {
     const name = poolNames[i];
-    if (!topSet.has(name) && name !== 'Other') { // If 'Other' was already in poolNames, handle carefully
-      for (let j = 0; j < months.length; j++) {
-        groupedSeries['Other'][j] += (series[name][j] || 0);
-      }
-    } else if (name === 'Other') {
+    if (!topSet.has(name)) { 
+      // This catch-all includes both the 'Other' bucket and any pools not in top 7
       for (let j = 0; j < months.length; j++) {
         groupedSeries['Other'][j] += (series[name][j] || 0);
       }
@@ -250,7 +249,7 @@ export function renderAreaChart({ months, series, poolNames, timelines = [] }) {
   const monthIndexByKey = new Map(months.map((m, idx) => [m, idx]));
   const parsedEvents = (timelines || []).map(t => {
     const d = new Date(t.date);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
     const idx = monthIndexByKey.get(key);
     return idx != null ? { index: idx, key, ...t } : null;
   }).filter(Boolean);
@@ -347,19 +346,6 @@ export function renderAreaChart({ months, series, poolNames, timelines = [] }) {
       splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
       axisLabel: { color: THEME.muted, fontSize: 11 },
     },
-    dataZoom: [
-      { type: 'inside', start: 0, end: 100 },
-      {
-        type: 'slider',
-        height: 22,
-        bottom: 8,
-        borderColor: THEME.border,
-        backgroundColor: THEME.bg2,
-        fillerColor: 'rgba(226,163,74,0.15)',
-        handleStyle: { color: THEME.accent },
-        textStyle: { color: THEME.muted, fontSize: 10 },
-      },
-    ],
     series: seriesList,
   }, true);
 }
