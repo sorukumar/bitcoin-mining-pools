@@ -209,7 +209,7 @@ document.getElementById('pool-select').addEventListener('change', (e) => {
 The cleanest approach is to apply it as a second filter in `renderAll()`:
 ```js
 function renderAll() {
-  let filtered = filterBlocks(allBlocks, { range: activeRange, epoch: activeEpoch });
+  let filtered = filterBlocks(allBlocks, { range: activeRange });
   if (activePool) {
     filtered = filtered.filter(b => b.pool_name === activePool);
   }

@@ -14,8 +14,12 @@ by GitHub Pages.
 │   ├── index.html      ← single page, loads all JS/CSS   │
 │   ├── css/style.css   ← all styles, no preprocessor     │
 │   ├── data/           ← pre-built data files            │
-│   │   ├── blocks.parquet   (9.6 MB, Snappy)             │
-│   │   └── pool_meta.json   (6.6 KB)                     │
+│   │   ├── blocks_post_2020.parquet (3.3 MB, Snappy)     │
+│   │   ├── blocks_pre_2020.parquet  (7.6 MB, Snappy)     │
+│   │   ├── pool_meta.json   (6.8 KB)                     │
+│   │   └── lookup/                                       │
+│   │       ├── pools_info.json                           │
+│   │       └── timelines.json                            │
 │   └── js/                                               │
 │       ├── main.js          ← app bootstrap + state      │
 │       ├── data-loader.js   ← parquet parsing + aggs     │
@@ -67,8 +71,12 @@ bitcoin-mining-pools/
 │   ├── index.html
 │   ├── css/style.css
 │   ├── data/
-│   │   ├── blocks.parquet      ← COPY of data/processed/blocks.parquet
-│   │   └── pool_meta.json      ← COPY of data/processed/pool_meta.json
+│   │   ├── blocks_post_2020.parquet
+│   │   ├── blocks_pre_2020.parquet
+│   │   ├── pool_meta.json      ← COPY of data/processed/pool_meta.json
+│   │   └── lookup/
+│   │       ├── pools_info.json
+│   │       └── timelines.json
 │   ├── js/
 │   │   ├── main.js             ← entry point, app state, filter wiring
 │   │   ├── data-loader.js      ← data fetching, parsing, all aggregation functions
@@ -162,7 +170,7 @@ circular import issues.
 
 | Phase | Status | Description |
 |---|---|---|
-| **V0** | ✅ Done | Static dashboard from jlopp CSV; 4 ECharts; pool share, dominance, bar, epoch |
+| **V0** | ✅ Done | Static dashboard from jlopp CSV; 5 ECharts; HHI trend, pool concentration, pool share (donut), pool dominance (area), ecosystem growth (line), plus interactive miner profile |
 | **V1** | 🔜 Next | Fetch gap (869k → tip) from mempool API; add real timestamps, fees, difficulty |
 | **V2** | 🔮 Planned | Bitcoin node as data source; full block metadata; GitHub Actions scheduled refresh |
 | **V3** | 🔮 Planned | Geolocation layer; hash rate concentration by country; `data/geo/` populated |

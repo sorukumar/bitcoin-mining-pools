@@ -42,16 +42,16 @@ All state lives as module-level `let` variables in `main.js`.
 There is no state management library, no store, no reactive framework.
 
 ```js
-let allBlocks   = [];       // full dataset, never mutated after load
-let poolMeta    = {};       // { [poolName]: { link } }, never mutated
-let activeRange = 'ALL';    // current time range button: '1M'|'3M'|'6M'|'1Y'|'2Y'|'ALL'
-let activeEpoch = null;     // current epoch filter: 0|1|2|3|4|null
-let barMetric   = 'blocks'; // bar chart mode: 'blocks' | 'pct'
+let allBlocks    = [];       // full dataset, never mutated after load
+let poolMeta     = {};       // { [poolName]: { link } }, never mutated
+let poolsInfo    = [];       // array of extended pool profiles
+let timelines    = [];       // timeline events
+let activeRange  = 'ALL';    // time range button: '1M'|'3M'|'6M'|'1Y'|'2Y'|'ALL'
+let activePeriod = 'post';   // active dataset period: 'pre' or 'post'
 ```
 
 **Invariants:**
-- `activeRange` and `activeEpoch` are **mutually exclusive**. When epoch is set,
-  range is ignored by `filterBlocks()`. When range is set, epoch is `null`.
+- `activeRange` time filters are hidden when `activePeriod` is `'pre'`, as that dataset is historical and fixed.
 - `allBlocks` is **never mutated**. Every filter creates a new array via `.filter()`.
 - `poolMeta` is **never mutated**. It is read-only after load.
 
@@ -60,32 +60,28 @@ let barMetric   = 'blocks'; // bar chart mode: 'blocks' | 'pct'
 ## State Transitions
 
 ```
-Initial state: activeRange='ALL', activeEpoch=null, barMetric='blocks'
+Initial state: activePeriod='post', activeRange='ALL'
+
+User clicks period button (e.g. "Pre-2020")
+  → activePeriod = 'pre'
+  → activeRange = 'ALL'          ← reset time range
+  → hide range buttons section
+  → update .active classes on period buttons
+  → loadAndRender('pre')         ← fetches new parquet and re-renders entire app
 
 User clicks time-range button (e.g. "1Y")
   → activeRange = '1Y'
-  → activeEpoch = null          ← always clear epoch
-  → remove .active from all .filter-btn and .epoch-btn
-  → add .active to clicked button
+  → update .active classes on range buttons
   → renderAll()
 
-User clicks epoch button (e.g. "E2")
-  → if same epoch already active:
-      activeEpoch = null
-      activeRange = 'ALL'        ← toggle off → back to ALL
-      remove .active from epoch button
-      add .active to ALL button
-  → else:
-      activeEpoch = 2
-      remove .active from all buttons
-      add .active to E2 button
-  → renderAll()
+User clicks donut slice OR table row
+  → lookup pool details in `poolsInfo` & `poolMeta`
+  → update `#pool-profile-card` DOM elements
+  → sync `#profile-selector` dropdown
+  → `#pool-profile-card` display block (fade in)
 
-User clicks bar metric toggle ("Share %")
-  → barMetric = 'pct'
-  → remove .active from sibling toggle buttons
-  → add .active to clicked button
-  → renderBarChart only (does NOT call renderAll — optimisation)
+User changes `#profile-selector` dropdown
+  → re-triggers profile card lookup & update
 ```
 
 ---
@@ -95,33 +91,37 @@ User clicks bar metric toggle ("Share %")
 Called on every filter change and once on initial load.
 
 ```
-renderAll()
+initApp() / loadAndRender(period)
     │
-    ├── filterBlocks(allBlocks, { range: activeRange, epoch: activeEpoch })
-    │       └── returns filtered[]   (subset of allBlocks)
+    ├── loadData(period)  → { blocks, poolMeta, poolsInfo, timelines }
     │
-    ├── updateHeader(filtered)
-    │       ├── minD = filtered[0].approx_date          ← safe: blocks are sorted
-    │       └── maxD = filtered[filtered.length-1].approx_date
+    ├── updateCardsLatestMonth()
+    │       └── filters blocks to most recent month, calculates KPI stats & HHI
     │
-    ├── updateCards(filtered)
-    │       ├── loop once: count unknown, build Set of pool names
-    │       └── aggregateByPool(filtered excluding unknown) → top pool name/pct
+    ├── initStaticMacroCharts()
+    │       ├── aggregateMonthly(allBlocks, 12)  → returns { months, series, hhi }
+    │       ├── renderHhiChart({ months, hhi })
+    │       └── renderConcentrationChart({ months, top3, top5 })
     │
-    ├── aggregateByPool(filtered)           → poolAgg[]
-    │       └── shared result passed to 3 renderers below:
-    │
-    ├── renderDonut(poolAgg, poolMeta)      [charts.js]
-    ├── renderPoolTable(poolAgg, poolMeta)  [charts.js]
-    ├── renderBarChart(poolAgg, barMetric)  [charts.js]
-    │
-    ├── aggregateMonthly(filtered, 12)      → { months, series, poolNames }
-    │       └── renderAreaChart(monthly)   [charts.js]
-    │
-    ├── aggregateByEpoch(allBlocks)         → epochData[]  ← NOTE: uses allBlocks, NOT filtered
-    │       └── renderEpochChart(epochData) [charts.js]
-    │
-    └── update #donut-subtitle text
+    └── renderAll()
+            │
+            ├── filterBlocks(allBlocks, { range: activeRange })
+            │       └── returns filtered[]   (subset of allBlocks)
+            │
+            ├── aggregateByPool(filtered)           → poolAgg[]
+            │       ├── renderDonut(poolAgg, poolMeta, poolsInfo)
+            │       └── renderPoolTable(poolAgg, poolMeta)
+            │
+            ├── wire profile card click events
+            │       └── attaches showProfileCard() to donut clicks and table rows
+            │
+            ├── aggregateMonthly(filtered, 12)      → { months, series, poolNames }
+            │       └── renderAreaChart(monthly)
+            │
+            ├── aggregatePoolEntry(filtered)        → { months, cumulativePools }
+            │       └── renderLineChart(poolEntry)
+            │
+            └── update #donut-subtitle text based on activePeriod and activeRange
 ```
 
 **Performance note:** `aggregateByPool` runs twice in `updateCards` + the main
@@ -169,11 +169,13 @@ create (~50ms each). Creating them once and reusing avoids jank on filter change
 
 | Function | Signature | Description |
 |---|---|---|
-| `initApp` | `async () → void` | Entry point. Loads data, wires UI, renders. |
+| `initApp` | `async () → void` | Entry point. Calls loadAndRender('post'), wires UI. |
+| `loadAndRender` | `async (period) → void` | Loads data, initializes charts/selectors, and calls renderAll(). |
 | `renderAll` | `() → void` | Full re-render triggered by any filter change. |
-| `wireFilters` | `() → void` | Attaches click listeners to all filter/toggle buttons. Called once. |
-| `updateHeader` | `(filtered[]) → void` | Sets the date range + block count in the header. |
-| `updateCards` | `(filtered[]) → void` | Updates the 4 summary stat cards. |
+| `wireFilters` | `() → void` | Attaches click listeners to all filter buttons. Called once. |
+| `initStaticMacroCharts` | `() → void` | Renders HHI and Concentration macro charts. |
+| `updateCardsLatestMonth` | `() → void` | Updates KPI cards based on the latest available month. |
+| `showProfileCard` | `(poolName) → void` | Dynamically updates the profile UI and synchronizes dropdown. |
 | `hideOverlay` | `() → void` | Fades and removes the loading spinner. |
 | `showError` | `(msg: string) → void` | Replaces loading spinner with an error message. |
 
@@ -181,22 +183,23 @@ create (~50ms each). Creating them once and reusing avoids jank on filter change
 
 | Function | Signature | Description |
 |---|---|---|
-| `loadData` | `async () → Dataset` | Fetches and parses both data files. Called once. |
-| `filterBlocks` | `(blocks[], {range, epoch}) → blocks[]` | Returns a filtered subset. Pure function. |
+| `loadData` | `async (period) → Dataset` | Fetches parquet and JSON files based on period. |
+| `filterBlocks` | `(blocks[], {range}) → blocks[]` | Returns a time-filtered subset. Pure function. |
 | `aggregateByPool` | `(blocks[]) → [{name, count, pct}]` | Pool block counts, sorted desc. Pure. |
-| `aggregateMonthly` | `(blocks[], topN) → {months, series, poolNames}` | Monthly series for area chart. Pure. |
-| `aggregateByEpoch` | `(blocks[]) → [{epoch, label, total, topPool}]` | Per-epoch summary. Pure. |
+| `aggregateMonthly` | `(blocks[], topN) → {months, series, poolNames, hhi}` | Handles monthly distribution and HHI index. Pure. |
+| `aggregatePoolEntry` | `(blocks[]) → {months, cumulativePools}` | Ecosystem growth array. Pure. |
 
 ### `charts.js`
 
 | Function | Signature | Description |
 |---|---|---|
-| `renderDonut` | `(poolData[], poolMeta) → void` | Pie/donut chart, top 15 + Other. |
-| `renderPoolTable` | `(poolData[], poolMeta) → void` | HTML table, top 20. Not an ECharts chart. |
+| `renderDonut` | `(poolData[], poolMeta, poolsInfo) → void` | Pie/donut chart, top 15 + Other. |
+| `renderPoolTable` | `(poolData[], poolMeta) → void` | HTML table showing miner list. |
+| `renderHhiChart` | `({months, hhi}) → void` | Line chart displaying HHI decentralization index over time. |
+| `renderConcentrationChart` | `({months, top3, top5}) → void` | Line chart showing Top N pool market limits. |
 | `renderAreaChart` | `({months, series, poolNames}) → void` | Stacked area with dataZoom. |
-| `renderBarChart` | `(poolData[], metric) → void` | Horizontal bar, top 20, excludes Unknown. |
-| `renderEpochChart` | `(epochData[]) → void` | Vertical bar, one bar per epoch. |
-| `resizeAll` | `() → void` | Resize all chart instances. Exported but not currently called (window resize listeners handle it). |
+| `renderLineChart` | `({months, cumulativePools}) → void` | Line chart displaying cumulative pools. |
+| `resizeAll` | `() → void` | Resizes all chart instances to handle window dimensions. |
 
 ---
 
@@ -206,21 +209,21 @@ Every element `main.js` and `charts.js` reads or writes:
 
 | Element ID | Type | Written by |
 |---|---|---|
-| `data-range-label` | `<div>` in header | `updateHeader()` |
-| `val-total-blocks` | `.card-value` | `updateCards()` |
-| `val-unique-pools` | `.card-value` | `updateCards()` |
-| `val-top-pool` | `.card-value` | `updateCards()` |
-| `val-top-pool-pct` | `.card-sub` | `updateCards()` |
-| `val-unknown` | `.card-value` | `updateCards()` |
+| `val-unique-pools` | `.kpi-value` | `updateCardsLatestMonth()` |
+| `val-top-pool` | `.kpi-value` | `updateCardsLatestMonth()` |
+| `val-concentration` | `.kpi-value` | `updateCardsLatestMonth()` |
+| `val-hhi` | `.kpi-value` | `updateCardsLatestMonth()` |
 | `donut-subtitle` | `<span>` | `renderAll()` |
-| `range-buttons` | `<div>` container | `wireFilters()` listens; `renderAll()` updates `.active` |
-| `epoch-buttons` | `<div>` container | `wireFilters()` listens; `renderAll()` updates `.active` |
-| `bar-toggle` | `<div>` container | `wireFilters()` listens |
-| `chart-donut` | `<div>` | `renderDonut()` — ECharts canvas |
+| `period-buttons` | `<div>` container | `wireFilters()` |
+| `range-buttons` | `<div>` container | `wireFilters()` |
+| `chart-hhi` | `<div>` | `renderHhiChart()` — ECharts |
+| `chart-concentration` | `<div>` | `renderConcentrationChart()` — ECharts |
+| `chart-donut` | `<div>` | `renderDonut()` — ECharts |
 | `pool-table` | `<div>` | `renderPoolTable()` — innerHTML |
-| `chart-area` | `<div>` | `renderAreaChart()` — ECharts canvas |
-| `chart-bar` | `<div>` | `renderBarChart()` — ECharts canvas |
-| `chart-epoch` | `<div>` | `renderEpochChart()` — ECharts canvas |
+| `chart-area` | `<div>` | `renderAreaChart()` — ECharts |
+| `chart-line` | `<div>` | `renderLineChart()` — ECharts |
+| `pool-profile-card` | `<div>` container | `showProfileCard()` dynamically reveals |
+| `profile-selector` | `<select>` | User input / `showProfileCard()` |
 | `loading-overlay` | `<div>` | `hideOverlay()` / `showError()` |
 
 ---

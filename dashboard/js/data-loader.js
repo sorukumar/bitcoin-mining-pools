@@ -4,7 +4,7 @@
  * Returns a structured dataset ready for aggregation.
  */
 
-const POOL_META_URL = './data/pool_meta.json';
+const POOL_META_URL = './data/pool_meta.json?v=3';
 const POOLS_INFO_URL = './data/lookup/pools_info.json';
 const TIMELINES_URL = './data/lookup/timelines.json';
 
@@ -65,14 +65,22 @@ async function loadTimelines() {
   return res.json();
 }
 
+/** Fetch Global Ecosystem Growth JSON */
+async function loadEcosystem() {
+  const res = await fetch('./data/ecosystem.json?v=6');
+  if (!res.ok) throw new Error(`Failed to fetch ecosystem: ${res.status}`);
+  return res.json();
+}
+
 /** Main entry – returns a Dataset */
 export async function loadData(period = 'post') {
-  const parquetUrl = period === 'pre' ? './data/blocks_pre_2020.parquet' : './data/blocks_post_2020.parquet';
-  const [blocks, poolMeta, poolsInfo, timelines] = await Promise.all([
+  const parquetUrl = period === 'pre' ? './data/blocks.parquet' : './data/blocks_post_2020.parquet';
+  const [blocks, poolMeta, poolsInfo, timelines, ecosystem] = await Promise.all([
     loadParquet(parquetUrl),
     loadPoolMeta(),
     loadPoolsInfo(),
     loadTimelines(),
+    loadEcosystem()
   ]);
 
   // approx_date from hyparquet may be a timestamp number (ms) or a Date object
@@ -93,7 +101,7 @@ export async function loadData(period = 'post') {
   const minDate = blocks[0].approx_date;
   const maxDate = blocks[blocks.length - 1].approx_date;
 
-  return { blocks, poolMeta, poolsInfo, timelines, minDate, maxDate };
+  return { blocks, poolMeta, poolsInfo, timelines, ecosystem, minDate, maxDate };
 }
 
 /**
@@ -127,6 +135,24 @@ export function aggregateByPool(blocks) {
   }
   return Array.from(counts.entries())
     .map(([name, count]) => ({ name, count, pct: count / total * 100 }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Aggregate pool data into country shares.
+ * Returns array sorted by count desc: [{ country, count }]
+ */
+export function aggregateByCountry(poolAgg, poolsInfo) {
+  const counts = new Map();
+  for (const p of poolAgg) {
+    if (p.name === 'Unknown' || p.name === 'Other') continue;
+    const info = poolsInfo.find(i => i.name === p.name);
+    let c = info && info.country ? info.country : 'Unknown';
+    // Count blocks by country
+    counts.set(c, (counts.get(c) ?? 0) + p.count);
+  }
+  return Array.from(counts.entries())
+    .map(([country, count]) => ({ country, count }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -177,30 +203,4 @@ export function aggregateMonthly(blocks, topN = 12) {
   return { months, series, poolNames, hhi };
 }
 
-/**
- * Aggregate cumulative unique pools over time.
- * Returns { months: string[], cumulativePools: number[] }
- */
-export function aggregatePoolEntry(filtered) {
-  const monthMap = new Map();
-  const poolSet = new Set();
 
-  for (const b of filtered) {
-    const d = b.approx_date;
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    if (!monthMap.has(key)) monthMap.set(key, []);
-    monthMap.get(key).push(b.pool_name);
-  }
-
-  const months = Array.from(monthMap.keys()).sort();
-  const cumulativePools = [];
-  const seenPools = new Set();
-
-  for (const m of months) {
-    const poolsInMonth = monthMap.get(m);
-    poolsInMonth.forEach(p => seenPools.add(p));
-    cumulativePools.push(seenPools.size);
-  }
-
-  return { months, cumulativePools };
-}

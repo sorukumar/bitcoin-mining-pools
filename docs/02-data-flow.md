@@ -9,8 +9,8 @@ blocks.csv (869k rows)          pools.json (payout_addresses + coinbase_tags)
                           │
               ┌───────────┴────────────┐
               │                        │
-       blocks.parquet            pool_meta.json
-       (9.6 MB, Snappy)          (6.6 KB)
+     blocks_*.parquet            pool_meta.json
+       (Snappy)                  (6.8 KB)
               │                        │
               └───────── browser ───────┘
                           │
@@ -18,16 +18,17 @@ blocks.csv (869k rows)          pools.json (payout_addresses + coinbase_tags)
                     ├── loadParquet()       → raw rows[]
                     ├── normalise dates     → rows[] with JS Date
                     ├── sort by height      → sorted rows[]
-                    └── loadData() returns  → { blocks, poolMeta, minDate, maxDate }
+                    └── loadData() returns  → { blocks, poolMeta, poolsInfo, timelines }
                           │
-                    filterBlocks()          → filtered subset (by range or epoch)
+                    filterBlocks()          → filtered subset (by active range)
                           │
-              ┌───────────┼────────────────┐
-              │           │                │
-     aggregateByPool  aggregateMonthly  aggregateByEpoch
-              │           │                │
-          renderDonut  renderAreaChart  renderEpochChart
-        renderPoolTable  renderBarChart
+              ┌───────────┼────────────────────────┐
+              │           │                        │
+     aggregateByPool   aggregateMonthly      aggregatePoolEntry
+              │           │                        │
+          renderDonut  renderAreaChart  renderLineChart
+        renderPoolTable  renderHhiChart
+                       renderConcentrationChart
 ```
 
 ---
@@ -195,13 +196,13 @@ Never break the sort invariant.
 ### `loadData()` return value
 ```js
 {
-  blocks:  Block[],     // 869,316 objects, sorted ascending by height
+  blocks:  Block[],     // objects, sorted ascending by height
   poolMeta: {           // { [poolName]: { link } }
     "AntPool": { link: "https://..." },
     ...
   },
-  minDate: Date,        // blocks[0].approx_date
-  maxDate: Date,        // blocks[blocks.length-1].approx_date
+  poolsInfo: [ ... ],   // array of expanded miner pool details
+  timelines: [ ... ]    // timeline events array
 }
 ```
 
@@ -228,10 +229,8 @@ return blocks where approx_date >= cutoff
 | 2Y | 24 |
 | ALL | no filter |
 
-**By epoch** (mutually exclusive with range):
-```
-return blocks where epoch === N
-```
+**By activePeriod=pre vs post:**
+This filtering is handled implicitly by serving either `blocks_pre_2020.parquet` or `blocks_post_2020.parquet` depending on the user's selection, which leads to a full reload of `allBlocks` rather than client-side array filtering.
 
 ### `aggregateByPool(blocks)` → used by donut, bar, pool table
 ```
@@ -281,11 +280,12 @@ to replace the entire option rather than merge, which prevents stale data.
 
 | Function | Input | ECharts type |
 |---|---|---|
-| `renderDonut(poolData, poolMeta)` | `aggregateByPool` result | `pie` with inner radius |
+| `renderDonut(poolData, poolMeta, poolsInfo)` | `aggregateByPool` result | `pie` with inner radius |
 | `renderPoolTable(poolData, poolMeta)` | `aggregateByPool` result | HTML table (not ECharts) |
 | `renderAreaChart({ months, series, poolNames })` | `aggregateMonthly` result | `line` stacked with `areaStyle` |
-| `renderBarChart(poolData, metric)` | `aggregateByPool` result | `bar` horizontal |
-| `renderEpochChart(epochData)` | `aggregateByEpoch` result | `bar` vertical |
+| `renderHhiChart({ months, hhi })` | `aggregateMonthly` result | `line` chart of decentralization limits |
+| `renderConcentrationChart(...)` | Custom aggregate in `main.js` | `line` chart of top-level limits |
+| `renderLineChart(poolEntry)` | `aggregatePoolEntry` result | `line` representing cumulative ecosystem |
 
 ---
 

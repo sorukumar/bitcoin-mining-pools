@@ -8,32 +8,32 @@ const ec = () => window.__echarts;
 
 // ── Shared palette (Bitcoin-themed, 15 distinct colours) ─────────────────────
 export const POOL_COLORS = [
-  '#f7931a', '#fbbf24', '#3fb950', '#58a6ff', '#d2a8ff',
-  '#f85149', '#79c0ff', '#56d364', '#e3b341', '#ff7b72',
-  '#b392f0', '#89d4ff', '#ffa657', '#7ee787', '#ff9492',
+  '#E5C07B', '#7BAE7F', '#8AB4F8', '#E06C75', '#C678DD',
+  '#56B6C2', '#98C379', '#F29F67', '#D19A66', '#61AFEF',
+  '#ABB2BF', '#BE835D', '#A0B89C', '#879BBF', '#D4A0A4'
 ];
 
 const THEME = {
-  bg:        '#161b22',
-  bg2:       '#21262d',
-  border:    '#30363d',
-  text:      '#e6edf3',
-  muted:     '#8b949e',
-  accent:    '#f7931a',
+  bg: '#161b22',
+  bg2: '#21262d',
+  border: '#30363d',
+  text: '#e6edf3',
+  muted: '#8b949e',
+  accent: '#E2A34A',
 };
 
 function baseTooltip(extra = {}) {
   return {
     backgroundColor: THEME.bg2,
-    borderColor:     THEME.border,
-    borderWidth:     1,
+    borderColor: THEME.border,
+    borderWidth: 1,
     textStyle: { color: THEME.text, fontSize: 12 },
     ...extra,
   };
 }
 
 // ── Donut chart ───────────────────────────────────────────────────────────────
-let donutChart = null;
+export let donutChart = null;
 
 export function renderDonut(poolData, poolMeta, poolsInfo) {
   const el = document.getElementById('chart-donut');
@@ -44,13 +44,13 @@ export function renderDonut(poolData, poolMeta, poolsInfo) {
 
   // Top 15 + aggregate rest into "Other"
   const TOP = 15;
-  const top   = poolData.slice(0, TOP);
+  const top = poolData.slice(0, TOP);
   const other = poolData.slice(TOP).reduce((s, p) => s + p.count, 0);
   const total = poolData.reduce((s, p) => s + p.count, 0);
 
   const items = [
     ...top.map((p, i) => ({
-      name:  p.name,
+      name: p.name,
       value: p.count,
       itemStyle: { color: POOL_COLORS[i % POOL_COLORS.length] },
     })),
@@ -92,9 +92,9 @@ export function renderDonut(poolData, poolMeta, poolsInfo) {
           fontSize: 13,
           fontWeight: 'bold',
           color: THEME.text,
-          formatter: (p) => `${p.name}\n${(p.value / total * 100).toFixed(1)}%`,
+          formatter: (p) => `${p.name}\n${Math.round(p.value / total * 100)}%`,
         },
-        itemStyle: { shadowBlur: 16, shadowColor: 'rgba(247,147,26,0.4)' },
+        itemStyle: { shadowBlur: 16, shadowColor: 'rgba(226,163,74,0.4)' },
       },
       data: items,
     }],
@@ -107,18 +107,15 @@ export function renderPoolTable(poolData, poolMeta) {
   const total = poolData.reduce((s, p) => s + p.count, 0);
   const maxPct = poolData[0]?.pct ?? 1;
 
-  const rows = poolData.slice(0, 20).map((p, i) => {
-    const link = poolMeta[p.name]?.link;
-    const nameCell = link
-      ? `<a href="${link}" target="_blank">${p.name}</a>`
-      : p.name;
+  const rows = poolData.slice(0, 10).map((p, i) => {
+    const nameCell = p.name;
     const barW = (p.pct / maxPct * 100).toFixed(1);
     const color = POOL_COLORS[i] ?? '#444c56';
     return `
-      <tr>
+      <tr class="pool-row" data-pool="${p.name}">
         <td class="td-rank">${i + 1}</td>
         <td class="td-name">${nameCell}</td>
-        <td class="td-pct">${p.pct.toFixed(2)}%</td>
+        <td class="td-pct">${Math.round(p.pct)}%</td>
         <td class="td-bar">
           <div class="bar-track">
             <div class="bar-fill" style="width:${barW}%;background:${color}"></div>
@@ -143,19 +140,102 @@ export function renderPoolTable(poolData, poolMeta) {
     </div>`;
 }
 
+// ── Country Share chart ──────────────────────────────────────────────────────
+export let countryChart = null;
+
+export function renderCountryShareChart(countryAgg) {
+  const el = document.getElementById('chart-country');
+  if (!countryChart) {
+    countryChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => countryChart.resize());
+  }
+
+  const total = countryAgg.reduce((s, c) => s + c.count, 0);
+
+  // Group top 10 countries and "Other"
+  const TOP = 10;
+  const top = countryAgg.slice(0, TOP);
+  const other = countryAgg.slice(TOP).reduce((s, c) => s + c.count, 0);
+
+  const items = [
+    ...top.map((c, i) => ({
+      name: c.country,
+      value: c.count,
+      itemStyle: { color: POOL_COLORS[(i + 3) % POOL_COLORS.length] },
+    })),
+    ...(other > 0 ? [{ name: 'Other', value: other, itemStyle: { color: '#444c56' } }] : []),
+  ];
+
+  countryChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'item',
+      formatter: (p) => {
+        const pct = (p.value / total * 100).toFixed(2);
+        return `<b>${p.name}</b><br/>${p.value.toLocaleString()} blocks · <b>${pct}%</b>`;
+      },
+    },
+    series: [{
+      type: 'pie',
+      radius: ['42%', '72%'],
+      center: ['50%', '50%'],
+      avoidLabelOverlap: true,
+      itemStyle: { borderColor: THEME.bg, borderWidth: 2 },
+      label: { show: false },
+      emphasis: {
+        label: { show: false },
+        itemStyle: { shadowBlur: 16, shadowColor: 'rgba(226,163,74,0.4)' },
+      },
+      data: items,
+    }],
+  }, true);
+}
+
 // ── Stacked area chart ────────────────────────────────────────────────────────
 let areaChart = null;
 
-export function renderAreaChart({ months, series, poolNames, timelines = [], hhi = [] }) {
+export function renderAreaChart({ months, series, poolNames, timelines = [] }) {
   const el = document.getElementById('chart-area');
   if (!areaChart) {
     areaChart = ec().init(el, null, { renderer: 'canvas' });
     window.addEventListener('resize', () => areaChart.resize());
   }
 
-  const seriesList = poolNames.map((name, i) => ({
+  // Calculate totals to find Top 7
+  const poolTotals = poolNames.map(name => ({
     name,
-    type:  'line',
+    total: series[name].reduce((sum, v) => sum + (v || 0), 0)
+  })).sort((a, b) => b.total - a.total);
+
+  const topNames = poolTotals.slice(0, 7).map(p => p.name);
+  const topSet = new Set(topNames);
+
+  const groupedSeries = {};
+  topNames.forEach(name => groupedSeries[name] = [...series[name]]);
+  groupedSeries['Other'] = new Array(months.length).fill(0);
+
+  for (let i = 0; i < poolNames.length; i++) {
+    const name = poolNames[i];
+    if (!topSet.has(name) && name !== 'Other') { // If 'Other' was already in poolNames, handle carefully
+      for (let j = 0; j < months.length; j++) {
+        groupedSeries['Other'][j] += (series[name][j] || 0);
+      }
+    } else if (name === 'Other') {
+      for (let j = 0; j < months.length; j++) {
+        groupedSeries['Other'][j] += (series[name][j] || 0);
+      }
+    }
+  }
+
+  const finalNames = [...topNames];
+  if (groupedSeries['Other'].some(v => v > 0)) {
+    finalNames.push('Other');
+  }
+
+  const seriesList = finalNames.map((name, i) => ({
+    name,
+    type: 'line',
     stack: 'total',
     smooth: true,
     symbol: 'none',
@@ -163,22 +243,8 @@ export function renderAreaChart({ months, series, poolNames, timelines = [], hhi
     lineStyle: { width: 0 },
     color: name === 'Other' ? '#444c56' : POOL_COLORS[i % POOL_COLORS.length],
     emphasis: { focus: 'series' },
-    data: series[name],
+    data: groupedSeries[name],
   }));
-
-  // Add HHI series if available
-  if (hhi.length) {
-    seriesList.push({
-      name: 'HHI',
-      type: 'line',
-      yAxisIndex: 1,
-      smooth: true,
-      symbol: 'none',
-      lineStyle: { width: 2, color: '#ff7b72' },
-      emphasis: { focus: 'series' },
-      data: hhi,
-    });
-  }
 
   // Map timeline events to month keys
   const monthIndexByKey = new Map(months.map((m, idx) => [m, idx]));
@@ -196,20 +262,21 @@ export function renderAreaChart({ months, series, poolNames, timelines = [], hhi
     lineStyle: {
       color: THEME.accent,
       type: 'dashed',
-      width: 1,
-      opacity: 0.7,
+      width: 2,
+      opacity: 1,
     },
     label: {
       show: true,
       formatter: ev.event,
-      color: THEME.muted,
+      color: THEME.text,
       rotate: 90,
-      fontSize: 9,
+      fontSize: 11,
+      fontWeight: 'bold',
       padding: [4, 0, 0, 0],
     },
   }));
 
-  // Helper series only to host markLine (so it doesn't interfere with stacked area)
+  // Helper series only to host markLine
   if (markLineData.length) {
     seriesList.push({
       name: 'Milestones',
@@ -219,9 +286,19 @@ export function renderAreaChart({ months, series, poolNames, timelines = [], hhi
       yAxisIndex: 0,
       showSymbol: false,
       lineStyle: { opacity: 0 },
-      tooltip: { show: false },
       markLine: {
         symbol: 'none',
+        tooltip: {
+          show: true,
+          trigger: 'item',
+          formatter: (params) => {
+            const ev = parsedEvents.find(e => e.event === params.name);
+            if (ev) {
+              return `<b>${ev.event}</b><br/><span style="display:inline-block;max-width:250px;white-space:normal;font-size:11px;color:${THEME.muted};margin-top:4px;">${ev.description}</span>`;
+            }
+            return params.name;
+          }
+        },
         data: markLineData,
       },
     });
@@ -237,18 +314,15 @@ export function renderAreaChart({ months, series, poolNames, timelines = [], hhi
         const month = params[0].axisValue;
         const total = params.reduce((s, p) => s + (p.value || 0), 0);
         const lines = params
-          .filter(p => p.seriesName !== 'Milestones' && p.seriesName !== 'HHI' && p.value > 0)
+          .filter(p => p.seriesName !== 'Milestones' && p.value > 0)
           .sort((a, b) => b.value - a.value)
-          .slice(0, 6)
           .map(p => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value}</b>`)
           .join('<br/>');
-        const hhiVal = params.find(p => p.seriesName === 'HHI')?.value;
-        const hhiLine = hhiVal != null ? `<br/>HHI: <b>${hhiVal.toFixed(0)}</b>` : '';
         const ev = parsedEvents.find(e => e.key === month);
         const evLine = ev
           ? `<br/><br/><span style="font-size:11px;color:${THEME.muted}"><b>${ev.event}</b><br/>${ev.description}</span>`
           : '';
-        return `<b>${month}</b> · ${total} blocks<br/>${lines}${hhiLine}${evLine}`;
+        return `<b>${month}</b> · ${total} blocks<br/>${lines}${evLine}`;
       },
     },
     legend: {
@@ -258,31 +332,21 @@ export function renderAreaChart({ months, series, poolNames, timelines = [], hhi
       pageTextStyle: { color: THEME.muted },
       pageIconColor: THEME.accent,
       pageIconInactiveColor: THEME.border,
-      data: poolNames.concat(hhi.length ? ['HHI'] : []),
+      data: finalNames,
     },
-    grid: { top: 16, left: 56, right: 56, bottom: 90 }, // Adjusted right for secondary axis
+    grid: { top: 16, left: 56, right: 16, bottom: 90 },
     xAxis: {
       type: 'category',
       data: months,
-      axisLine:  { lineStyle: { color: THEME.border } },
+      axisLine: { lineStyle: { color: THEME.border } },
       axisLabel: { color: THEME.muted, fontSize: 11, rotate: 30 },
-      axisTick:  { show: false },
+      axisTick: { show: false },
     },
-    yAxis: [
-      {
-        type: 'value',
-        splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
-        axisLabel: { color: THEME.muted, fontSize: 11 },
-      },
-      {
-        type: 'value',
-        position: 'right',
-        splitLine: { show: false },
-        axisLabel: { color: THEME.muted, fontSize: 11, formatter: '{value}' },
-        min: 0,
-        max: 10000,
-      },
-    ],
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLabel: { color: THEME.muted, fontSize: 11 },
+    },
     dataZoom: [
       { type: 'inside', start: 0, end: 100 },
       {
@@ -291,7 +355,7 @@ export function renderAreaChart({ months, series, poolNames, timelines = [], hhi
         bottom: 8,
         borderColor: THEME.border,
         backgroundColor: THEME.bg2,
-        fillerColor: 'rgba(247,147,26,0.15)',
+        fillerColor: 'rgba(226,163,74,0.15)',
         handleStyle: { color: THEME.accent },
         textStyle: { color: THEME.muted, fontSize: 10 },
       },
@@ -340,15 +404,15 @@ export function renderBarChart(poolData, metric = 'blocks') {
       splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
       axisLabel: {
         color: THEME.muted, fontSize: 10,
-        formatter: metric === 'pct' ? '{value}%' : (v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v,
+        formatter: metric === 'pct' ? '{value}%' : (v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v,
       },
     },
     yAxis: {
       type: 'category',
       data: labels,
-      axisLine:  { lineStyle: { color: THEME.border } },
+      axisLine: { lineStyle: { color: THEME.border } },
       axisLabel: { color: THEME.text, fontSize: 11 },
-      axisTick:  { show: false },
+      axisTick: { show: false },
     },
     series: [{
       type: 'bar',
@@ -359,23 +423,212 @@ export function renderBarChart(poolData, metric = 'blocks') {
         position: 'right',
         color: THEME.muted,
         fontSize: 10,
-        formatter: metric === 'pct' ? '{c}%' : (p) => p.value >= 1000 ? `${(p.value/1000).toFixed(1)}k` : p.value,
+        formatter: metric === 'pct' ? '{c}%' : (p) => p.value >= 1000 ? `${(p.value / 1000).toFixed(1)}k` : p.value,
       },
     }],
   }, true);
 }
 
-// ── Line chart (pool entry/exit) ──────────────────────────────────────────────
-let lineChart = null;
+// ── Ecosystem Growth Chart (Line + Scatter) ──────────────────────────────────────────────
+export let growthChart = null;
 
-export function renderLineChart({ months, cumulativePools }) {
+export function renderEcosystemGrowthChart({ months, cumulativePools }, poolMeta) {
   const el = document.getElementById('chart-line');
-  if (!lineChart) {
-    lineChart = ec().init(el, null, { renderer: 'canvas' });
-    window.addEventListener('resize', () => lineChart.resize());
+  if (!growthChart) {
+    growthChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => growthChart.resize());
   }
 
-  lineChart.setOption({
+  // Calculate the global max timestamp to act as "today" for bucket comparisons
+  let maxTime = 0;
+  Object.values(poolMeta).forEach(m => {
+    if (m.last_seen_date) {
+      const t = new Date(m.last_seen_date).getTime();
+      if (t > maxTime) maxTime = t;
+    }
+  });
+
+  const MS_IN_DAY = 86400 * 1000;
+  const t3M = maxTime - 90 * MS_IN_DAY;
+  const t1Y = maxTime - 365 * MS_IN_DAY;
+
+  // Categories
+  const CAT_3M = 'Active (Last 3 Months)';
+  const CAT_1Y = 'Active (Last 1 Year)';
+  const CAT_OLD = 'Inactive (>1 Year)';
+
+  // Map month key to the Y value of the cumulative line at that month
+  const monthToY = new Map(months.map((m, i) => [m, cumulativePools[i]]));
+
+  const scatterBuckets = {
+    [CAT_3M]: [],
+    [CAT_1Y]: [],
+    [CAT_OLD]: []
+  };
+
+  // Find Top 20 Active pools by lifetime blocks
+  const activePoolList = Object.entries(poolMeta)
+    .filter(([name, meta]) => meta.last_seen_date && new Date(meta.last_seen_date).getTime() >= t1Y && name !== 'Unknown' && name !== 'Other')
+    .sort((a, b) => b[1].lifetime_blocks - a[1].lifetime_blocks)
+    .slice(0, 20);
+  const top20ActiveNames = new Set(activePoolList.map(entry => entry[0]));
+
+  Object.entries(poolMeta).forEach(([name, meta]) => {
+    if (meta.first_seen_date && name !== 'Unknown' && name !== 'Other') {
+      const monthKey = meta.first_seen_date.substring(0, 7); // e.g. "2020-10"
+      if (monthToY.has(monthKey)) {
+        const yVal = monthToY.get(monthKey);
+
+        const lastTime = new Date(meta.last_seen_date).getTime();
+        let category = CAT_OLD;
+        if (lastTime >= t3M) category = CAT_3M;
+        else if (lastTime >= t1Y) category = CAT_1Y;
+
+        const isTop20 = top20ActiveNames.has(name);
+
+        const point = {
+          name,
+          isTop20,
+          value: [
+            monthKey,
+            yVal,
+            meta.first_seen_date,
+            meta.first_block_mined,
+            meta.last_block_mined,
+            meta.lifetime_blocks,
+            meta.last_seen_date
+          ],
+          itemStyle: {},
+        };
+
+        // Highlight Top 20
+        if (isTop20) {
+          point.label = {
+            show: true,
+            formatter: '{b}', // Name
+            position: 'top',
+            distance: 5,
+            color: THEME.text,
+            fontSize: 10,
+            textBorderColor: THEME.bg,
+            textBorderWidth: 2
+          };
+        }
+
+        // Fade out inactive
+        if (category === CAT_OLD) {
+          point.itemStyle = { color: '#555', opacity: 0.3, borderColor: 'transparent' };
+        }
+
+        scatterBuckets[category].push(point);
+      }
+    }
+  });
+
+  // Common scatter series template
+  const createScatterSeries = (name, color, data) => {
+    // Sort so smallest bubbles are on top
+    data.sort((a, b) => b.value[5] - a.value[5]);
+    return {
+      name: name,
+      type: 'scatter',
+      data: data,
+      z: 10,
+      labelLayout: {
+        moveOverlap: 'shiftY' // "Ziggle" labels up/down to strictly prevent collisions
+      },
+      symbolSize: function (val, params) {
+        const blocks = val[5];
+        let size = 4 + (Math.log10(blocks || 1) * 3);
+        if (params.data.isTop20) size += 6; // Boost size
+        return Math.min(Math.max(size, 4), params.data.isTop20 ? 25 : 15);
+      },
+      itemStyle: {
+        color: color,
+        opacity: 0.9,
+        shadowBlur: 4,
+        shadowColor: 'rgba(0, 0, 0, 0.4)',
+        borderColor: THEME.bg,
+        borderWidth: 1
+      },
+      emphasis: {
+        focus: 'self',
+        itemStyle: { opacity: 1, borderColor: '#fff', borderWidth: 1 }
+      }
+    };
+  };
+
+  growthChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip(),
+      trigger: 'item',
+      formatter: (params) => {
+        if (params.seriesName === 'Cumulative Pools (Line)') {
+          return `<b>${params.name}</b><br/>Cumulative unique pools: <b>${params.value}</b>`;
+        }
+        const d = params.data.value; // [monthKey, yVal, date, first_block, last_block, lifetime, last_seen]
+        return `<div style="margin-bottom: 4px; border-bottom: 1px solid ${THEME.border}; padding-bottom: 4px;">
+                  <b style="color:${params.color}">${params.data.name}</b>
+                  <span style="margin-left: 6px; font-size: 10px; color: ${THEME.muted};">(${params.seriesName})</span>
+                </div>
+                First Seen: <b>${d[2]}</b> (Block ${d[3].toLocaleString()})<br/>
+                Last Block : <b>${d[6]}</b> (Block ${d[4].toLocaleString()})<br/>
+                Total Mined: <b>${d[5].toLocaleString()}</b> blocks`;
+      },
+    },
+    legend: {
+      data: [CAT_3M, CAT_1Y, CAT_OLD],
+      top: 0,
+      textStyle: { color: THEME.muted, fontSize: 11 },
+      icon: 'circle'
+    },
+    grid: { top: 32, left: 56, right: 30, bottom: 48 },
+    xAxis: {
+      type: 'category',
+      data: months,
+      axisLine: { lineStyle: { color: THEME.border } },
+      axisLabel: { color: THEME.muted, fontSize: 11, rotate: 30 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Cumulative Unique Pools',
+      nameLocation: 'middle',
+      nameGap: 40,
+      nameTextStyle: { color: THEME.muted, fontSize: 11 },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLabel: { color: THEME.muted, fontSize: 11 },
+    },
+    series: [
+      {
+        name: 'Cumulative Pools (Line)',
+        type: 'line',
+        data: cumulativePools,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { color: THEME.border, width: 2, type: 'dashed' },
+        areaStyle: { opacity: 0.1, color: THEME.border },
+        z: 2
+      },
+      createScatterSeries(CAT_3M, '#6db874', scatterBuckets[CAT_3M]), // Bright Green
+      createScatterSeries(CAT_1Y, '#E5C07B', scatterBuckets[CAT_1Y]), // Yellowish
+      createScatterSeries(CAT_OLD, '#6b7280', scatterBuckets[CAT_OLD]) // Handled by override, base color ignored 
+    ],
+  }, true);
+}
+
+// ── HHI Trend Chart ───────────────────────────────────────────────────────────
+let hhiChart = null;
+
+export function renderHhiChart({ months, hhi }) {
+  const el = document.getElementById('chart-hhi');
+  if (!hhiChart) {
+    hhiChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => hhiChart.resize());
+  }
+
+  hhiChart.setOption({
     backgroundColor: 'transparent',
     tooltip: {
       ...baseTooltip(),
@@ -383,38 +636,146 @@ export function renderLineChart({ months, cumulativePools }) {
       axisPointer: { type: 'cross', label: { backgroundColor: THEME.bg2 } },
       formatter: (params) => {
         const month = params[0].axisValue;
-        const pools = params[0].value;
-        return `<b>${month}</b><br/>Cumulative unique pools: <b>${pools}</b>`;
+        const val = params[0].value;
+        let hhiLevel = 'Healthy Pool Decentralization';
+        if (val > 2500) hhiLevel = 'High Pool Centralization (At Risk)';
+        else if (val > 1500) hhiLevel = 'Moderate Pool Centralization';
+        return `<b>${month}</b><br/>HHI: <b>${val.toFixed(0)}</b><br/><span style="font-size:11px;color:${THEME.muted}">${hhiLevel}</span>`;
       },
     },
     grid: { top: 16, left: 56, right: 16, bottom: 48 },
     xAxis: {
       type: 'category',
       data: months,
-      axisLine:  { lineStyle: { color: THEME.border } },
+      axisLine: { lineStyle: { color: THEME.border } },
       axisLabel: { color: THEME.muted, fontSize: 11, rotate: 30 },
-      axisTick:  { show: false },
+      axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
+      name: 'Mining Centralization Index (HHI)',
+      nameLocation: 'middle',
+      nameGap: 45,
+      nameTextStyle: { color: THEME.muted, fontSize: 11 },
+      min: 500,
+      max: 3500,
       splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
       axisLabel: { color: THEME.muted, fontSize: 11 },
     },
+    visualMap: {
+      show: false,
+      pieces: [
+        { gt: 0, lte: 1500, color: THEME.accent },
+        { gt: 1500, lte: 2500, color: POOL_COLORS[7] },
+        { gt: 2500, color: POOL_COLORS[3] }
+      ],
+      outOfRange: { color: '#999' }
+    },
     series: [{
       type: 'line',
-      data: cumulativePools,
+      data: hhi,
       smooth: true,
       symbol: 'none',
-      lineStyle: { color: POOL_COLORS[0], width: 2 },
-      areaStyle: { opacity: 0.3, color: POOL_COLORS[0] },
+      lineStyle: { width: 3 },
+      areaStyle: { opacity: 0.15 },
+      markLine: {
+        symbol: 'none',
+        label: {
+          formatter: '{b}',
+          position: 'insideStartTop',
+          fontSize: 10,
+          color: THEME.muted
+        },
+        lineStyle: { opacity: 0.8 },
+        data: [
+          { yAxis: 1500, name: 'Moderate Threshold (1,500)', lineStyle: { color: POOL_COLORS[7], type: 'dashed' } },
+          { yAxis: 2500, name: 'Concentration Risk (2,500)', lineStyle: { color: POOL_COLORS[3], type: 'dashed' } }
+        ]
+      }
     }],
+  }, true);
+}
+
+// ── Concentration Chart ───────────────────────────────────────────────────────
+let concentrationChart = null;
+
+export function renderConcentrationChart({ months, top3, top5 }) {
+  const el = document.getElementById('chart-concentration');
+  if (!concentrationChart) {
+    concentrationChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => concentrationChart.resize());
+  }
+
+  concentrationChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip(),
+      trigger: 'axis',
+      axisPointer: { type: 'cross', label: { backgroundColor: THEME.bg2 } },
+      formatter: (params) => {
+        const month = params[0].axisValue;
+        const lines = params
+          .sort((a, b) => b.value - a.value)
+          .map(p => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value.toFixed(1)}%</b>`)
+          .join('<br/>');
+        return `<b>${month}</b><br/>${lines}`;
+      },
+    },
+    legend: {
+      top: 0,
+      right: 0,
+      textStyle: { color: THEME.muted, fontSize: 11 },
+      icon: 'circle'
+    },
+    grid: { top: 32, left: 56, right: 16, bottom: 48 },
+    xAxis: {
+      type: 'category',
+      data: months,
+      axisLine: { lineStyle: { color: THEME.border } },
+      axisLabel: { color: THEME.muted, fontSize: 11, rotate: 30 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Combined Share of Blocks mined (%)',
+      nameLocation: 'middle',
+      nameGap: 40,
+      nameTextStyle: { color: THEME.muted, fontSize: 11 },
+      min: 20,
+      max: 100,
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLabel: { color: THEME.muted, fontSize: 11, formatter: '{value}%' },
+    },
+    series: [
+      {
+        name: 'Top 5 Pools',
+        type: 'line',
+        data: top5,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { width: 3, color: POOL_COLORS[2] },
+        areaStyle: { opacity: 0.1, color: POOL_COLORS[2] },
+      },
+      {
+        name: 'Top 3 Pools',
+        type: 'line',
+        data: top3,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { width: 3, color: POOL_COLORS[0] },
+        areaStyle: { opacity: 0.2, color: POOL_COLORS[0] },
+      }
+    ]
   }, true);
 }
 
 // ── Resize all ────────────────────────────────────────────────────────────────
 export function resizeAll() {
   donutChart?.resize();
+  countryChart?.resize();
   areaChart?.resize();
   barChart?.resize();
-  lineChart?.resize();
+  growthChart?.resize();
+  hhiChart?.resize();
+  concentrationChart?.resize();
 }

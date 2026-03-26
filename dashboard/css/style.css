@@ -6,7 +6,7 @@
   --bg-secondary: #131A26;
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
-  --accent: #F7931A;
+  --accent: #E2A34A;
   --border: rgba(255, 255, 255, 0.08);
   --card-bg: #161B22;
   --radius: 10px;
@@ -130,25 +130,33 @@ header h1 {
   gap: .35rem;
 }
 
-.filter-btn, .epoch-btn {
-  background: var(--card-bg);
+/* Segmented Controls (Replaces old filter buttons) */
+.segmented-control {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  border-radius: 8px;
   border: 1px solid var(--border);
+}
+.segmented-btn, .epoch-btn {
+  background: transparent;
+  border: 1px solid transparent; /* To prevent layout shift when active gets border */
   color: var(--text-secondary);
   border-radius: 6px;
-  padding: .3rem .75rem;
+  padding: .35rem .85rem;
   font-size: .8rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all .15s;
+  transition: all .2s ease;
 }
-.filter-btn:hover, .epoch-btn:hover {
-  border-color: var(--accent);
+.segmented-btn:hover, .epoch-btn:hover {
   color: var(--text-primary);
 }
-.filter-btn.active, .epoch-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #000;
-  font-weight: 600;
+.segmented-btn.active, .epoch-btn.active {
+  background: var(--card-bg);
+  color: var(--accent);
+  border-color: var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
 /* ── Charts grid ──────────────────────────────────────────────── */
@@ -246,8 +254,6 @@ header h1 {
 /* ── Pool table (next to donut) ───────────────────────────────── */
 .pool-table {
   flex: 1 1 0;
-  overflow-y: auto;
-  max-height: 360px;
   font-size: .8rem;
 }
 .pool-table table {
@@ -276,8 +282,8 @@ header h1 {
 .pool-table tr:last-child td { border-bottom: none; }
 .pool-table tr:hover td { background: var(--bg-secondary); }
 .pool-table .td-rank { color: var(--text-secondary); width: 2rem; text-align: right; }
-.pool-table .td-name a { color: var(--text-primary); }
-.pool-table .td-name a:hover { color: var(--accent); }
+.pool-table .td-name { color: var(--text-primary); }
+.pool-table tr:hover .td-name { color: var(--accent); }
 .pool-table .td-blocks { text-align: right; color: var(--text-secondary); }
 .pool-table .td-pct { text-align: right; font-weight: 600; color: var(--accent); }
 .pool-table .td-bar { width: 80px; padding-right: .8rem; }
@@ -420,6 +426,84 @@ footer {
   font-weight: 600;
   color: var(--text-primary);
 }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+/* ── Searchable Dropdown ────────────────────────────────────────── */
+.pool-search-container {
+  position: relative;
+  display: inline-block;
+  min-width: 320px;
+}
+.pool-search-input {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: text;
+  outline: none;
+  width: 100%;
+  border-bottom: 2px dotted rgba(226, 163, 74, 0.5);
+  padding-right: 25px;
+}
+.pool-search-input::placeholder {
+  color: var(--accent);
+  opacity: 0.6;
+}
+.pool-results-list {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: #1c2128;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 2000;
+  list-style: none;
+  display: none; /* Shown via JS */
+}
+.pool-results-list.show {
+  display: block;
+}
+.pool-result-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: background 0.1s;
+}
+.pool-result-item:hover, .pool-result-item.selected {
+  background: var(--bg-secondary);
+  color: var(--accent);
+}
+.pool-result-group {
+  padding: 8px 15px 4px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.02);
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.pool-result-no-match {
+  padding: 15px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+/* Scrollbar UI for the list */
+.pool-results-list::-webkit-scrollbar { width: 6px; }
+.pool-results-list::-webkit-scrollbar-track { background: transparent; }
+.pool-results-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.pool-results-list::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 900px) {
