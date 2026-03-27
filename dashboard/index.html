@@ -4,7 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bitcoin Mining Pools | Bitcoin Data Labs</title>
-  <meta name="description" content="Track Bitcoin mining pool dominance, concentration trends, and ecosystem evolution. Explore decentralization risks and key insights from post-2020 data.">
+  <meta name="description" content="Track Bitcoin mining pool dominance, concentration trends, ecosystem evolution, and block reorg risks. Explore decentralization insights from post-2020 data.">
+  <meta name="keywords" content="Bitcoin, Mining Pools, Hashrate, Decentralization, Reorg, Blockchain, Data Visualization, Market Share, Foundry, AntPool">
+  <meta name="author" content="Bitcoin Data Labs">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sorukumar.github.io/bitcoin-mining-pools/">
+  <meta property="og:title" content="Bitcoin Mining Pools | Data & Forensics Dashboard">
+  <meta property="og:description" content="Track Bitcoin mining pool dominance, concentration trends, ecosystem evolution, and block reorg risks.">
+  <meta property="og:image" content="https://sorukumar.github.io/bitcoin-mining-pools/favicon.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://sorukumar.github.io/bitcoin-mining-pools/">
+  <meta property="twitter:title" content="Bitcoin Mining Pools | Data & Forensics Dashboard">
+  <meta property="twitter:description" content="Track Bitcoin mining pool dominance, concentration trends, ecosystem evolution, and block reorg risks.">
+  <meta property="twitter:image" content="https://sorukumar.github.io/bitcoin-mining-pools/favicon.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Bitcoin Mining Pools Dashboard",
+    "url": "https://sorukumar.github.io/bitcoin-mining-pools/",
+    "description": "Interactive static dashboard for tracking Bitcoin mining pool centralisation, hashrate dominance, and forensic reorg risks.",
+    "applicationCategory": "DataVisualization",
+    "operatingSystem": "Any",
+    "author": {
+      "@type": "Organization",
+      "name": "Bitcoin Data Labs"
+    }
+  }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,8 +53,11 @@
   <div id="header"></div>
 
   <div class="container" style="margin-top: 40px;">
-    <!-- Vital Signs: KPIs -->
-    <section id="vital-signs" style="margin-bottom: 30px;">
+    
+    <!-- Tab 1: Network Overview -->
+    <div id="tab-overview" class="tab-content active">
+      <!-- Vital Signs: KPIs -->
+      <section id="vital-signs" style="margin-bottom: 30px;">
       <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
         <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; display: flex; align-items: center; gap: 6px; opacity: 0.7;">
           <i class="fa-solid fa-clock-rotate-left" style="font-size: 0.7rem; color: var(--accent);"></i>
@@ -105,10 +142,67 @@
         </div>
         <div id="chart-country" class="chart-el chart-el--donut" style="flex: 1; width: 100%;"></div>
       </div>
-    </section>
+    </div> <!-- End Tab 1: Network Overview -->
 
-    <!-- Row 3: Dominance Over Time -->
-    <section id="row-dominance" class="card" style="display: flex; flex-direction: column; margin-bottom: 30px; min-height: 400px; flex-wrap: wrap;">
+    <!-- Tab 2: Ecosystem & History -->
+    <div id="tab-ecosystem" class="tab-content">
+      <!-- Ecosystem Growth -->
+      <section class="card" style="margin-bottom: 30px;">
+        <h3>New Pool Entries & Activity</h3>
+        <span class="chart-sub">Timeline of when pools first appeared and their current mining status</span>
+        <div id="chart-line" class="chart-el chart-el--medium" style="height: 450px; width: 100%;"></div>
+      </section>
+
+      <!-- Miner Pool Profile Card -->
+      <div id="pool-profile-card" class="card" style="margin-bottom: 30px; background: rgba(22, 27, 34, 0.7); backdrop-filter: blur(10px); border-top: 3px solid var(--accent); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 300px; padding-right: 20px;">
+            <h2 style="margin-bottom: 5px; color: var(--accent); font-size: 1.5rem; display: flex; align-items: center; position: relative;">
+              <div class="pool-search-container">
+                <input type="text" id="pool-search-input" class="pool-search-input" placeholder="Search for a mining pool..." autocomplete="off">
+                <ul id="pool-results-list" class="pool-results-list"></ul>
+              </div>
+              <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; margin-left: -15px; pointer-events: none; color: var(--accent);"></i>
+            </h2>
+            <a id="profile-link" href="#" target="_blank" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px; display: inline-block;">Website <i class="fa-solid fa-external-link-alt" style="font-size: 0.75rem; margin-left: 2px;"></i></a>
+            <p id="profile-scoop" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 0;">Description missing.</p>
+          </div>
+          <div style="flex: 0 0 250px; background: var(--bg-secondary); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="margin-bottom: 10px;">
+              <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Birth (First Block Mined)</div>
+              <div id="profile-first-block" style="font-weight: 600; font-size: 1.1rem;">-</div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Lifetime Blocks Mined</div>
+              <div id="profile-blocks" style="font-weight: 600; font-size: 1.1rem;">-</div>
+            </div>
+            <div>
+               <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Market Share (Last 30 Days)</div>
+               <div id="profile-share" style="font-weight: 600; color: var(--accent); font-size: 1.1rem;">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Mining Pools Breakdown -->
+      <section class="card" style="margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+          <div>
+            <h3 style="margin: 0;">Top Mining Pools</h3>
+            <span class="chart-sub">Performance and identity breakdown of the top 30 network contributors</span>
+          </div>
+          <div class="segmented-control" id="top-pools-range-buttons">
+            <button class="segmented-btn active" data-range="1M">1M</button>
+            <button class="segmented-btn" data-range="3M">3M</button>
+            <button class="segmented-btn" data-range="1Y">1Y</button>
+            <button class="segmented-btn" data-range="3Y">3Y</button>
+          </div>
+        </div>
+        <div id="top-miners-table-container"></div>
+      </section>
+
+      <!-- Historical Dominance -->
+      <section id="row-dominance" class="card" style="display: flex; flex-direction: column; margin-bottom: 30px; min-height: 400px; flex-wrap: wrap;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
           <h3 style="margin: 0;">Historical Pool Dominance</h3>
           <div class="filter-buttons segmented-control" id="period-buttons" style="margin: 0;">
@@ -118,61 +212,107 @@
         </div>
         <span class="chart-sub">Tracking the scale and share of major mining pools since 2009</span>
         <div id="chart-area" class="chart-el chart-el--tall" style="flex: 1; width: 100%;"></div>
-    </section>
+      </section>
+    </div> <!-- End Tab 2: Ecosystem & History -->
 
-    <!-- Row 2: Ecosystem Growth -->
-    <section class="card" style="margin-bottom: 30px;">
-      <h3>New Pool Entries & Activity</h3>
-      <span class="chart-sub">Timeline of when pools first appeared and their current mining status</span>
-      <div id="chart-line" class="chart-el chart-el--medium" style="height: 450px; width: 100%;"></div>
-    </section>
-
-    <!-- Miner Pool Profile Card (Dynamic Lookup) -->
-    <div id="pool-profile-card" class="card" style="margin-bottom: 30px; background: rgba(22, 27, 34, 0.7); backdrop-filter: blur(10px); border-top: 3px solid var(--accent); position: relative;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 300px; padding-right: 20px;">
-          <h2 style="margin-bottom: 5px; color: var(--accent); font-size: 1.5rem; display: flex; align-items: center; position: relative;">
-            <div class="pool-search-container">
-              <input type="text" id="pool-search-input" class="pool-search-input" placeholder="Search for a mining pool..." autocomplete="off">
-              <ul id="pool-results-list" class="pool-results-list"></ul>
-            </div>
-            <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; margin-left: -15px; pointer-events: none; color: var(--accent);"></i>
+    <!-- Tab 3: Forensic Analysis -->
+    <div id="tab-forensics" class="tab-content">
+      <section id="forensics" class="card" style="margin-bottom: 40px; background: rgba(30,35,45, 0.4); border: 1px solid rgba(226,163,74,0.15);">
+        <div style="margin-bottom: 25px;">
+          <h2 style="margin: 0; color: var(--accent); font-size: 1.4rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-microscope" style="font-size: 1.1rem;"></i>
+            Mining Forensics & Reorg Risks
           </h2>
-          <a id="profile-link" href="#" target="_blank" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px; display: inline-block;">Website <i class="fa-solid fa-external-link-alt" style="font-size: 0.75rem; margin-left: 2px;"></i></a>
-          <p id="profile-scoop" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 0;">Description missing.</p>
+          <p class="chart-sub" style="margin-bottom: 0;">Detecting network latency, centralization patterns, and block races</p>
         </div>
-        <div style="flex: 0 0 250px; background: var(--bg-secondary); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
-          <div style="margin-bottom: 10px;">
-            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Birth (First Block Mined)</div>
-            <div id="profile-first-block" style="font-weight: 600; font-size: 1.1rem;">-</div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px;">
+          <!-- Top Row: Consecutive Blocks & Latency -->
+          <div class="forensic-box">
+            <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h4>Consecutive Blocks & Reorg Risk</h4>
+                  <span class="forensic-sub">Pools mining 6+ blocks in a row. High consecutive blocks increase the risk of blockchain reorganizations.</span>
+                </div>
+                <button class="info-toggle" data-target="info-streaks"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-streaks">
+                <p><strong>How to read it:</strong> This table logs anomalous mining streaks where a single pool successfully mined 6 or more consecutive blocks. It details the pool involved, the length of the streak, the exact block height it started, and the total duration it took to mine those blocks.</p>
+                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <ul style="margin-left: 15px; margin-top: 4px;">
+                  <li><strong>Reorg & Fork Risk:</strong> When a pool mines many blocks right after one another, it increases the probability of simultaneous blocks (races) and blockchain reorganizations.</li>
+                  <li><strong>Network Dominance:</strong> Extremely fast and frequent streaks by a single pool suggest outsized short-term hashrate dominance or highly optimized block propagation that outpaces competitor nodes.</li>
+                </ul>
+              </div>
+            </div>
+            <div id="forensics-streaks-table"></div>
           </div>
-          <div style="margin-bottom: 10px;">
-            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Lifetime Blocks Mined</div>
-            <div id="profile-blocks" style="font-weight: 600; font-size: 1.1rem;">-</div>
+          <div class="forensic-box">
+            <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h4>Block Interval Latency (During Streaks)</h4>
+                  <span class="forensic-sub">Time between consecutive blocks by the same pool. Shorter intervals (< 30s) often lead to block races and forks.</span>
+                </div>
+                <button class="info-toggle" data-target="info-latency"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-latency">
+                <p><strong>How to read it:</strong> This chart breaks down the time duration between consecutive blocks mined by the same pool into specific time buckets (e.g., &lt; 30s, 30s-60s). The &lt; 30s bucket is explicitly highlighted in red/orange.</p>
+                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <ul style="margin-left: 15px; margin-top: 4px;">
+                  <li><strong>The "Danger Zone":</strong> Blocks found within 15 to 30 seconds of the previous block are highly prone to causing network forks. Other mining pools (who often refresh stratum jobs every 30 seconds) may not have received the previous block yet.</li>
+                  <li><strong>Propagational Advantage:</strong> Pools that consistently dominate the &lt; 30s bucket often possess significant network latency monopolies, allowing them to win tight block races and trigger multi-block reorgs.</li>
+                </ul>
+              </div>
+            </div>
+            <div id="chart-sync-histogram" style="height: 350px;"></div>
           </div>
-          <div>
-             <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Market Share (Last 30 Days)</div>
-             <div id="profile-share" style="font-weight: 600; color: var(--accent); font-size: 1.1rem;">-</div>
+
+          <!-- Bottom Row: Z-Score & Entropy (Full Width or Grid) -->
+          <div class="forensic-box" style="grid-column: 1 / -1;">
+            <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h4>Reported vs. Actual Hashrate (Luck & Z-Score)</h4>
+                  <span class="forensic-sub">Pools exhibiting statistically improbable luck ($Z > 3$) may be misreporting hashrate.</span>
+                </div>
+                <button class="info-toggle" data-target="info-zscore"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-zscore">
+                <p><strong>How to read it:</strong> This scatter plot compares a pool's expected block production (based on historical market share) against their actual block production over recent short-term windows. The Z-Score calculates the statistical probability of that variance.</p>
+                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <ul style="margin-left: 15px; margin-top: 4px;">
+                  <li><strong>Hidden Hashrate:</strong> While short-term variance ("luck") is normal, a consistent Z-Score above 3 (or below -3) is a statistical anomaly.</li>
+                  <li><strong>Deception Indicator:</strong> If a pool remains in the extreme positive zone, it strongly suggests they are harboring "ghost" hashrate—controlling significantly more mining power on the network than their public pool statistics let on.</li>
+                </ul>
+              </div>
+            </div>
+            <div id="chart-zscore-funnel" style="height: 320px;"></div>
+          </div>
+          <div class="forensic-box" style="grid-column: 1 / -1;">
+            <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h4>Miner Timing Patterns (Entropy Heatmap)</h4>
+                  <span class="forensic-sub">Differentiating steady "Corporate" operations (Low Entropy) from irregular "Retail" mining (High Entropy).</span>
+                </div>
+                <button class="info-toggle" data-target="info-entropy"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-entropy">
+                <p><strong>How to read it:</strong> This heatmap visualizes the "entropy" (Coefficient of Variation) of a pool's block-mining cadence over time. Cooler colors (High > 1.0) mean irregular arrival times. Warmer colors (Low < 0.7) mean highly consistent arrival times.</p>
+                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <ul style="margin-left: 15px; margin-top: 4px;">
+                  <li><strong>Actor Profiling:</strong> We can differentiate mining behaviors based on their timeline variance.</li>
+                  <li><strong>Corporate vs. Retail:</strong> Stable, low-entropy blocks typically map to heavily centralized, professional "Corporate" setups with stable connectivity. High-entropy maps to "Retail" or decentralized pools experiencing rapid hashrate fluctuations and connectivity turbulence.</li>
+                </ul>
+              </div>
+            </div>
+            <div id="chart-entropy-heatmap" style="height: 400px;"></div>
           </div>
         </div>
-      </div>
-    </div>
-    <!-- Section: Top Mining Pools Breakdown -->
-    <section class="card" style="margin-bottom: 30px;">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-        <div>
-          <h3 style="margin: 0;">Top Mining Pools</h3>
-          <span class="chart-sub">Performance and identity breakdown of the top 30 network contributors</span>
-        </div>
-        <div class="segmented-control" id="top-pools-range-buttons">
-          <button class="segmented-btn active" data-range="1M">1M</button>
-          <button class="segmented-btn" data-range="3M">3M</button>
-          <button class="segmented-btn" data-range="1Y">1Y</button>
-          <button class="segmented-btn" data-range="3Y">3Y</button>
-        </div>
-      </div>
-      <div id="top-miners-table-container"></div>
-    </section>
+      </section>
+    </div> <!-- End Tab 3: Forensics -->
 
     <footer>
       <p>Data: <a href="https://github.com/jlopp/bitcoin-blocks-by-mining-pool" target="_blank">jlopp/bitcoin-blocks-by-mining-pool</a> · Pool metadata: <a href="https://github.com/bitcoin-data/mining-pools" target="_blank">bitcoin-data/mining-pools</a></p>
@@ -194,20 +334,35 @@
     window.__hyparquet = { parquetRead, parquetMetadata };
     window.__echarts = echarts;
 
-    // Bootstrap app after libs are ready
-    const { initApp } = await import('./js/main.js?v=23');
-    initApp();
+    const boot = async () => {
+      // Load main logic
+      const { initApp } = await import('./js/main.js?v=24');
+
+      // Initialize shared components (Header, Nav)
+      if (typeof BitcoinLabsAppComponents !== 'undefined') {
+        BitcoinLabsAppComponents.init({
+          isApp: true,
+          appName: 'bitcoin-mining-pools',
+          appHomeUrl: './index.html',
+          navLinks: [
+            { name: 'Overview', url: '#overview' },
+            { name: 'Ecosystem & History', url: '#ecosystem' },
+            { name: 'Mining Forensics', url: '#forensics' }
+          ]
+        });
+      }
+
+      // Initialize App logic
+      initApp();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
   </script>
 
   <script src="https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js"></script>
-  <script>
-    BitcoinLabsAppComponents.init({
-      isApp: true,
-      appName: 'bitcoin-mining-pools',
-      appHomeUrl: './index.html',
-      navLinks: []
-    });
-  </script>
-
 </body>
 </html>

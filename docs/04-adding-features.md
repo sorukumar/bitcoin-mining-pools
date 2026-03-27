@@ -316,6 +316,22 @@ Use ECharts' built-in `map` series or a `treemap` to show country distribution.
 ECharts map requires registering a GeoJSON — see the ECharts docs for
 `echarts.registerMap('world', geoJson)`.
 
+## Pattern 6 — Adding Forensic Metrics
+
+The `scripts/process_forensics.py` pipeline handles advanced network analysis by exporting a structured JSON (`dashboard/data/forensics_data.json`) dedicated entirely to reorg risks and mathematical profiling.
+
+### Key Metrics Calculated:
+1. **Consecutive Strikes**: Detecting pools mining 6+ blocks sequentially.
+2. **Luck Funnel (Z-Score)**: Comparing observed block counts vs expected based on market share. $Z > 3$ indicates statistically improbable luck (hidden hashrate).
+3. **Entropy Heatmap**: Coefficient of Variation (CV) on block arrival times.
+4. **Latency Histogram**: Distribution of time deltas during consecutive blocks. `< 30s` is highlighted as the Reorg Risk Danger Zone based on network propagation metrics from forks/reorgs.
+
+### To add a new forensics metric:
+1. Calculate the new metric in `process_forensics.py`.
+2. Append it to the `output` dictionary compiled at the end of the script.
+3. Fetch it dynamically on load in `dashboard/js/data-loader.js` under the `loadForensics()` function.
+4. Render using an ECharts function in `dashboard/js/charts.js`.
+
 ---
 
 ## Checklist for Any Change

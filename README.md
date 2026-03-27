@@ -12,6 +12,7 @@ A "no-build-step," fully static web application hosted on GitHub Pages. It lever
 - **Miner Profiles**: Searchable, deep-dive profiles for over 150+ mining pools.
 - **Decentralization Lab**: Real-time HHI (Herfindahl-Hirschman Index) tracking and Top-3/Top-5 pool concentration benches.
 - **Ecosystem Growth**: A historical scatter-line visualization of every pool discovered since 2011.
+- **Mining Forensics & Reorg Risks**: Analyzes pool luck via Z-scores, propagation latency histograms, and timing entropy heatmaps to profile systemic network threats.
 
 ### 2. The Data Pipeline (Processed Insights)
 A robust Python pipeline that transforms raw block-level data into high-performance, dictionary-encoded **Parquet** files.

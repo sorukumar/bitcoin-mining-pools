@@ -79,6 +79,13 @@ async function loadEcosystem() {
   return res.json();
 }
 
+/** Fetch Forensics Data JSON */
+export async function loadForensics() {
+  const res = await fetch('./data/forensics_data.json');
+  if (!res.ok) throw new Error(`Failed to fetch forensics: ${res.status}`);
+  return res.json();
+}
+
 /** Main entry – returns a Dataset */
 export async function loadData(period = 'post') {
   const isFullHistory = (period === 'pre');

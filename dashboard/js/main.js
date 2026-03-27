@@ -1,10 +1,9 @@
-/**
- * main.js
- * App bootstrap — wires data loading, filters, and chart rendering.
- */
-
-import { loadData, loadParquetOnly, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
-import { renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, donutChart, growthChart } from './charts.js?v=13';
+import { loadData, loadParquetOnly, loadForensics, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
+import { 
+  renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, 
+  renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram,
+  resizeAllCharts, donutChart, growthChart 
+} from './charts.js?v=13';
 
 let allBlocks   = [];
 let poolMeta    = {};
@@ -12,6 +11,7 @@ let poolsInfo   = [];
 let timelines   = [];
 let lookupTable = {}; // Cached for background load
 let ecosystem   = null;
+let forensics   = null;
 
 let post2020Blocks = null;
 let fullHistoryBlocks = null;
@@ -295,6 +295,14 @@ function renderAll() {
   // 4. Ecosystem chart uses entirely global data (spanning from genesis to present)
   renderEcosystemGrowthChart(ecosystem, poolMeta);
 
+  // 5. Forensics
+  if (forensics) {
+    renderStreaksLeaderboard(forensics.kpi1_strikes);
+    renderZScoreFunnel(forensics.kpi2_funnel);
+    renderEntropyHeatmap(forensics.kpi3_entropy);
+    renderSyncHistogram(forensics.kpi4_sync);
+  }
+
   // Handle custom request-profile events from the new search UI
   document.removeEventListener('request-profile', profileHandler);
   document.addEventListener('request-profile', profileHandler);
@@ -394,6 +402,22 @@ function wireFilters() {
   }
 }
 
+function wireInfoToggles() {
+  document.querySelectorAll('.info-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = btn.getAttribute('data-target');
+      const card = document.getElementById(targetId);
+      if (card) {
+        const isShowing = card.classList.contains('show');
+        // Close others if desired, or allow multiple to be open. Let's allow multiple.
+        card.classList.toggle('show', !isShowing);
+        btn.classList.toggle('active', !isShowing);
+      }
+    });
+  });
+}
+
 // ── Load and render ───────────────────────────────────────────────────────────
 async function loadAndRender(period) {
   try {
@@ -404,7 +428,22 @@ async function loadAndRender(period) {
       <p>Loading ${period === 'pre' ? 'full historical' : 'post-2020'} data…</p>
     `;
 
-    const dataset = await loadData(period);
+    let results;
+    try {
+      results = await Promise.all([
+        loadData(period),
+        loadForensics().catch(e => {
+          console.warn("Forensics data not found or failed to load. Forensics tab will be empty.", e);
+          return null; // Return null so the app continues
+        })
+      ]);
+    } catch (e) {
+      throw new Error(`Core data failed to load: ${e.message}`);
+    }
+
+    const dataset = results[0];
+    forensics = results[1];
+
     allBlocks = dataset.blocks;
     poolMeta  = dataset.poolMeta;
     poolsInfo = dataset.poolsInfo;
@@ -426,6 +465,7 @@ async function loadAndRender(period) {
     updateKPICards();
     initStaticMacroCharts();
     initProfileSelector();
+    initTabs();
 
     renderAll();
     
@@ -433,10 +473,11 @@ async function loadAndRender(period) {
     const topPool = Object.keys(poolMeta).sort((a,b) => poolMeta[b].lifetime_blocks - poolMeta[a].lifetime_blocks)[0];
     if (topPool) showProfileCard(topPool);
 
-    hideOverlay();
   } catch (err) {
-    console.error(err);
+    console.error("Initialization Failed:", err);
     showError(`Failed to load data: ${err.message}`);
+  } finally {
+    hideOverlay();
   }
 }
 
@@ -459,7 +500,43 @@ async function lazyLoadHistory() {
 export async function initApp() {
   await loadAndRender('post');
   wireFilters();
+  wireInfoToggles();
   
   // Start lazy loading once the dashboard is interactive
   setTimeout(lazyLoadHistory, 1000);
+}
+// ── Tab Management (Sync with Header Nav) ────────────────────────────────────
+function initTabs() {
+  const switchTab = (tabId) => {
+    const slug = tabId.replace('#', '') || 'overview';
+    const contents = document.querySelectorAll('.tab-content');
+    let found = false;
+    
+    contents.forEach(content => {
+      const isActive = content.id === `tab-${slug}`;
+      content.classList.toggle('active', isActive);
+      if (isActive) found = true;
+    });
+
+    // Update Header Nav active state
+    // Use a small delay to ensure BitcoinLabsAppComponents has finished rendering
+    setTimeout(() => {
+      document.querySelectorAll('.app-nav a, .nav-links a').forEach(a => {
+        const href = a.getAttribute('href') || '';
+        a.classList.toggle('active', href.endsWith(`#${slug}`));
+      });
+    }, 100);
+
+    if (found) {
+      setTimeout(resizeAllCharts, 150);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  window.addEventListener('hashchange', () => switchTab(window.location.hash));
+  
+  // Handle initial hash on load
+  if (window.location.hash) {
+    switchTab(window.location.hash);
+  }
 }

@@ -47,8 +47,21 @@ def main():
         for entry in pools_raw.get(section, {}).values():
             name = entry.get("name", "")
             if name:
+                # Same normalization as used in merge_myrp.py
                 slug = name.lower().replace(" ", "").replace("-", "").replace("_", "").replace(".", "")
                 slug_to_name[slug] = name
+
+    # Also normalize the pool_slug column in the dataframe
+    def to_slug_safe(s):
+        if pd.isna(s) or s == "": return "unknown"
+        s = str(s).lower()
+        if s == "unknown": return "unknown"
+        for char in [" ", "-", "_", "."]:
+            s = s.replace(char, "")
+        return s
+
+    print("Normalizing block slugs ...")
+    blocks["pool_slug"] = blocks["pool_slug"].apply(to_slug_safe)
 
     # Add unknown
     slug_to_name["unknown"] = "Unknown"

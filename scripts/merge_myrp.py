@@ -1,7 +1,7 @@
 """
 merge_myrp.py
 Reads bitcoin_miners_myrp.parquet, transforms columns, and appends to blocks_post_2020.parquet
-Updates blocks.parquet with the merged data
+
 """
 
 import pandas as pd
@@ -13,6 +13,17 @@ ROOT = Path(__file__).parent.parent
 RAW = ROOT / "data" / "raw"
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
 
+
+def to_slug(s):
+    if pd.isna(s) or s == "":
+        return "unknown"
+    s = str(s).lower()
+    if s == "unknown":
+        return "unknown"
+    # Project-wide canonical normalization: lowercase, remove spaces/dashes/dots/underscores
+    for char in [" ", "-", "_", "."]:
+        s = s.replace(char, "")
+    return s
 
 
 def main():
@@ -33,8 +44,14 @@ def main():
     # Keep only necessary columns: height, pool_slug, date
     df_myrp = df_myrp[['height', 'pool_slug', 'date']]
 
+    print("Normalizing slugs ...")
+    df_post['pool_slug'] = df_post['pool_slug'].apply(to_slug)
+    df_myrp['pool_slug'] = df_myrp['pool_slug'].apply(to_slug)
+
     print("Appending MYRP to post-2020 ...")
     df_post_merged = pd.concat([df_post, df_myrp], ignore_index=True)
+    # Ensure newly identified miners replace old entries for the same height
+    df_post_merged = df_post_merged.drop_duplicates(subset=['height'], keep='last')
     df_post_merged = df_post_merged.sort_values('height').reset_index(drop=True)
     print(f"  Merged post-2020 blocks: {len(df_post_merged)} (heights {df_post_merged['height'].min()} – {df_post_merged['height'].max()})")
 

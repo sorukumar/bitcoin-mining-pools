@@ -1,0 +1,17 @@
+# Bitcoin Mining Pools Data & Dashboard
+
+This repository contains a full-stack data pipeline and interactive static dashboard for tracking Bitcoin mining pool dominance, forensics, and decentralization metrics.
+
+## Architecture
+1. **Pipeline (`scripts/`)**: Python RAG scripts (Pandas/PyArrow) read `data/raw/blocks.csv` and parquet files. It maps coinbase tags to pools, and computes metrics like Herfindahl-Hirschman Index (HHI), Z-scores for hashrate luck, and Consecutive Blocks latency.
+2. **Dashboard (`dashboard/`)**: A "no-build-step" static web application. It uses `hyparquet` to read the processed Parquet files directly in the browser and visualizes them using ECharts (`dashboard/js/charts.js`).
+
+## Key Forensics Metrics ("Reorg Risks")
+- **Consecutive Blocks**: Tracks pools mining 6+ blocks in a row. Short latency intervals (< 30s) increase risk of forks and 2-block reorgs.
+- **Luck & Z-Score**: Expected block production vs actual production. High positive Z-scores (Z > 3) signal hidden/ghost hashrate.
+- **Entropy Heatmap**: Differentiates corporate mining (hyper-stable latency) from retail operations (high variance).
+
+## Useful File References
+- `/dashboard/index.html`: The core UI layout.
+- `/dashboard/js/charts.js`: The ECharts rendering logic.
+- `/scripts/process_forensics.py`: The mathematical modeling for the mining forensics metrics.

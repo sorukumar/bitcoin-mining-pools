@@ -838,3 +838,227 @@ export function resizeAll() {
   hhiChart?.resize();
   concentrationChart?.resize();
 }
+
+// ── KPI 1: Streaks Leaderboard ────────────────────────────────────────────────
+export function renderStreaksLeaderboard(strikes) {
+  const el = document.getElementById('forensics-streaks-table');
+  if (!el || !strikes) return;
+
+  const rows = strikes.slice(0, 10).map((s, i) => {
+    // Format duration nicely (e.g. 12.5 mins or 2.1 hours)
+    let durationStr = '-';
+    if (s.duration_sec) {
+      if (s.duration_sec < 3600) {
+        durationStr = `${(s.duration_sec / 60).toFixed(1)} mins`;
+      } else {
+        durationStr = `${(s.duration_sec / 3600).toFixed(1)} hrs`;
+      }
+    }
+    return `
+    <tr>
+      <td style="width: 30px; opacity: 0.5;">${i + 1}</td>
+      <td style="font-weight: 600; color: var(--text-primary)">${s.pool}</td>
+      <td><span class="streak-badge">${s.count} Blocks</span></td>
+      <td style="color: var(--text-secondary); font-size: 0.8rem">${new Date(s.start_time).toLocaleDateString()}</td>
+      <td style="color: var(--text-secondary); font-size: 0.85rem; font-family: monospace;">${s.start_height.toLocaleString()}</td>
+      <td style="color: var(--accent); font-size: 0.85rem; text-align: right; white-space: nowrap;">${durationStr}</td>
+    </tr>
+  `;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="forensic-table-wrapper">
+      <table class="forensic-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pool</th>
+            <th>Streak Count</th>
+            <th>Date</th>
+            <th>Start Height</th>
+            <th style="text-align: right;">Duration</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── KPI 2: Z-Score Funnel (Scatter) ──────────────────────────────────────────
+export let zscoreChart = null;
+export function renderZScoreFunnel(funnelData) {
+  const el = document.getElementById('chart-zscore-funnel');
+  if (!el || !funnelData || funnelData.length === 0) return;
+  if (!zscoreChart) {
+    zscoreChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => zscoreChart.resize());
+  }
+
+  // Use only the most recent snapshot for the scatter plot
+  const latestTs = funnelData[0].timestamp;
+  const data = funnelData.filter(d => d.timestamp === latestTs);
+
+  zscoreChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'item',
+      formatter: (p) => {
+        const d = p.data;
+        const color = Math.abs(d[2]) > 3 ? '#ff4d4f' : '#6db874';
+        return `<b style="color:${color}">${d[3]}</b><br/>Share: <b>${d[0]}%</b><br/>Luck: <b>${d[1]}%</b><br/>Z-Score: <b>${d[2]}</b>`;
+      }
+    },
+    grid: { top: 40, left: 50, right: 30, bottom: 40 },
+    xAxis: { 
+      name: 'Pool Share %',
+      nameLocation: 'middle',
+      nameGap: 30,
+      splitLine: { show: false }, 
+      axisLabel: { color: THEME.muted },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    yAxis: { 
+      name: 'Luck %',
+      nameLocation: 'middle',
+      nameGap: 35,
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLabel: { color: THEME.muted },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    series: [{
+      type: 'scatter',
+      symbolSize: (val) => 10 + Math.sqrt(val[0]) * 3,
+      data: data.map(d => [d.share, d.luck, d.z, d.pool]),
+      itemStyle: {
+        color: (p) => Math.abs(p.data[2]) > 3 ? '#ff4d4f' : '#6db874',
+        opacity: 0.8,
+        borderColor: THEME.bg,
+        borderWidth: 1,
+        shadowBlur: 10,
+        shadowColor: 'rgba(0,0,0,0.3)'
+      },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        lineStyle: { color: THEME.muted, type: 'dashed', opacity: 0.3 },
+        data: [{ yAxis: 100 }]
+      }
+    }]
+  }, true);
+}
+
+// ── KPI 3: Entropy Heatmap ────────────────────────────────────────────────────
+export let entropyChart = null;
+export function renderEntropyHeatmap(entropyData) {
+  const el = document.getElementById('chart-entropy-heatmap');
+  if (!el || !entropyData || entropyData.length === 0) return;
+  if (!entropyChart) {
+    entropyChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => entropyChart.resize());
+  }
+
+  const pools = [...new Set(entropyData.map(d => d.pool))];
+  const dates = [...new Set(entropyData.map(d => d.date))].sort();
+
+  const data = entropyData.map(d => [dates.indexOf(d.date), pools.indexOf(d.pool), d.cv]);
+
+  entropyChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: { 
+      ...baseTooltip({ confine: true }),
+      position: 'top',
+      formatter: (p) => {
+        const val = p.data[2];
+        const status = val < 0.7 ? 'Centralized/Industrial' : (val > 1.0 ? 'Decentralized/Retail' : 'Normal');
+        return `<b>${pools[p.data[1]]}</b> (${dates[p.data[0]]})<br/>Entropy (CV): <b>${val.toFixed(3)}</b><br/><span style="font-size:10px; opacity:0.8">${status}</span>`;
+      }
+    },
+    grid: { top: 10, left: 100, right: 20, bottom: 60 },
+    xAxis: { 
+      type: 'category', 
+      data: dates, 
+      axisLabel: { color: THEME.muted, rotate: 30, fontSize: 10 },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    yAxis: { 
+      type: 'category', 
+      data: pools, 
+      axisLabel: { color: THEME.text, fontSize: 11 },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    visualMap: {
+      min: 0.5,
+      max: 1.2,
+      calculable: true,
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 0,
+      text: ['High Entropy', 'Low Entropy'],
+      textStyle: { color: THEME.muted, fontSize: 10 },
+      inRange: {
+        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+      }
+    },
+    series: [{
+      type: 'heatmap',
+      data: data,
+      label: { show: false },
+      emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
+    }]
+  }, true);
+}
+
+// ── KPI 4: Sync Histogram ─────────────────────────────────────────────────────
+export let syncChart = null;
+export function renderSyncHistogram(syncData) {
+  const el = document.getElementById('chart-sync-histogram');
+  if (!el || !syncData || syncData.length === 0) return;
+  if (!syncChart) {
+    syncChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => syncChart.resize());
+  }
+
+  const poolNames = syncData.map(d => d.pool);
+  const keys = ['sub_30s', 'sub_60s', 'sub_2m', 'sub_5m', 'slow'];
+  // Highlight sub_30s in red/orange to indicate fork/reorg risk
+  const colors = ['#ff4d4f', '#E2A34A', '#E5C07B', '#98C379', '#56B6C2'];
+
+  const series = keys.map((key, i) => ({
+    name: key.replace('sub_', '< ').replace('s', 's').replace('m', 'm').replace('slow', '> 5m'),
+    type: 'bar',
+    stack: 'total',
+    itemStyle: { color: colors[i] },
+    data: syncData.map(d => d.buckets[key])
+  }));
+
+  syncChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: { ...baseTooltip({ confine: true }), trigger: 'axis', axisPointer: { type: 'shadow' } },
+    legend: { 
+      bottom: 0, 
+      textStyle: { color: THEME.muted, fontSize: 10 },
+      icon: 'circle',
+      itemWidth: 10
+    },
+    grid: { top: 20, left: 100, right: 30, bottom: 60 },
+    xAxis: { 
+      type: 'value', 
+      axisLabel: { color: THEME.muted, fontSize: 10 },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+    },
+    yAxis: { 
+      type: 'category', 
+      data: poolNames, 
+      axisLabel: { color: THEME.text, fontSize: 11 },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    series: series
+  }, true);
+}
+
+export function resizeAllCharts() {
+  const charts = [donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart, zscoreChart, entropyChart, syncChart];
+  charts.forEach(c => c && c.resize());
+}

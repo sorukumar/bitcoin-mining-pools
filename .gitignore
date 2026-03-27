@@ -3,6 +3,7 @@ blocks.csv
 block.csv
 data/raw/blocks.csv
 data/raw/*.csv
+bitcoin_blocks_pool*
 
 # Environment
 .venv/

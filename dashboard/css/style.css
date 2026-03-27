@@ -562,3 +562,147 @@ footer {
 .top-miners-table i {
   color: var(--accent);
 }
+
+/* Forensics Section */
+.forensic-box {
+  background: rgba(22, 27, 34, 0.4);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+.forensic-box:hover {
+  border-color: var(--accent);
+  background: rgba(22, 27, 34, 0.6);
+}
+.forensic-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 15px;
+}
+.forensic-header h4 {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.forensic-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: 4px;
+}
+.streak-badge {
+  background: rgba(226, 163, 74, 0.15);
+  color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border: 1px solid rgba(226, 163, 74, 0.4);
+}
+.forensic-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.forensic-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 5px;
+  border-bottom: 1px solid var(--border);
+}
+.forensic-table td {
+  padding: 12px 5px;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed var(--border);
+}
+.forensic-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── App Tabs ─────────────────────────────────────────────────── */
+.app-tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 70px;
+  z-index: 90;
+  backdrop-filter: blur(10px);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.main-tabs {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  width: 100%;
+}
+.main-tabs .segmented-btn {
+  padding: 0.8rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure forensic table is responsive */
+.forensic-table-wrapper {
+  overflow-x: auto;
+}
+
+/* ── Info Cards ───────────────────────────────────────────────── */
+.info-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.info-toggle:hover {
+  color: var(--accent);
+  background: rgba(226, 163, 74, 0.1);
+}
+.info-toggle.active {
+  color: var(--accent);
+}
+.info-card {
+  display: none;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  animation: fadeIn 0.2s ease;
+}
+.info-card.show {
+  display: block;
+}
+.info-card strong {
+  color: var(--text-primary);
+}
