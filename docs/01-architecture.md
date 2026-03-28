@@ -18,6 +18,7 @@ by GitHub Pages.
 │   │   ├── blocks_pre_2020.parquet  (7.6 MB, Snappy)     │
 │   │   ├── pool_metrics.json   (30 KB)                   │
 │   │   ├── pool_growth.json   (2.7 KB)                   │
+│   │   ├── forensics_data.json (15 KB)                   │
 │   │   └── lookup/                                       │
 │   │       ├── lookup_slug_to_name.json                  │
 │   │       ├── pools_info.json                           │
@@ -34,17 +35,20 @@ by GitHub Pages.
 │   data/raw/                                              │
 │   ├── blocks.csv       ← source from jlopp (869k rows)  │
 │   ├── pools.json       ← pool metadata from bitcoin-data│
-│   └── bitcoin_miners_myrp.parquet ← new MYRP data       │
+│   ├── bitcoin_miners_myrp.parquet ← new MYRP data       │
+│   └── bitcoin_blocks_pool.parquet ← modern epoch blocks │
 │                                                          │
 │   scripts/                                               │
 │   ├── prepare_data.py  ← CSV → Parquet pipeline         │
 │   ├── merge_myrp.py    ← Merges MYRP data into parquets │
-│   └── update_metrics.py ← Calculates final metrics JSONs │
+│   ├── update_metrics.py ← Calculates final metrics JSONs │
+│   └── process_forensics.py ← Forensics & Reorg Risks    │
 │                                                          │
 │   data/processed/                                        │
 │   ├── blocks.parquet   ← master copy (source of truth)  │
 │   ├── pool_metrics.json ← master copy                    │
-│   └── pool_growth.json  ← master copy                    │
+│   ├── pool_growth.json  ← master copy                    │
+│   └── forensics_data.json ← master copy                  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -64,18 +68,21 @@ bitcoin-mining-pools/
 ├── data/
 │   ├── raw/
 │   │   ├── blocks.csv          ← canonical raw input for the pipeline
-│   │   └── pools.json          ← pool name/link lookup from bitcoin-data/mining-pools
+│   │   ├── pools.json          ← pool name/link lookup from bitcoin-data/mining-pools
+│   │   └── bitcoin_blocks_pool.parquet ← modern blocks and mempool data
 │   ├── processed/
 │   │   ├── blocks.parquet      ← master processed parquet (source of truth)
 │   │   ├── pool_metrics.json   ← master pool metadata/metrics JSON
-│   │   └── pool_growth.json    ← master ecosystem growth JSON
+│   │   ├── pool_growth.json    ← master ecosystem growth JSON
+│   │   └── forensics_data.json ← master forensics export
 │   └── geo/                    ← RESERVED: future geolocation data (empty now)
 │       └── .gitkeep
 │
 ├── scripts/
 │   ├── prepare_data.py         ← processes legacy CSV and pools.json
 │   ├── merge_myrp.py           ← merges additional MYRP blocks
-│   └── update_metrics.py       ← calculates final metrics and ecosystem growth
+│   ├── update_metrics.py       ← calculates final metrics and ecosystem growth
+│   └── process_forensics.py    ← generates reorg risks, entropy, Z-scores
 │
 ├── dashboard/                  ← GitHub Pages root (everything here is public)
 │   ├── index.html
@@ -85,6 +92,7 @@ bitcoin-mining-pools/
 │   │   ├── blocks_pre_2020.parquet
 │   │   ├── pool_metrics.json   ← COPY of data/processed/pool_metrics.json
 │   │   ├── pool_growth.json    ← COPY of data/processed/pool_growth.json
+│   │   ├── forensics_data.json ← COPY of data/processed/forensics_data.json
 │   │   └── lookup/
 │   │       ├── lookup_slug_to_name.json
 │   │       ├── pools_info.json
@@ -112,6 +120,7 @@ bitcoin-mining-pools/
 > cp data/processed/blocks_pre_2020.parquet  dashboard/data/blocks_pre_2020.parquet
 > cp data/processed/pool_metrics.json      dashboard/data/pool_metrics.json
 > cp data/processed/pool_growth.json       dashboard/data/pool_growth.json
+> cp data/processed/forensics_data.json    dashboard/data/forensics_data.json
 > cp data/processed/lookup/lookup_slug_to_name.json dashboard/data/lookup/lookup_slug_to_name.json
 > ```
 
