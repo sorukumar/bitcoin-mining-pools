@@ -36,24 +36,28 @@ def resolve_pool(coinbase_tag, sorted_tags):
     return "Unknown"
 
 def main():
-    print("Loading bitcoin_blocks_pool.parquet ...")
-    df = pd.read_parquet(RAW / "bitcoin_blocks_pool.parquet")
+    print("Loading datasets for synchronization...")
+    # 1. Load Main Dashboard Data (The "Identity" Source)
+    df_main = pd.read_parquet(DASHBOARD_DATA / "blocks_post_2020.parquet")
     
-    # Filter for Jan 2020 onwards
-    # Height ~610682
-    df = df[df['block_height'] >= 610682].copy()
-    df = df.sort_values('block_height').reset_index(drop=True)
+    # 2. Load Raw Forensics Data (The "Metric" Source)
+    df_raw = pd.read_parquet(RAW / "bitcoin_blocks_pool.parquet")
     
-    print(f"Processing {len(df):,} blocks (post-2020)...")
+    # 3. Join on Height to ensure 100% consistency with main dashboard
+    print("Joining datasets on block height ...")
+    df = pd.merge(
+        df_main, 
+        df_raw[['block_height', 'bytes_total', 'block_weight', 'tx_count', 'block_time']], 
+        left_on='height', 
+        right_on='block_height', 
+        how='inner'
+    )
     
-    # 1. Resolve Pools
-    print("Mapping coinbase tags to pools ...")
-    tags = load_pool_mapping()
-    df['pool_name'] = df['coinbase_tag'].apply(lambda x: resolve_pool(x, tags))
+    # Use pool_slug as the primary pool identifier
+    df['pool_name'] = df['pool_slug']
     
     # 2. Add Datetime
     df['timestamp'] = pd.to_datetime(df['block_time'], unit='s')
-    df['date_key'] = df['timestamp'].dt.date
     
     # KPI 1: Consecutive Strikes
     print("KPI 1: Consecutive Strikes Analysis...")
@@ -186,12 +190,85 @@ def main():
             "total_consecutive": len(p_deltas)
         })
 
+    # KPI 5: Empty Block Auditor (Multi-Horizon)
+    print("KPI 5: Empty Block Auditor Analysis...")
+    df['is_empty'] = df['tx_count'] == 1
+    
+    # 1. Snapshots (All-time vs 30-day)
+    thirty_days_ago = df['timestamp'].max() - pd.Timedelta(days=30)
+    df_30d = df[df['timestamp'] >= thirty_days_ago]
+    
+    empty_stats = []
+    for pool in top_pools:
+        # All-time
+        p_df = df[df['pool_name'] == pool]
+        if len(p_df) < 50: continue
+        
+        total_all = len(p_df)
+        empty_all = int(p_df['is_empty'].sum())
+        
+        # 30-day
+        p_df_30 = df_30d[df_30d['pool_name'] == pool]
+        total_30 = len(p_df_30)
+        empty_30 = int(p_df_30['is_empty'].sum()) if total_30 > 0 else 0
+        
+        empty_stats.append({
+            "pool": pool,
+            "total_all": total_all,
+            "empty_all": empty_all,
+            "ratio_all": round(empty_all / total_all * 100, 2),
+            "total_30d": total_30,
+            "empty_30d": empty_30,
+            "ratio_30d": round(empty_30 / total_30 * 100, 2) if total_30 > 0 else 0
+        })
+    
+    empty_stats = sorted(empty_stats, key=lambda x: x['ratio_all'], reverse=True)
+
+    # 2. Monthly Trend (for the Top 10 pools by empty ratio)
+    print("  Calculating monthly empty block trends...")
+    df['month'] = df['timestamp'].dt.to_period('M').astype(str)
+    
+    # We only take pools that actually have a significant presence
+    top_empty_offenders = [s['pool'] for s in empty_stats[:10]]
+    trend_df = df[df['pool_name'].isin(top_empty_offenders)].groupby(['month', 'pool_name']).agg(
+        total=('is_empty', 'count'),
+        empty=('is_empty', 'sum')
+    ).reset_index()
+    trend_df['ratio'] = (trend_df['empty'] / trend_df['total'] * 100).round(2)
+    
+    monthly_empty_trend = trend_df.to_dict(orient='records')
+
+    # KPI 6: Block Density Index
+    print("KPI 6: Block Density Index...")
+    # Space efficiency = bytes_total / block_weight
+    # Max block_weight is 4,000,000
+    df['density'] = df['bytes_total'] / df['block_weight']
+    
+    density_stats = []
+    for pool in top_pools:
+        p_df = df[df['pool_name'] == pool]
+        if len(p_df) < 100: continue
+        
+        density_stats.append({
+            "pool": pool,
+            "avg_density": round(float(p_df['density'].mean()), 4),
+            "avg_tx_count": round(float(p_df['tx_count'].mean()), 2),
+            "avg_bytes": round(float(p_df['bytes_total'].mean()), 2)
+        })
+    
+    density_stats = sorted(density_stats, key=lambda x: x['avg_density'], reverse=True)
+
     # Combine all into one JSON
     output = {
         "kpi1_strikes": leaderboard_json,
         "kpi2_funnel": funnel_data,
         "kpi3_entropy": entropy_data,
         "kpi4_sync": sync_stats,
+        "kpi5_empty_blocks": {
+            "leaderboard": empty_stats,
+            "monthly_trend": monthly_empty_trend
+        },
+        "kpi6_density": density_stats,
         "last_updated": pd.Timestamp.now().isoformat()
     }
     

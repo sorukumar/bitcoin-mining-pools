@@ -294,6 +294,26 @@
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                  <h4>Empty Block Auditor (Propagational Latency)</h4>
+                  <span class="forensic-sub">Pools mining empty blocks (1 transaction) often indicate "spy mining" or skipping validation to save time.</span>
+                </div>
+                <button class="info-toggle" data-target="info-empty"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-empty">
+                <p><strong>How to read it:</strong> This scatter plot identifies pools that mine "Empty Blocks" (blocks containing only the coinbase transaction). The X-axis shows the pool's market share, and the Y-axis shows the percentage of their blocks that were empty.</p>
+                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <ul style="margin-left: 15px; margin-top: 4px;">
+                  <li><strong>Spy Mining:</strong> High-share pools with high empty block ratios are likely "spy mining"—starting to mine on the headers of a new block before they have fully validated its transactions.</li>
+                  <li><strong>Network Stewardship:</strong> Low ratios indicate pools that prioritize network health by ensuring all blocks carry maximum transaction utility.</li>
+                </ul>
+              </div>
+            </div>
+            <div id="chart-empty-blocks" style="height: 320px;"></div>
+          </div>
+          <div class="forensic-box" style="grid-column: 1 / -1;">
+            <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
                   <h4>Miner Timing Patterns (Entropy Heatmap)</h4>
                   <span class="forensic-sub">Differentiating steady "Corporate" operations (Low Entropy) from irregular "Retail" mining (High Entropy).</span>
                 </div>

@@ -1,7 +1,7 @@
 import { loadData, loadParquetOnly, loadForensics, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
 import { 
   renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, 
-  renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram,
+  renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram, renderEmptyBlockChart,
   resizeAllCharts, donutChart, growthChart 
 } from './charts.js?v=13';
 
@@ -301,6 +301,7 @@ function renderAll() {
     renderZScoreFunnel(forensics.kpi2_funnel);
     renderEntropyHeatmap(forensics.kpi3_entropy);
     renderSyncHistogram(forensics.kpi4_sync);
+    renderEmptyBlockChart(forensics.kpi5_empty_blocks);
   }
 
   // Handle custom request-profile events from the new search UI

@@ -1010,6 +1010,79 @@ export function renderEntropyHeatmap(entropyData) {
   }, true);
 }
 
+// ── KPI 5: Empty Block Auditor (Scatter) ──────────────────────────────────────
+export let emptyChart = null;
+export function renderEmptyBlockChart(emptyData) {
+  const el = document.getElementById('chart-empty-blocks');
+  if (!el || !emptyData || !emptyData.leaderboard) return;
+  if (!emptyChart) {
+    emptyChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => emptyChart.resize());
+  }
+
+  // Calculate Market Share for X-axis (if not provided, we derive it from leaderboard)
+  // Let's use the All-time ratio to start, or we could toggle to 30d
+  const data = emptyData.leaderboard.map(d => {
+    // We want: [X: Share %, Y: Empty %, R: Total Blocks, Name: Pool]
+    // Since we don't have global share here, we'll use a placeholder or have caller provide it.
+    // Actually, let's just use total_all as a proxy for share if needed, 
+    // but better to calculate actual share.
+    const totalGlobal = emptyData.leaderboard.reduce((s, x) => s + x.total_all, 0);
+    const share = (d.total_all / totalGlobal) * 100;
+    return [share, d.ratio_all, d.total_all, d.pool, d.ratio_30d];
+  });
+
+  emptyChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'item',
+      formatter: (p) => {
+        const d = p.data;
+        const color = d[1] > 1.0 ? '#ff4d4f' : THEME.accent;
+        return `<b style="color:${color}">${d[3]}</b><br/>All-Time Share: <b>${d[0].toFixed(2)}%</b><br/>Empty Ratio (All-time): <b>${d[1]}%</b><br/>Empty Ratio (Last 30d): <b>${d[4]}%</b><br/>Total Blocks: <b>${d[2].toLocaleString()}</b>`;
+      }
+    },
+    grid: { top: 40, left: 50, right: 30, bottom: 40 },
+    xAxis: { 
+      name: 'All-Time Market Share %',
+      nameLocation: 'middle',
+      nameGap: 30,
+      splitLine: { show: false }, 
+      axisLabel: { color: THEME.muted },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    yAxis: { 
+      name: 'Empty Block %',
+      nameLocation: 'middle',
+      nameGap: 35,
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLabel: { color: THEME.muted },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    series: [{
+      type: 'scatter',
+      symbolSize: (val) => 10 + Math.sqrt(val[2]) * 0.1,
+      data: data,
+      itemStyle: {
+        color: (p) => p.data[1] > 1.0 ? '#ff4d4f' : THEME.accent,
+        opacity: 0.8,
+        borderColor: THEME.bg,
+        borderWidth: 1,
+        shadowBlur: 10,
+        shadowColor: 'rgba(0,0,0,0.3)'
+      },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        lineStyle: { color: '#ff4d4f', type: 'dashed', opacity: 0.5 },
+        label: { show: true, formatter: 'Anomaly Threshold (1%)', position: 'end', color: '#ff4d4f', fontSize: 10 },
+        data: [{ yAxis: 1.0 }]
+      }
+    }]
+  }, true);
+}
+
 // ── KPI 4: Sync Histogram ─────────────────────────────────────────────────────
 export let syncChart = null;
 export function renderSyncHistogram(syncData) {
@@ -1059,6 +1132,6 @@ export function renderSyncHistogram(syncData) {
 }
 
 export function resizeAllCharts() {
-  const charts = [donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart, zscoreChart, entropyChart, syncChart];
+  const charts = [donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart, zscoreChart, entropyChart, syncChart, emptyChart];
   charts.forEach(c => c && c.resize());
 }
