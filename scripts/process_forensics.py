@@ -38,7 +38,7 @@ def resolve_pool(coinbase_tag, sorted_tags):
 def main():
     print("Loading datasets for synchronization...")
     # 1. Load Main Dashboard Data (The "Identity" Source)
-    df_main = pd.read_parquet(DASHBOARD_DATA / "blocks_post_2020.parquet")
+    df_main = pd.read_parquet(DASHBOARD_DATA / "blocks_post_2021.parquet")
     
     # 2. Load Raw Forensics Data (The "Metric" Source)
     df_raw = pd.read_parquet(RAW / "bitcoin_blocks_pool.parquet")
@@ -47,7 +47,7 @@ def main():
     print("Joining datasets on block height ...")
     df = pd.merge(
         df_main, 
-        df_raw[['block_height', 'bytes_total', 'block_weight', 'tx_count', 'block_time']], 
+        df_raw[['block_height', 'bytes_total', 'block_weight', 'tx_count', 'block_time', 'protocol_version', 'bytes_stripped']], 
         left_on='height', 
         right_on='block_height', 
         how='inner'
@@ -58,6 +58,9 @@ def main():
     
     # 2. Add Datetime
     df['timestamp'] = pd.to_datetime(df['block_time'], unit='s')
+    
+    # Filter to start from January 2021 as requested
+    df = df[df['timestamp'] >= '2021-01-01'].copy()
     
     # KPI 1: Consecutive Strikes
     print("KPI 1: Consecutive Strikes Analysis...")
@@ -258,6 +261,85 @@ def main():
     
     density_stats = sorted(density_stats, key=lambda x: x['avg_density'], reverse=True)
 
+    # KPI 7: BIP 110 Battleground
+    print("KPI 7: BIP 110 Battleground Analysis...")
+    # 1. Signaling Logic
+    df['is_bip110'] = (df['protocol_version'] & 16) != 0
+    
+    # Get 2016-block rolling average of signaling
+    # We'll do this globally and also per-pool if we want the stacked area
+    # For a stacked area chart, we need the contribution of each pool to the total signaling
+    # Or rather, the share of signaling blocks mined by each pool in the window.
+    df['signaling_val'] = df['is_bip110'].astype(int)
+    
+    # Calculate global signaling % over last 2016 blocks
+    df['global_signaling_2016'] = df['signaling_val'].rolling(window=2016, min_periods=1).mean() * 100
+    
+    # For the stacked area chart: we group by Day and Pool
+    df['day'] = df['timestamp'].dt.to_period('D').astype(str)
+    
+    # 2. Signaling Trend (Daily)
+    # We want: Day, Pool, SignalingBlocksCount
+    # And also TotalBlocksCount in that day to get the % context
+    bip110_daily = df.groupby(['day', 'pool_name']).agg(
+        total_blocks=('block_height', 'count'),
+        signaling_blocks=('is_bip110', 'sum')
+    ).reset_index()
+    
+    # 3. Efficiency Ratio (Scatter Sample)
+    # Take last 30 days for the efficiency scatter plot
+    efficiency_sample = df_30d[['block_height', 'tx_count', 'bytes_total', 'pool_name']].to_dict(orient='records')
+    
+    # 4. "Over-Limit" Blocks (83-Byte Rule Proxy)
+    # Calculation: (bytes_total - bytes_stripped) / tx_count
+    df['data_overhead'] = (df['bytes_total'] - df['bytes_stripped']) / df['tx_count'].replace(0, 1) # Avoid div by zero
+    
+    # Re-filter 30d to pick up the new column
+    df_30d_new = df[df['timestamp'] >= thirty_days_ago]
+    
+    overhead_stats = []
+    for pool in top_pools:
+        # Last 30 days only for overhead
+        p_df_30 = df_30d_new[df_30d_new['pool_name'] == pool]
+        if len(p_df_30) < 50: continue
+        
+        overhead_stats.append({
+            "pool": pool,
+            "avg_overhead": round(float(p_df_30['data_overhead'].mean()), 2),
+            "max_overhead": round(float(p_df_30['data_overhead'].max()), 2)
+        })
+    overhead_stats = sorted(overhead_stats, key=lambda x: x['avg_overhead'], reverse=True)
+
+    # Final Signaling Trend Data Formatting
+    days = sorted(bip110_daily['day'].unique())
+    # Pre-calculate global rolling at the end of each day efficiently
+    daily_rolling = df.groupby('day')['global_signaling_2016'].last().to_dict()
+    
+    signaling_trend = []
+    for d in days:
+        day_data = bip110_daily[bip110_daily['day'] == d]
+        pool_signaling = {}
+        pool_total = {}
+        day_total_blocks = 0
+        
+        for _, row in day_data.iterrows():
+            pname = row['pool_name']
+            sig_count = int(row['signaling_blocks'])
+            tot_count = int(row['total_blocks'])
+            day_total_blocks += tot_count
+            
+            if sig_count > 0:
+                pool_signaling[pname] = sig_count
+            pool_total[pname] = tot_count
+        
+        signaling_trend.append({
+            "day": str(d),
+            "total_blocks": day_total_blocks,
+            "pools_signaling": pool_signaling,
+            "pools_total": pool_total,
+            "global_rolling": round(float(daily_rolling.get(d, 0)), 2)
+        })
+
     # Combine all into one JSON
     output = {
         "kpi1_strikes": leaderboard_json,
@@ -269,6 +351,11 @@ def main():
             "monthly_trend": monthly_empty_trend
         },
         "kpi6_density": density_stats,
+        "kpi7_bip110": {
+            "signaling_trend": signaling_trend[-180:], # Last 180 days
+            "efficiency_scatter": efficiency_sample,
+            "overhead_bar": overhead_stats
+        },
         "last_updated": pd.Timestamp.now().isoformat()
     }
     

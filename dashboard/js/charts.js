@@ -842,47 +842,115 @@ export function resizeAll() {
 // ── KPI 1: Streaks Leaderboard ────────────────────────────────────────────────
 export function renderStreaksLeaderboard(strikes) {
   const el = document.getElementById('forensics-streaks-table');
-  if (!el || !strikes) return;
+  if (!el || !strikes || strikes.length === 0) return;
 
-  const rows = strikes.slice(0, 10).map((s, i) => {
-    // Format duration nicely (e.g. 12.5 mins or 2.1 hours)
-    let durationStr = '-';
-    if (s.duration_sec) {
-      if (s.duration_sec < 3600) {
-        durationStr = `${(s.duration_sec / 60).toFixed(1)} mins`;
-      } else {
-        durationStr = `${(s.duration_sec / 3600).toFixed(1)} hrs`;
-      }
+  // 1. Group by Pool
+  const poolStreaksMap = {};
+  strikes.forEach(s => {
+    if (!poolStreaksMap[s.pool]) {
+      poolStreaksMap[s.pool] = [];
     }
+    poolStreaksMap[s.pool].push(s);
+  });
+
+  // 2. Aggregate Pool Statistics
+  const poolStats = Object.keys(poolStreaksMap).map(pool => {
+    const pStrikes = poolStreaksMap[pool];
+    const latestStreak = pStrikes.reduce((latest, current) => 
+      new Date(current.start_time) > new Date(latest.start_time) ? current : latest, pStrikes[0]);
+    
+    return {
+      pool,
+      frequency: pStrikes.length,
+      maxStreak: Math.max(...pStrikes.map(s => s.count)),
+      latestDate: new Date(latestStreak.start_time).toLocaleDateString(),
+      allStreaks: pStrikes.sort((a, b) => b.count - a.count) // Sort nested streaks by count desc
+    };
+  });
+
+  // Sort pools by total frequency of streaks (Most active "streakers" first)
+  poolStats.sort((a, b) => b.frequency - a.frequency || b.maxStreak - a.maxStreak);
+
+  // 3. Render Leaderboard Rows
+  const rows = poolStats.slice(0, 10).map((p, i) => {
+    // Generate the drill-down table for this pool
+    const drillDownRows = p.allStreaks.slice(0, 10).map(s => {
+      let durationStr = s.duration_sec 
+        ? (s.duration_sec < 3600 ? `${(s.duration_sec / 60).toFixed(1)}m` : `${(s.duration_sec / 3600).toFixed(1)}h`)
+        : '-';
+      return `
+        <tr>
+          <td style="color: var(--text-secondary); padding: 6px 0;">${new Date(s.start_time).toLocaleDateString()}</td>
+          <td style="font-weight: 600; color: var(--accent);">${s.count} Blocks</td>
+          <td style="color: var(--text-secondary); font-family: monospace;">#${s.start_height.toLocaleString()}</td>
+          <td style="text-align: right; color: var(--text-secondary); opacity: 0.8;">${durationStr}</td>
+        </tr>
+      `;
+    }).join('');
+
     return `
-    <tr>
+    <tr class="pool-streak-row" data-pool="${p.pool}">
       <td style="width: 30px; opacity: 0.5;">${i + 1}</td>
-      <td style="font-weight: 600; color: var(--text-primary)">${s.pool}</td>
-      <td><span class="streak-badge">${s.count} Blocks</span></td>
-      <td style="color: var(--text-secondary); font-size: 0.8rem">${new Date(s.start_time).toLocaleDateString()}</td>
-      <td style="color: var(--text-secondary); font-size: 0.85rem; font-family: monospace;">${s.start_height.toLocaleString()}</td>
-      <td style="color: var(--accent); font-size: 0.85rem; text-align: right; white-space: nowrap;">${durationStr}</td>
+      <td style="font-weight: 700; color: var(--text-primary)">
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; margin-right: 8px; transition: transform 0.2s;"></i>
+        ${p.pool}
+      </td>
+      <td style="text-align: center;"><span class="streak-badge" style="background: rgba(138, 180, 248, 0.1); color: #8ab4f8; border-color: rgba(138, 180, 248, 0.3);">${p.frequency} Events</span></td>
+      <td style="text-align: right;"><span class="streak-badge">${p.maxStreak} Max</span></td>
+    </tr>
+    <tr class="pool-streak-detail" style="display: none;">
+      <td colspan="4" style="padding: 0 15px 15px 40px; border-bottom: none;">
+        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border-left: 2px solid var(--accent);">
+          <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; letter-spacing: 0.05em;">Top 10 Historical Streak Events</div>
+          <table style="width: 100%; font-size: 0.82rem;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <th style="text-align: left; padding: 5px 0;">Date</th>
+                <th style="text-align: left;">Count</th>
+                <th style="text-align: left;">Start Height</th>
+                <th style="text-align: right;">Duration</th>
+              </tr>
+            </thead>
+            <tbody>${drillDownRows}</tbody>
+          </table>
+        </div>
+      </td>
     </tr>
   `;
   }).join('');
 
   el.innerHTML = `
     <div class="forensic-table-wrapper">
-      <table class="forensic-table">
+      <table class="forensic-table streak-leaderboard">
         <thead>
           <tr>
             <th>#</th>
-            <th>Pool</th>
-            <th>Streak Count</th>
-            <th>Date</th>
-            <th>Start Height</th>
-            <th style="text-align: right;">Duration</th>
+            <th>Pool Identity</th>
+            <th style="text-align: center;">Frequency (≥6 Blocks)</th>
+            <th style="text-align: right;">Longest Streak</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
   `;
+
+  // 4. Wire Toggle Interactivity
+  el.querySelectorAll('.pool-streak-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const next = row.nextElementSibling;
+      const chevron = row.querySelector('.fa-chevron-right');
+      const isOpen = next.style.display !== 'none';
+      
+      // Close all others first (optional, for accordion effect)
+      // el.querySelectorAll('.pool-streak-detail').forEach(d => d.style.display = 'none');
+      // el.querySelectorAll('.fa-chevron-right').forEach(c => c.style.transform = 'rotate(0deg)');
+      
+      next.style.display = isOpen ? 'none' : 'table-row';
+      chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+      row.classList.toggle('active', !isOpen);
+    });
+  });
 }
 
 // ── KPI 2: Z-Score Funnel (Scatter) ──────────────────────────────────────────
@@ -1131,7 +1199,332 @@ export function renderSyncHistogram(syncData) {
   }, true);
 }
 
+// ── KPI 7: BIP 110 Signaling Trend ──────────────────────────────────────────
+export let bip110SignalingChart = null;
+export function renderBip110Signaling(trendData) {
+  const el = document.getElementById('chart-bip110-signaling');
+  if (!el || !trendData || trendData.length === 0) return;
+  if (!bip110SignalingChart) {
+    bip110SignalingChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => bip110SignalingChart.resize());
+  }
+
+  const days = trendData.map(d => d.day);
+  const globalRolling = trendData.map(d => d.global_rolling);
+  
+  // 1. Identify Top 5 Signaling and Top 5 Holdout pools overall (based on last 30 days)
+  const recentTrend = trendData.slice(-30);
+  const sigTotals = {};
+  const holdTotals = {};
+  
+  recentTrend.forEach(d => {
+    Object.entries(d.pools_total).forEach(([pool, total]) => {
+      const sig = d.pools_signaling[pool] || 0;
+      const hold = total - sig;
+      sigTotals[pool] = (sigTotals[pool] || 0) + sig;
+      holdTotals[pool] = (holdTotals[pool] || 0) + hold;
+    });
+  });
+
+  const topSignalers = Object.entries(sigTotals).sort((a,b) => b[1] - a[1]).slice(0, 5).map(p => p[0]);
+  const topHoldouts = Object.entries(holdTotals).sort((a,b) => b[1] - a[1]).slice(0, 5).map(p => p[0]);
+  
+  // Update the mini-leaderboard list
+  const sigList = document.getElementById('list-top-signalers');
+  const holdList = document.getElementById('list-top-holdouts');
+  const latestDay = trendData[trendData.length - 1];
+  
+  if (sigList) {
+    sigList.innerHTML = topSignalers.map((name, i) => {
+      const share = latestDay.total_blocks > 0 ? (latestDay.pools_signaling[name] || 0) / latestDay.total_blocks * 100 : 0;
+      return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span style="color:var(--text-primary); font-weight:500;">${name}</span>
+                <span style="color:#4ade80; font-weight:bold;">${share.toFixed(1)}%</span>
+              </div>`;
+    }).join('');
+  }
+  
+  if (holdList) {
+    holdList.innerHTML = topHoldouts.map((name, i) => {
+      const total = latestDay.pools_total[name] || 0;
+      const sig = latestDay.pools_signaling[name] || 0;
+      const share = latestDay.total_blocks > 0 ? (total - sig) / latestDay.total_blocks * 100 : 0;
+      return `<div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span style="color:var(--text-primary); font-weight:500;">${name}</span>
+                <span style="color:#ef4444; font-weight:bold;">${share.toFixed(1)}%</span>
+              </div>`;
+    }).join('');
+  }
+
+  const signalerSet = new Set(topSignalers);
+  const holdoutSet = new Set(topHoldouts);
+
+  // 2. Build Series (Stacked)
+  // We want Signaling at the bottom (Greens), then Holdouts at the top (Grays/Reds)
+  const series = [];
+  
+  // SIGNALERS (Greenish)
+  topSignalers.forEach((name, i) => {
+    series.push({
+      name: `Signal: ${name}`,
+      type: 'line',
+      stack: 'total',
+      smooth: true,
+      symbol: 'none',
+      areaStyle: { opacity: 0.85 },
+      lineStyle: { width: 0 },
+      color: ['#4ade80', '#22c55e', '#16a34a', '#15803d', '#14532d'][i],
+      emphasis: { focus: 'series' },
+      data: trendData.map(d => d.total_blocks > 0 ? (d.pools_signaling[name] || 0) / d.total_blocks * 100 : 0)
+    });
+  });
+
+  // OTHER SIGNALERS
+  series.push({
+    name: 'Other Signalers',
+    type: 'line',
+    stack: 'total',
+    smooth: true,
+    symbol: 'none',
+    areaStyle: { opacity: 0.6 },
+    lineStyle: { width: 0 },
+    color: '#064e3b',
+    data: trendData.map(d => {
+      let sum = 0;
+      Object.entries(d.pools_signaling).forEach(([p, c]) => { if (!signalerSet.has(p)) sum += c; });
+      return d.total_blocks > 0 ? sum / d.total_blocks * 100 : 0;
+    })
+  });
+
+  // HOLDOUTS (Reds/Grays)
+  topHoldouts.forEach((name, i) => {
+    series.push({
+      name: `Holdout: ${name}`,
+      type: 'line',
+      stack: 'total',
+      smooth: true,
+      symbol: 'none',
+      areaStyle: { opacity: 0.7 },
+      lineStyle: { width: 0 },
+      color: ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d'][i],
+      emphasis: { focus: 'series' },
+      data: trendData.map(d => {
+        const total = d.pools_total[name] || 0;
+        const sig = d.pools_signaling[name] || 0;
+        return d.total_blocks > 0 ? (total - sig) / d.total_blocks * 100 : 0;
+      })
+    });
+  });
+
+  // OTHER HOLDOUTS
+  series.push({
+    name: 'Other Holdouts',
+    type: 'line',
+    stack: 'total',
+    smooth: true,
+    symbol: 'none',
+    areaStyle: { opacity: 0.5 },
+    lineStyle: { width: 0 },
+    color: '#334155',
+    data: trendData.map(d => {
+      let sum = 0;
+      Object.entries(d.pools_total).forEach(([p, t]) => {
+        if (!holdoutSet.has(p)) {
+           const s = d.pools_signaling[p] || 0;
+           sum += (t - s);
+        }
+      });
+      return d.total_blocks > 0 ? sum / d.total_blocks * 100 : 0;
+    })
+  });
+
+  // Activation Progress Rolling Line
+  series.push({
+    name: '2,016 Block Activation Progress',
+    type: 'line',
+    smooth: true,
+    symbol: 'none',
+    lineStyle: { color: '#E2A34A', width: 4, type: 'solid', shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' },
+    data: globalRolling,
+    markLine: {
+      silent: true,
+      symbol: 'none',
+      label: { formatter: 'Activation (55%)', position: 'end', color: '#E2A34A', fontWeight: 'bold' },
+      lineStyle: { color: '#E2A34A', type: 'dashed', opacity: 0.9, width: 2 },
+      data: [{ yAxis: 55 }]
+    }
+  });
+
+  bip110SignalingChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params) => {
+        let h = `<div style="margin-bottom:5px; font-weight:bold; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">${params[0].axisValue} Coverage</div>`;
+        let sig = [];
+        let hold = [];
+        let rolling = null;
+        params.forEach(p => {
+          if (p.seriesName.includes('Activation')) rolling = p.value;
+          else if (p.seriesName.includes('Signal')) sig.push(p);
+          else hold.push(p);
+        });
+        
+        h += `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">`;
+        h += `<div><span style="color:#4ade80; font-size:10px; font-weight:bold;">SIGNALERS</span><br/>`;
+        sig.forEach(p => {
+          if (p.value > 0.1) h += `<div style="font-size:11px;">${p.marker} ${p.seriesName.replace('Signaling: ','').replace('Signal: ','')}: ${p.value.toFixed(1)}%</div>`;
+        });
+        h += `</div>`;
+        h += `<div><span style="color:#ef4444; font-size:10px; font-weight:bold;">HOLDOUTS</span><br/>`;
+        hold.forEach(p => {
+          if (p.value > 0.1) h += `<div style="font-size:11px;">${p.marker} ${p.seriesName.replace('Holdout: ','')}: ${p.value.toFixed(1)}%</div>`;
+        });
+        h += `</div></div>`;
+        if (rolling !== null) h += `<div style="margin-top:8px; padding-top:5px; border-top:1px solid rgba(255,255,255,0.1); color:#E2A34A; font-weight:bold;">Activation Progress: ${rolling}%</div>`;
+        return h;
+      }
+    },
+    legend: {
+      show: false // Too many items, better to use tooltip
+    },
+    grid: { top: 40, left: 50, right: 50, bottom: 40 },
+    xAxis: {
+      type: 'category',
+      data: days,
+      axisLabel: { color: THEME.muted, fontSize: 10, rotate: 30, hideOverlap: true },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    yAxis: {
+      type: 'value',
+      min: 0,
+      max: 100,
+      axisLabel: { color: THEME.muted, formatter: '{value}%' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+    },
+    series
+  }, true);
+}
+
+// ── KPI 7: BIP 110 Efficiency (Scatter) ──────────────────────────────────────
+export let bip110EfficiencyChart = null;
+export function renderBip110Efficiency(efficiencyData) {
+  const el = document.getElementById('chart-bip110-efficiency');
+  if (!el || !efficiencyData || efficiencyData.length === 0) return;
+  if (!bip110EfficiencyChart) {
+    bip110EfficiencyChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => bip110EfficiencyChart.resize());
+  }
+
+  // Group by pool for coloring
+  const poolGroups = {};
+  efficiencyData.forEach(d => {
+    if (!poolGroups[d.pool_name]) poolGroups[d.pool_name] = [];
+    poolGroups[d.pool_name].push([d.tx_count, d.bytes_total, d.block_height]);
+  });
+
+  const series = Object.keys(poolGroups).map((name, i) => ({
+    name,
+    type: 'scatter',
+    symbolSize: 6,
+    data: poolGroups[name],
+    itemStyle: {
+      color: POOL_COLORS[i % POOL_COLORS.length],
+      opacity: 0.6
+    },
+    emphasis: { focus: 'self' }
+  }));
+
+  bip110EfficiencyChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'item',
+      formatter: (p) => `<b>${p.seriesName}</b><br/>TXs: ${p.data[0]}<br/>Size: ${(p.data[1] / 1024 / 1024).toFixed(2)} MB<br/>Height: ${p.data[2]}`
+    },
+    legend: {
+      type: 'scroll',
+      top: 0,
+      textStyle: { color: THEME.muted, fontSize: 10 }
+    },
+    grid: { top: 40, left: 60, right: 30, bottom: 40 },
+    xAxis: {
+      name: 'Transaction Count',
+      nameLocation: 'middle',
+      nameGap: 25,
+      type: 'value',
+      axisLabel: { color: THEME.muted },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+    },
+    yAxis: {
+      name: 'Block Size (Bytes)',
+      nameLocation: 'middle',
+      nameGap: 45,
+      type: 'value',
+      axisLabel: { color: THEME.muted, formatter: (v) => (v / 1024 / 1024).toFixed(1) + ' MB' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+    },
+    series
+  }, true);
+}
+
+// ── KPI 7: BIP 110 Over-Limit (Bar) ──────────────────────────────────────────
+export let bip110OverheadChart = null;
+export function renderBip110Overhead(overheadData) {
+  const el = document.getElementById('chart-bip110-overhead');
+  if (!el || !overheadData || overheadData.length === 0) return;
+  if (!bip110OverheadChart) {
+    bip110OverheadChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => bip110OverheadChart.resize());
+  }
+
+  const data = [...overheadData].sort((a,b) => a.avg_overhead - b.avg_overhead);
+  const labels = data.map(d => d.pool);
+  const values = data.map(d => d.avg_overhead);
+
+  bip110OverheadChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: { ...baseTooltip(), trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { top: 20, left: 100, right: 40, bottom: 40 },
+    xAxis: {
+      type: 'value',
+      name: 'Bytes per TX',
+      nameLocation: 'middle',
+      nameGap: 25,
+      axisLabel: { color: THEME.muted },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+    },
+    yAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: { color: THEME.text, fontSize: 11 },
+      axisLine: { lineStyle: { color: THEME.border } }
+    },
+    series: [{
+      type: 'bar',
+      data: values.map((v, i) => ({
+        value: v,
+        itemStyle: { color: v > 200 ? '#ff4d4f' : '#6db874' }
+      })),
+      label: { show: true, position: 'right', color: THEME.muted, fontSize: 10, formatter: '{c} B' },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        label: { formatter: 'Proposed Limit (256B)', position: 'end', color: '#ff4d4f', fontSize: 10 },
+        lineStyle: { color: '#ff4d4f', type: 'dashed', opacity: 0.6 },
+        data: [{ xAxis: 256 }]
+      }
+    }]
+  }, true);
+}
+
 export function resizeAllCharts() {
-  const charts = [donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart, zscoreChart, entropyChart, syncChart, emptyChart];
+  const charts = [
+    donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart, 
+    zscoreChart, entropyChart, syncChart, emptyChart,
+    bip110SignalingChart, bip110EfficiencyChart, bip110OverheadChart
+  ];
   charts.forEach(c => c && c.resize());
 }

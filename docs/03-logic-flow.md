@@ -17,7 +17,7 @@ index.html parsed by browser
 initApp()  [main.js]
   │
   ├── loadData('post') [data-loader.js]
-  │     ├── fetch('./data/blocks_post_2020.parquet') ─┐ parallel
+  │     ├── fetch('./data/blocks_post_2021.parquet') ─┐ parallel
   │     ├── fetch('./data/pool_metrics.json')        ─┘
   │     ├── parquetRead({ file, rowFormat:'object', onComplete })
   │     ├── normalise date → JS Date
@@ -25,7 +25,7 @@ initApp()  [main.js]
   │     └── return { blocks, poolMeta, ..., maxDate }
   │
   ├── lazyLoadHistory() [main.js] (Begins in background)
-  │     └── fetch('./data/blocks_pre_2020.parquet')
+  │     └── fetch('./data/blocks_pre_2021.parquet')
   │
   ├── allBlocks  = dataset.blocks    ← stored in module-level state
   ├── poolMeta   = dataset.poolMeta  ← stored in module-level state

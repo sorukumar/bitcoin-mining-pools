@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bitcoin Mining Pools | Bitcoin Data Labs</title>
-  <meta name="description" content="Track Bitcoin mining pool dominance, concentration trends, ecosystem evolution, and block reorg risks. Explore decentralization insights from post-2020 data.">
+  <meta name="description" content="Track Bitcoin mining pool dominance, concentration trends, ecosystem evolution, and block reorg risks. Explore decentralization insights from post-2021 data.">
   <meta name="keywords" content="Bitcoin, Mining Pools, Hashrate, Decentralization, Reorg, Blockchain, Data Visualization, Market Share, Foundry, AntPool">
   <meta name="author" content="Bitcoin Data Labs">
   
@@ -88,7 +88,7 @@
       </div>
     </section>
 
-    <!-- Row 1: Macro Network Health (Unfiltered Post-2020) -->
+    <!-- Row 1: Macro Network Health (Unfiltered Post-2021) -->
     <section style="display: flex; gap: 20px; margin-bottom: 30px; min-height: 400px; flex-wrap: wrap;">
       <!-- Left 1/2: HHI Trend -->
       <div class="card" style="flex: 1; min-width: 350px; display: flex; flex-direction: column;">
@@ -207,7 +207,7 @@
           <h3 style="margin: 0;">Historical Pool Dominance</h3>
           <div class="filter-buttons segmented-control" id="period-buttons" style="margin: 0;">
             <button class="filter-btn segmented-btn" data-period="pre">From Beginning (2009)</button>
-            <button class="filter-btn segmented-btn active" data-period="post">Post-2020</button>
+            <button class="filter-btn segmented-btn active" data-period="post">Post-2021</button>
           </div>
         </div>
         <span class="chart-sub">Tracking the scale and share of major mining pools since 2009</span>
@@ -232,6 +232,7 @@
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                  <div class="horizon-tag hist"><i class="fa-solid fa-clock-rotate-left"></i> Historical Record (Post-2021)</div>
                   <h4>Consecutive Blocks & Reorg Risk</h4>
                   <span class="forensic-sub">Pools mining 6+ blocks in a row. High consecutive blocks increase the risk of blockchain reorganizations.</span>
                 </div>
@@ -252,6 +253,7 @@
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                  <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (Post-2021)</div>
                   <h4>Block Interval Latency (During Streaks)</h4>
                   <span class="forensic-sub">Time between consecutive blocks by the same pool. Shorter intervals (< 30s) often lead to block races and forks.</span>
                 </div>
@@ -274,6 +276,7 @@
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                  <div class="horizon-tag live"><i class="fa-solid fa-bolt"></i> Live Alert (24h Window / 14d Baseline)</div>
                   <h4>Reported vs. Actual Hashrate (Luck & Z-Score)</h4>
                   <span class="forensic-sub">Pools exhibiting statistically improbable luck ($Z > 3$) may be misreporting hashrate.</span>
                 </div>
@@ -294,6 +297,7 @@
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                  <div class="horizon-tag hist"><i class="fa-solid fa-layer-group"></i> Legacy vs. Recent (30-Day Snapshot)</div>
                   <h4>Empty Block Auditor (Propagational Latency)</h4>
                   <span class="forensic-sub">Pools mining empty blocks (1 transaction) often indicate "spy mining" or skipping validation to save time.</span>
                 </div>
@@ -310,10 +314,48 @@
             </div>
             <div id="chart-empty-blocks" style="height: 320px;"></div>
           </div>
+
+          <!-- Economic Efficiency (Moved from BIP 110) -->
+          <div class="forensic-box">
+             <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div class="horizon-tag recent"><i class="fa-solid fa-calendar-check"></i> Stewardship (Last 30 Days)</div>
+                  <h4>Economic Efficiency (The "Spam-to-Value" Index)</h4>
+                  <span class="forensic-sub">Transaction count vs. Total Block Size. Identifies data-heavy patterns (Inscriptions).</span>
+                </div>
+                <button class="info-toggle" data-target="info-efficiency"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-efficiency">
+                <p><strong>How to read it:</strong> Efficient blocks contain many transactions in a small size (bottom-right cluster). Blocks with few transactions but 4MB size (top-left) indicate heavy "Blob" data use like Inscriptions.</p>
+              </div>
+            </div>
+            <div id="chart-bip110-efficiency" style="height: 350px;"></div>
+          </div>
+
+          <!-- Data Overhead Bar (Moved from BIP 110) -->
+          <div class="forensic-box">
+             <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div class="horizon-tag recent"><i class="fa-solid fa-calendar-check"></i> Stewardship (Last 30 Days)</div>
+                  <h4>Average Data Overhead per Pool</h4>
+                  <span class="forensic-sub">Witness bytes per transaction. BIP 110 aims to soft-limit this to 256 bytes per push.</span>
+                </div>
+                <button class="info-toggle" data-target="info-overhead"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-overhead">
+                <p><strong>How to read it:</strong> This measures the "Witness density" of each pool. Red bars indicate pools that consistently mine data-heavy blocks that might exceed future soft-fork limits.</p>
+              </div>
+            </div>
+            <div id="chart-bip110-overhead" style="height: 350px;"></div>
+          </div>
+
           <div class="forensic-box" style="grid-column: 1 / -1;">
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                  <div class="horizon-tag hist"><i class="fa-solid fa-chart-line"></i> Behavioral Consistency (Weekly)</div>
                   <h4>Miner Timing Patterns (Entropy Heatmap)</h4>
                   <span class="forensic-sub">Differentiating steady "Corporate" operations (Low Entropy) from irregular "Retail" mining (High Entropy).</span>
                 </div>

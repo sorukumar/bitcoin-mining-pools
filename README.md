@@ -16,7 +16,7 @@ A "no-build-step," fully static web application hosted on GitHub Pages. It lever
 
 ### 2. The Data Pipeline (Processed Insights)
 A robust Python pipeline that transforms raw block-level data into high-performance, dictionary-encoded **Parquet** files.
-- **Dual-Era Storage**: Data is split into `blocks_pre_2020.parquet` and `blocks_post_2020.parquet`. This enables users to fetch only the modern industrial era (~3MB) for recent analysis without downloading the entire 17-year history.
+- **Dual-Era Storage**: Data is split into `blocks_pre_2021.parquet` and `blocks_post_2021.parquet`. This enables users to fetch only the modern industrial era (~3MB) for recent analysis without downloading the entire 17-year history.
 - **HHI Metrics**: Pre-calculated decentralization indices to track network health trends.
 
 ### 📊 Data Schema
@@ -70,9 +70,15 @@ We stand on the shoulders of the community. Our historical and real-time data is
 ## 🚀 Getting Started
 
 - **View Live Dashboard**: [Visit the GitHub Pages site](https://sorukumar.github.io/bitcoin-mining-pools/) (or your repo's URL).
-- **Run the Pipeline**: 
-  ```bash
-  python scripts/prepare_data.py
-  python scripts/update_metrics.py
-  ```
+
+### 🔄 Data Update Loop
+To refresh the dashboard with new block data from a node or pool-lookup registry, run the following sequence:
+
+1. **`python scripts/merge_myrp.py`**: Merges new blocks from your local node (`data/raw/bitcoin_miners_myrp.parquet`) into the dashboard dataset.
+2. **`python scripts/update_metrics.py`**: Recalculates all pool KPIs, ecosystem growth, and generates the master slug-to-name lookup.
+3. **`python scripts/process_forensics.py`**: Calibrates the advanced forensics models (Z-Scores, Entropy, Streaks).
+
+> [!NOTE]
+> `scripts/prepare_data.py` is now a **Legacy Importer** and should only be run if you are resetting the entire historical dataset from the original `blocks.csv`. Regular updates should skip this to avoid overwriting node data.
+
 - **Read the Docs**: Start with [docs/01-architecture.md](./docs/01-architecture.md) for a deep dive into how we handle 860k blocks in a browser.

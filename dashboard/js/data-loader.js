@@ -90,8 +90,8 @@ export async function loadForensics() {
 export async function loadData(period = 'post') {
   const isFullHistory = (period === 'pre');
   const parquetUrls = isFullHistory 
-    ? ['./data/blocks_pre_2020.parquet', './data/blocks_post_2020.parquet']
-    : ['./data/blocks_post_2020.parquet'];
+    ? ['./data/blocks_pre_2021.parquet', './data/blocks_post_2021.parquet']
+    : ['./data/blocks_post_2021.parquet'];
 
   const [blocksData, poolMeta, poolsInfo, timelines, ecosystem, lookup] = await Promise.all([
     Promise.all(parquetUrls.map(url => loadParquet(url))),
@@ -102,7 +102,17 @@ export async function loadData(period = 'post') {
     loadLookupSlugToName()
   ]);
 
-  const blocks = blocksData.flat();
+  let blocks = blocksData.flat();
+  
+  // If post-2021 is requested, filter out 2020 data
+  if (period === 'post') {
+    const start2021 = new Date('2021-01-01T00:00:00Z');
+    blocks = blocks.filter(b => {
+      // Sometimes b.date is µs timestamp from parquet at this stage
+      const d = (b.date instanceof Date) ? b.date : new Date(Number(b.date) / 1000);
+      return d >= start2021;
+    });
+  }
 
   // Normalise to JS Date and map pool_name from slug
   for (const b of blocks) {

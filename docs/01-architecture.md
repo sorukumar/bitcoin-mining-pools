@@ -13,9 +13,9 @@ by GitHub Pages.
 │   dashboard/          ← static file root                │
 │   ├── index.html      ← single page, loads all JS/CSS   │
 │   ├── css/style.css   ← all styles, no preprocessor     │
-│   ├── data/           ← pre-built data files            │
-│   │   ├── blocks_post_2020.parquet (3.3 MB, Snappy)     │
-│   │   ├── blocks_pre_2020.parquet  (7.6 MB, Snappy)     │
+│   ├── data/           ← pre-built data files (Updated: 2026-03-29)   │
+│   │   ├── blocks_post_2021.parquet (3.3 MB, Snappy)     │
+│   │   ├── blocks_pre_2021.parquet  (7.6 MB, Snappy)     │
 │   │   ├── pool_metrics.json   (30 KB)                   │
 │   │   ├── pool_growth.json   (2.7 KB)                   │
 │   │   ├── forensics_data.json (15 KB)                   │
@@ -35,20 +35,20 @@ by GitHub Pages.
 │   data/raw/                                              │
 │   ├── blocks.csv       ← source from jlopp (869k rows)  │
 │   ├── pools.json       ← pool metadata from bitcoin-data│
-│   ├── bitcoin_miners_myrp.parquet ← new MYRP data       │
-│   └── bitcoin_blocks_pool.parquet ← modern epoch blocks │
+│   ├── bitcoin_miners_myrp.parquet ← node data (till 2026)│
+│   └── bitcoin_blocks_pool.parquet ← forensics (till 2026)│
 │                                                          │
 │   scripts/                                               │
-│   ├── prepare_data.py  ← CSV → Parquet pipeline         │
-│   ├── merge_myrp.py    ← Merges MYRP data into parquets │
-│   ├── update_metrics.py ← Calculates final metrics JSONs │
-│   └── process_forensics.py ← Forensics & Reorg Risks    │
+│   ├── merge_myrp.py    ← (Step 1) Appends node data     │
+│   ├── update_metrics.py ← (Step 2) JSONs + Slug Lookup   │
+│   ├── process_forensics.py ← (Step 3) Forensics Analytics │
+│   └── prepare_data.py  ← [LEGACY] One-time CSV Import    │
 │                                                          │
-│   data/processed/                                        │
-│   ├── blocks.parquet   ← master copy (source of truth)  │
-│   ├── pool_metrics.json ← master copy                    │
-│   ├── pool_growth.json  ← master copy                    │
-│   └── forensics_data.json ← master copy                  │
+│   dashboard/data/      ← (Generated Artifacts)           │
+│   ├── blocks_post_2021.parquet                           │
+│   ├── pool_metrics.json                                  │
+│   ├── pool_growth.json                                   │
+│   └── forensics_data.json                                │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -79,17 +79,17 @@ bitcoin-mining-pools/
 │       └── .gitkeep
 │
 ├── scripts/
-│   ├── prepare_data.py         ← processes legacy CSV and pools.json
-│   ├── merge_myrp.py           ← merges additional MYRP blocks
-│   ├── update_metrics.py       ← calculates final metrics and ecosystem growth
-│   └── process_forensics.py    ← generates reorg risks, entropy, Z-scores
+│   ├── prepare_data.py         ← [LEGACY] processes CSV once and exits
+│   ├── merge_myrp.py           ← (Step 1) merges additional MYRP blocks
+│   ├── update_metrics.py       ← (Step 2) calculates final metrics and Slug Lookup
+│   └── process_forensics.py    ← (Step 3) generates reorg risks, entropy, Z-scores
 │
 ├── dashboard/                  ← GitHub Pages root (everything here is public)
 │   ├── index.html
 │   ├── css/style.css
 │   ├── data/
-│   │   ├── blocks_post_2020.parquet
-│   │   ├── blocks_pre_2020.parquet
+│   │   ├── blocks_post_2021.parquet ← (2021 — 2026)
+│   │   ├── blocks_pre_2021.parquet  ← (Genesis — 2020)
 │   │   ├── pool_metrics.json   ← COPY of data/processed/pool_metrics.json
 │   │   ├── pool_growth.json    ← COPY of data/processed/pool_growth.json
 │   │   ├── forensics_data.json ← COPY of data/processed/forensics_data.json
@@ -110,19 +110,13 @@ bitcoin-mining-pools/
     └── workflows/              ← RESERVED: future scheduled data refresh Action
 ```
 
-> **Important:** `dashboard/data/` is a **copy** of `data/processed/`.
-> 1. `python scripts/prepare_data.py`
-> 2. `python scripts/merge_myrp.py`
-> 3. `python scripts/update_metrics.py`
-> 4. Copy the resulting files:
-> ```bash
-> cp data/processed/blocks_post_2020.parquet dashboard/data/blocks_post_2020.parquet
-> cp data/processed/blocks_pre_2020.parquet  dashboard/data/blocks_pre_2020.parquet
-> cp data/processed/pool_metrics.json      dashboard/data/pool_metrics.json
-> cp data/processed/pool_growth.json       dashboard/data/pool_growth.json
-> cp data/processed/forensics_data.json    dashboard/data/forensics_data.json
-> cp data/processed/lookup/lookup_slug_to_name.json dashboard/data/lookup/lookup_slug_to_name.json
-> ```
+> **Standard Data Refresh Pipeline (Regular Use):**
+> 1. `python scripts/merge_myrp.py` (Appends 2025/2026 node data)
+> 2. `python scripts/update_metrics.py` (Refreshes lifetime KPIs and Slug Lookup)
+> 3. `python scripts/process_forensics.py` (Refreshes reorg & latency data)
+>
+> **Legacy Setup Only (Don't run by mistake):**
+> *   `python scripts/prepare_data.py` (Only for one-time CSV-to-Parquet migration)
 
 ---
 
@@ -134,7 +128,7 @@ bitcoin-mining-pools/
 | Data processing | `pandas` | Fast CSV read, clean column ops |
 | Parquet write | `pyarrow` | Best-in-class parquet support |
 | Compression | **Snappy** | Only codec hyparquet supports natively in-browser |
-| Dictionary encoding | `use_dictionary=["pool_slug"]` | Slugs repeat ~143 unique values across 869k rows → massive size saving |
+| Dictionary encoding | `use_dictionary=["pool_slug"]` | Slugs repeat ~143 unique values across 942k rows → massive size saving |
 
 ### Browser / Dashboard
 | Component | Choice | Version | Why |
@@ -164,7 +158,7 @@ circular import issues.
 |---|---|---|
 | jlopp/bitcoin-blocks-by-mining-pool | [GitHub Repo](https://github.com/jlopp/bitcoin-blocks-by-mining-pool) | `blocks.csv` — Historical (heights 0–869305) |
 | bitcoin-data/mining-pools | [GitHub Repo (generated branch)](https://github.com/bitcoin-data/mining-pools/tree/generated) | `pools.json` — Mapping addresses/tags to pool names |
-| Bitcoin Node (self-hosted) | Local RPC | **Post-2024 Data** — real-time blocks, fees, and network tip |
+| Bitcoin Node (self-hosted) | Local RPC | **Post-2024 Data** — March 2026 blocks ($H \approx 942,459$) |
 
 ---
 

@@ -706,3 +706,69 @@ footer {
 .info-card strong {
   color: var(--text-primary);
 }
+/* ── BIP 110 Battleground Theme ────────────────────────────────── */
+#tab-bip110 .card {
+  border-top: 3px solid #ff4d4f;
+}
+#tab-bip110 .forensic-box:hover {
+  border-color: #ff4d4f;
+  background: rgba(45, 30, 30, 0.6);
+}
+#tab-bip110 .info-toggle:hover {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+#tab-bip110 .info-toggle.active {
+  color: #ff4d4f;
+}
+#tab-bip110 .info-card {
+  border-left-color: #ff4d4f;
+}
+/* ── Horizon Tag (Consistency Part 1) ────────────────────────── */
+.horizon-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.horizon-tag.hist   { color: #8ab4f8; border-color: rgba(138, 180, 248, 0.2); background: rgba(138, 180, 248, 0.05); }
+.horizon-tag.live   { color: #ff4d4f; border-color: rgba(255, 77, 79, 0.2); background: rgba(255, 77, 79, 0.05); }
+.horizon-tag.recent { color: #98c379; border-color: rgba(152, 195, 121, 0.2); background: rgba(152, 195, 121, 0.05); }
+.horizon-tag i { font-size: 0.7rem; }
+
+/* ── Streaks Leaderboard Expandable (Part 2) ─────────────────── */
+.streak-leaderboard .pool-streak-row {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.streak-leaderboard .pool-streak-row:hover {
+  background: rgba(226, 163, 74, 0.05);
+}
+.streak-leaderboard .pool-streak-row.active {
+  background: rgba(226, 163, 74, 0.08);
+  border-left: 2px solid var(--accent);
+}
+.streak-leaderboard .streak-badge {
+  display: inline-block;
+  min-width: 65px;
+  text-align: center;
+}
+.pool-streak-detail td {
+  background: rgba(0, 0, 0, 0.1);
+  border-bottom: none !important;
+}
+.pool-streak-detail table th {
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}

@@ -2,6 +2,7 @@ import { loadData, loadParquetOnly, loadForensics, filterBlocks, aggregateByPool
 import { 
   renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, 
   renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram, renderEmptyBlockChart,
+  renderBip110Signaling, renderBip110Efficiency, renderBip110Overhead,
   resizeAllCharts, donutChart, growthChart 
 } from './charts.js?v=13';
 
@@ -13,7 +14,7 @@ let lookupTable = {}; // Cached for background load
 let ecosystem   = null;
 let forensics   = null;
 
-let post2020Blocks = null;
+let post2021Blocks = null;
 let fullHistoryBlocks = null;
 
 let activeRange = '1Y';
@@ -35,7 +36,7 @@ function showProfileCard(poolName) {
      document.getElementById('profile-scoop').textContent = "Unknown blocks represent mining activity where the block's coinbase transaction does not contain a recognized pool identifier. This typically includes solo miners, newly emerging private pools, or legacy miners who have not yet identified themselves to the network.";
      
      const meta = poolMeta['Unknown'] || {};
-     const snapshotBlocks = post2020Blocks || allBlocks;
+     const snapshotBlocks = post2021Blocks || allBlocks;
      const last30Blocks = filterBlocks(snapshotBlocks, { range: '1M' });
      const last30Agg = aggregateByPool(last30Blocks);
      const poolEntry = last30Agg.find(p => p.name === 'Unknown');
@@ -68,7 +69,7 @@ function showProfileCard(poolName) {
   
   // Calculate dynamic share for the last 30 days based on the primary dataset
   // Use post2020Blocks if available to stay consistent with the modern dashboard focus
-  const snapshotBlocks = post2020Blocks || allBlocks;
+  const snapshotBlocks = post2021Blocks || allBlocks;
   const last30Blocks = filterBlocks(snapshotBlocks, { range: '1M' });
   const last30Agg = aggregateByPool(last30Blocks);
   const poolEntry = last30Agg.find(p => p.name === poolName);
@@ -115,7 +116,7 @@ function updateKPICards() {
   if (!allBlocks || allBlocks.length === 0) return;
   
   // Use post2020Blocks if available for KPIs to ensure they reflect the modern network
-  const snapshotBlocks = post2020Blocks || allBlocks;
+  const snapshotBlocks = post2021Blocks || allBlocks;
   const last30Blocks = filterBlocks(snapshotBlocks, { range: '1M' });
   const startD = last30Blocks[0].date;
   const endD   = last30Blocks[last30Blocks.length - 1].date;
@@ -155,7 +156,7 @@ function initStaticMacroCharts() {
 
   // 2. HHI and Concentration macro trends should ALWAYs remain focused on the modern era (Post-2020)
   // regardless of how far back the historical dominance area chart expands.
-  const modernBlocks = post2020Blocks || allBlocks;
+  const modernBlocks = post2021Blocks || allBlocks;
   const monthlyModern = aggregateMonthly(modernBlocks, 12);
   
   const { months, series, poolNames, hhi } = monthlyModern;
@@ -274,7 +275,7 @@ function renderAll() {
   // Snapshot charts (Donut, Table, Country) respect the active timeframe scope (1M, 3M, etc.)
   // We use post2020Blocks (the modern dataset) to ensure these stay relevant to current mining
   // regardless of whether the historical macro chart is showing the full 2009+ history.
-  const snapshotBlocks = post2020Blocks || allBlocks;
+  const snapshotBlocks = post2021Blocks || allBlocks;
   const filtered = filterBlocks(snapshotBlocks, { range: activeRange });
   
   const poolAgg = aggregateByPool(filtered);
@@ -302,6 +303,13 @@ function renderAll() {
     renderEntropyHeatmap(forensics.kpi3_entropy);
     renderSyncHistogram(forensics.kpi4_sync);
     renderEmptyBlockChart(forensics.kpi5_empty_blocks);
+    
+    // BIP 110 Battleground
+    if (forensics.kpi7_bip110) {
+      renderBip110Signaling(forensics.kpi7_bip110.signaling_trend);
+      renderBip110Efficiency(forensics.kpi7_bip110.efficiency_scatter);
+      renderBip110Overhead(forensics.kpi7_bip110.overhead_bar);
+    }
   }
 
   // Handle custom request-profile events from the new search UI
@@ -343,8 +351,8 @@ function wireFilters() {
       // Instant switch if data is already cached
       if (period === 'pre' && fullHistoryBlocks) {
         allBlocks = fullHistoryBlocks;
-      } else if (period === 'post' && post2020Blocks) {
-        allBlocks = post2020Blocks;
+      } else if (period === 'post' && post2021Blocks) {
+        allBlocks = post2021Blocks;
       } else {
         // Fallback to loading
         await loadAndRender(period);
@@ -426,7 +434,7 @@ async function loadAndRender(period) {
     document.getElementById('loading-overlay').classList.remove('hidden');
     document.getElementById('loading-overlay').innerHTML = `
       <div class="spinner"></div>
-      <p>Loading ${period === 'pre' ? 'full historical' : 'post-2020'} data…</p>
+      <p>Loading ${period === 'pre' ? 'full historical' : 'post-2021'} data…</p>
     `;
 
     let results;
@@ -452,16 +460,16 @@ async function loadAndRender(period) {
     ecosystem = dataset.ecosystem;
     
     // Cache the lookup table and blocks for background loading
-    if (period === 'post') {
-      post2020Blocks = allBlocks;
-    } else {
-      fullHistoryBlocks = allBlocks;
-      // Guarantee post2020Blocks is set even if we somehow skipped the 'post' load
-      if (!post2020Blocks) {
-        const pivotDate = new Date('2020-01-01T00:00:00Z');
-        post2020Blocks = allBlocks.filter(b => b.date >= pivotDate);
+      if (period === 'post') {
+        post2021Blocks = allBlocks;
+      } else {
+        fullHistoryBlocks = allBlocks;
+        // Guarantee post2021Blocks is set even if we somehow skipped the 'post' load
+        if (!post2021Blocks) {
+          const pivotDate = new Date('2021-01-01T00:00:00Z');
+          post2021Blocks = allBlocks.filter(b => b.date >= pivotDate);
+        }
       }
-    }
 
     updateKPICards();
     initStaticMacroCharts();
@@ -489,8 +497,8 @@ async function lazyLoadHistory() {
     const res = await fetch('./data/lookup/lookup_slug_to_name.json');
     const lookup = await res.json();
     
-    const preBlocks = await loadParquetOnly('./data/blocks_pre_2020.parquet', lookup);
-    fullHistoryBlocks = [...preBlocks, ...post2020Blocks];
+    const preBlocks = await loadParquetOnly('./data/blocks_pre_2021.parquet', lookup);
+    fullHistoryBlocks = [...preBlocks, ...post2021Blocks];
     console.log("Historical data loaded in background.");
   } catch (err) {
     console.warn("Background load failed:", err);
