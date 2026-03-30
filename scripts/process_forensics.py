@@ -67,6 +67,11 @@ def main():
     df['prev_pool'] = df['pool_name'].shift(1)
     df['strike_id'] = (df['pool_name'] != df['prev_pool']).cumsum()
     
+    # Calculate Pool Shares for the entire period baseline
+    pool_counts = df['pool_name'].value_counts()
+    total_blocks = len(df)
+    pool_shares = (pool_counts / total_blocks).to_dict()
+
     strikes = df.groupby('strike_id').agg({
         'pool_name': 'first',
         'block_height': ['min', 'max', 'count'],
@@ -75,12 +80,83 @@ def main():
     strikes.columns = ['pool', 'start_height', 'end_height', 'count', 'start_time', 'end_time']
     strikes['duration_sec'] = (strikes['end_time'] - strikes['start_time']).dt.total_seconds()
     
-    leaderboard = strikes[strikes['count'] >= 6].sort_values(['count', 'start_time'], ascending=[False, False])
-    leaderboard_json = leaderboard.head(50).to_dict(orient='records')
-    # Convert timestamps for JSON
-    for entry in leaderboard_json:
-        entry['start_time'] = entry['start_time'].isoformat()
-        entry['end_time'] = entry['end_time'].isoformat()
+    # Filter for streaks >= 7
+    strikes_filtered = strikes[strikes['count'] >= 7].sort_values(['count', 'start_time'], ascending=[False, False])
+    
+    def get_propensity_score(pool, length):
+        p = pool_shares.get(pool, 0)
+        if p <= 0 or p >= 1: return 0
+        expected_n = total_blocks * (p**length) * (1-p)
+        actual_n = strikes[(strikes['pool'] == pool) & (strikes['count'] >= length)].shape[0]
+        return round(actual_n / expected_n, 2) if expected_n > 0 else 0
+
+    # Group by Pool to get Pool-Level metrics
+    pool_summaries = []
+    top_pools_by_hashrate = list(pool_shares.keys())[:15] # Analyze top 15 pools
+
+    for pool in top_pools_by_hashrate:
+        p_strikes = strikes_filtered[strikes_filtered['pool'] == pool]
+        if len(p_strikes) == 0: continue
+        
+        counts_dist = {str(k): int(v) for k, v in p_strikes['count'].value_counts().sort_index(ascending=False).to_dict().items()}
+        max_n = int(p_strikes['count'].max())
+        
+        # Streak events for this pool, converted for JSON
+        # Sort by count (longest first) then time (recent first) to ensure top ones are visible
+        events = p_strikes.sort_values(['count', 'start_time'], ascending=[False, False]).to_dict(orient='records')
+        for ev in events:
+            ev['pool'] = str(ev['pool'])
+            ev['start_time'] = ev['start_time'].isoformat()
+            ev['end_time'] = ev['end_time'].isoformat()
+            ev['start_height'] = int(ev['start_height'])
+            ev['end_height'] = int(ev['end_height'])
+            ev['count'] = int(ev['count'])
+            ev['duration_sec'] = float(ev['duration_sec']) if not pd.isna(ev['duration_sec']) else 0
+        p_val = float(pool_shares.get(pool, 0))
+        expected_7plus = total_blocks * (p_val**7) * (1-p_val)
+        actual_7plus = len(p_strikes) # Already filtered for >= 7
+        propensity_base = round(actual_7plus / expected_7plus, 2) if expected_7plus > 0 else 1.0
+
+        # Streak events for this pool, converted for JSON
+        events = p_strikes.sort_values(['count', 'start_time'], ascending=[False, False]).to_dict(orient='records')
+        for ev in events:
+            ev['pool'] = str(ev['pool'])
+            ev['start_time'] = ev['start_time'].isoformat()
+            ev['end_time'] = ev['end_time'].isoformat()
+            ev['start_height'] = int(ev['start_height'])
+            ev['end_height'] = int(ev['end_height'])
+            ev['count'] = int(ev['count'])
+            ev['duration_sec'] = float(ev['duration_sec']) if not pd.isna(ev['duration_sec']) else 0
+            
+            p = float(pool_shares.get(pool, 0))
+            n = int(ev['count'])
+            ev['pool_share'] = round(p * 100, 2)
+            if p > 0 and p < 1:
+                prob_start = (p**n) * (1-p)
+                expected_blocks = 1 / prob_start if prob_start > 0 else 10**10 
+                years = round(expected_blocks / (144 * 365.25), 2)
+                ev['expected_1_in_years'] = min(years, 999.0)
+                # Specific propensity for THIS length
+                expected_this_n = total_blocks * prob_start
+                actual_this_n = strikes[(strikes['pool'] == pool) & (strikes['count'] >= n)].shape[0]
+                ev['propensity_score'] = round(actual_this_n / expected_this_n, 2) if expected_this_n > 0 else 1.0
+            else:
+                ev['expected_1_in_years'] = 0
+                ev['propensity_score'] = 1.0
+
+        pool_summaries.append({
+            "pool": str(pool),
+            "total_events": int(len(p_strikes)),
+            "max_streak": max_n,
+            "pool_share": round(float(pool_shares.get(pool, 0)) * 100, 2),
+            "propensity": propensity_base, # Stable base for 7+ streaks
+            "distribution": counts_dist,
+            "events": events
+        })
+
+    # Sort pools by total events
+    pool_summaries = sorted(pool_summaries, key=lambda x: x['total_events'], reverse=True)
+    leaderboard_json = pool_summaries
 
     # KPI 2: Z-Score Funnel (Hidden Hashrate)
     # Observed: counts in last 144 blocks
@@ -166,17 +242,25 @@ def main():
 
     # KPI 4: Mempool Synchronization Index
     print("KPI 4: Mempool Synchronization Analysis...")
-    # Blocks where prev_pool == pool
+    
+    # Define Empty Blocks: Primary forensic indicator of Header-First mining
+    df['is_empty'] = df['tx_count'] == 1
+    
+    # Blocks where prev_pool == pool (Consecutive blocks)
     df['is_strike'] = df['pool_name'] == df['prev_pool']
     sync_df = df[df['is_strike']].copy()
     
     sync_stats = []
     for pool in top_pools:
+        p_df_full = df[df['pool_name'] == pool]
         p_deltas = sync_df[sync_df['pool_name'] == pool]['time_delta']
         if len(p_deltas) < 50: continue
         
         # We want the distribution, so we'll bucket them
         # 0-30s, 30-60s, 60-120s, 120-300s, 300s+
+        p_sync_pool = sync_df[sync_df['pool_name'] == pool]
+        p_deltas = p_sync_pool['time_delta']
+        
         buckets = {
             "sub_30s": int((p_deltas < 30).sum()),
             "sub_60s": int(((p_deltas >= 30) & (p_deltas < 60)).sum()),
@@ -184,18 +268,28 @@ def main():
             "sub_5m": int(((p_deltas >= 120) & (p_deltas < 300)).sum()),
             "slow": int((p_deltas >= 300).sum())
         }
+
+        # Count empty consecutive blocks in those same time-frames
+        buckets_empty = {
+            "sub_30s": int(((p_deltas < 30) & p_sync_pool['is_empty']).sum()),
+            "sub_60s": int(((p_deltas >= 30) & (p_deltas < 60) & p_sync_pool['is_empty']).sum()),
+            "sub_2m": int(((p_deltas >= 60) & (p_deltas < 120) & p_sync_pool['is_empty']).sum()),
+            "sub_5m": int(((p_deltas >= 120) & (p_deltas < 300) & p_sync_pool['is_empty']).sum()),
+            "slow": int(((p_deltas >= 300) & p_sync_pool['is_empty']).sum())
+        }
         
         sync_stats.append({
             "pool": pool,
             "avg_strike_delta": round(p_deltas.mean(), 2),
             "median_strike_delta": round(p_deltas.median(), 2),
             "buckets": buckets,
-            "total_consecutive": len(p_deltas)
+            "buckets_empty": buckets_empty,
+            "total_consecutive": len(p_deltas),
+            "total_blocks": len(p_df_full)
         })
 
     # KPI 5: Empty Block Auditor (Multi-Horizon)
     print("KPI 5: Empty Block Auditor Analysis...")
-    df['is_empty'] = df['tx_count'] == 1
     
     # 1. Snapshots (All-time vs 30-day)
     thirty_days_ago = df['timestamp'].max() - pd.Timedelta(days=30)

@@ -2,453 +2,499 @@
   "kpi1_strikes": [
     {
       "pool": "foundryusa",
-      "start_height": 785053,
-      "end_height": 785062,
-      "count": 10,
-      "start_time": "2023-04-12T10:29:25+00:00",
-      "end_time": "2023-04-12T11:22:13+00:00",
-      "duration_sec": 3168.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 889982,
-      "end_height": 889990,
-      "count": 9,
-      "start_time": "2025-03-29T14:28:44+00:00",
-      "end_time": "2025-03-29T16:35:37+00:00",
-      "duration_sec": 7613.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 940677,
-      "end_height": 940684,
-      "count": 8,
-      "start_time": "2026-03-14T20:35:50+00:00",
-      "end_time": "2026-03-14T21:26:14+00:00",
-      "duration_sec": 3024.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 910500,
-      "end_height": 910507,
-      "count": 8,
-      "start_time": "2025-08-17T19:54:56+00:00",
-      "end_time": "2025-08-17T20:57:50+00:00",
-      "duration_sec": 3774.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 799302,
-      "end_height": 799309,
-      "count": 8,
-      "start_time": "2023-07-18T23:03:13+00:00",
-      "end_time": "2023-07-18T23:55:50+00:00",
-      "duration_sec": 3157.0
+      "total_events": 33,
+      "max_streak": 10,
+      "pool_share": 24.26,
+      "propensity": 3.17,
+      "distribution": {
+        "10": 1,
+        "9": 1,
+        "8": 5,
+        "7": 26
+      },
+      "events": [
+        {
+          "pool": "foundryusa",
+          "start_height": 785053,
+          "end_height": 785062,
+          "count": 10,
+          "start_time": "2023-04-12T10:29:25+00:00",
+          "end_time": "2023-04-12T11:22:13+00:00",
+          "duration_sec": 3168.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 35.59,
+          "propensity_score": 6.72
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 889982,
+          "end_height": 889990,
+          "count": 9,
+          "start_time": "2025-03-29T14:28:44+00:00",
+          "end_time": "2025-03-29T16:35:37+00:00",
+          "duration_sec": 7613.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 8.63,
+          "propensity_score": 3.26
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 940677,
+          "end_height": 940684,
+          "count": 8,
+          "start_time": "2026-03-14T20:35:50+00:00",
+          "end_time": "2026-03-14T21:26:14+00:00",
+          "duration_sec": 3024.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 2.09,
+          "propensity_score": 2.77
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 910500,
+          "end_height": 910507,
+          "count": 8,
+          "start_time": "2025-08-17T19:54:56+00:00",
+          "end_time": "2025-08-17T20:57:50+00:00",
+          "duration_sec": 3774.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 2.09,
+          "propensity_score": 2.77
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 799302,
+          "end_height": 799309,
+          "count": 8,
+          "start_time": "2023-07-18T23:03:13+00:00",
+          "end_time": "2023-07-18T23:55:50+00:00",
+          "duration_sec": 3157.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 2.09,
+          "propensity_score": 2.77
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 792636,
+          "end_height": 792643,
+          "count": 8,
+          "start_time": "2023-06-03T02:58:53+00:00",
+          "end_time": "2023-06-03T05:05:44+00:00",
+          "duration_sec": 7611.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 2.09,
+          "propensity_score": 2.77
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 781685,
+          "end_height": 781692,
+          "count": 8,
+          "start_time": "2023-03-20T16:32:18+00:00",
+          "end_time": "2023-03-20T17:49:13+00:00",
+          "duration_sec": 4615.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 2.09,
+          "propensity_score": 2.77
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 941879,
+          "end_height": 941885,
+          "count": 7,
+          "start_time": "2026-03-23T15:43:07+00:00",
+          "end_time": "2026-03-23T16:04:46+00:00",
+          "duration_sec": 1299.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 940315,
+          "end_height": 940321,
+          "count": 7,
+          "start_time": "2026-03-11T22:15:15+00:00",
+          "end_time": "2026-03-11T23:46:32+00:00",
+          "duration_sec": 5477.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 915473,
+          "end_height": 915479,
+          "count": 7,
+          "start_time": "2025-09-19T21:42:43+00:00",
+          "end_time": "2025-09-19T22:25:16+00:00",
+          "duration_sec": 2553.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 903899,
+          "end_height": 903905,
+          "count": 7,
+          "start_time": "2025-07-04T00:43:24+00:00",
+          "end_time": "2025-07-04T02:11:54+00:00",
+          "duration_sec": 5310.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 887187,
+          "end_height": 887193,
+          "count": 7,
+          "start_time": "2025-03-10T15:46:06+00:00",
+          "end_time": "2025-03-10T17:01:00+00:00",
+          "duration_sec": 4494.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 880822,
+          "end_height": 880828,
+          "count": 7,
+          "start_time": "2025-01-25T23:26:25+00:00",
+          "end_time": "2025-01-26T00:14:10+00:00",
+          "duration_sec": 2865.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 879910,
+          "end_height": 879916,
+          "count": 7,
+          "start_time": "2025-01-19T10:03:10+00:00",
+          "end_time": "2025-01-19T11:01:39+00:00",
+          "duration_sec": 3509.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 879818,
+          "end_height": 879824,
+          "count": 7,
+          "start_time": "2025-01-18T20:40:40+00:00",
+          "end_time": "2025-01-18T21:22:49+00:00",
+          "duration_sec": 2529.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 878086,
+          "end_height": 878092,
+          "count": 7,
+          "start_time": "2025-01-06T11:52:55+00:00",
+          "end_time": "2025-01-06T13:06:20+00:00",
+          "duration_sec": 4405.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 877811,
+          "end_height": 877817,
+          "count": 7,
+          "start_time": "2025-01-04T16:31:00+00:00",
+          "end_time": "2025-01-04T17:09:20+00:00",
+          "duration_sec": 2300.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 853872,
+          "end_height": 853878,
+          "count": 7,
+          "start_time": "2024-07-25T13:32:28+00:00",
+          "end_time": "2024-07-25T13:54:46+00:00",
+          "duration_sec": 1338.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 845507,
+          "end_height": 845513,
+          "count": 7,
+          "start_time": "2024-05-28T12:21:02+00:00",
+          "end_time": "2024-05-28T13:43:55+00:00",
+          "duration_sec": 4973.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 840850,
+          "end_height": 840856,
+          "count": 7,
+          "start_time": "2024-04-25T18:58:31+00:00",
+          "end_time": "2024-04-25T19:39:09+00:00",
+          "duration_sec": 2438.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 812588,
+          "end_height": 812594,
+          "count": 7,
+          "start_time": "2023-10-17T08:32:01+00:00",
+          "end_time": "2023-10-17T10:42:07+00:00",
+          "duration_sec": 7806.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 806858,
+          "end_height": 806864,
+          "count": 7,
+          "start_time": "2023-09-09T11:30:47+00:00",
+          "end_time": "2023-09-09T12:39:49+00:00",
+          "duration_sec": 4142.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 803238,
+          "end_height": 803244,
+          "count": 7,
+          "start_time": "2023-08-15T05:35:32+00:00",
+          "end_time": "2023-08-15T05:57:20+00:00",
+          "duration_sec": 1308.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 796923,
+          "end_height": 796929,
+          "count": 7,
+          "start_time": "2023-07-02T22:37:32+00:00",
+          "end_time": "2023-07-02T23:20:31+00:00",
+          "duration_sec": 2579.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 796416,
+          "end_height": 796422,
+          "count": 7,
+          "start_time": "2023-06-29T14:06:00+00:00",
+          "end_time": "2023-06-29T15:06:39+00:00",
+          "duration_sec": 3639.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 793348,
+          "end_height": 793354,
+          "count": 7,
+          "start_time": "2023-06-08T05:51:12+00:00",
+          "end_time": "2023-06-08T07:33:31+00:00",
+          "duration_sec": 6139.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 789346,
+          "end_height": 789352,
+          "count": 7,
+          "start_time": "2023-05-12T06:32:32+00:00",
+          "end_time": "2023-05-12T07:35:48+00:00",
+          "duration_sec": 3796.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 787090,
+          "end_height": 787096,
+          "count": 7,
+          "start_time": "2023-04-26T13:37:00+00:00",
+          "end_time": "2023-04-26T14:18:33+00:00",
+          "duration_sec": 2493.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 779624,
+          "end_height": 779630,
+          "count": 7,
+          "start_time": "2023-03-06T20:59:34+00:00",
+          "end_time": "2023-03-06T22:17:07+00:00",
+          "duration_sec": 4653.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 776564,
+          "end_height": 776570,
+          "count": 7,
+          "start_time": "2023-02-14T22:00:53+00:00",
+          "end_time": "2023-02-14T23:09:08+00:00",
+          "duration_sec": 4095.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 775368,
+          "end_height": 775374,
+          "count": 7,
+          "start_time": "2023-02-07T00:54:13+00:00",
+          "end_time": "2023-02-07T02:26:13+00:00",
+          "duration_sec": 5520.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 775242,
+          "end_height": 775248,
+          "count": 7,
+          "start_time": "2023-02-06T05:10:31+00:00",
+          "end_time": "2023-02-06T05:59:38+00:00",
+          "duration_sec": 2947.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        },
+        {
+          "pool": "foundryusa",
+          "start_height": 761899,
+          "end_height": 761905,
+          "count": 7,
+          "start_time": "2022-11-05T23:38:37+00:00",
+          "end_time": "2022-11-06T00:31:24+00:00",
+          "duration_sec": 3167.0,
+          "pool_share": 24.26,
+          "expected_1_in_years": 0.51,
+          "propensity_score": 3.17
+        }
+      ]
     },
     {
       "pool": "antpool",
-      "start_height": 794465,
-      "end_height": 794472,
-      "count": 8,
-      "start_time": "2023-06-15T13:02:15+00:00",
-      "end_time": "2023-06-15T14:48:26+00:00",
-      "duration_sec": 6371.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 792636,
-      "end_height": 792643,
-      "count": 8,
-      "start_time": "2023-06-03T02:58:53+00:00",
-      "end_time": "2023-06-03T05:05:44+00:00",
-      "duration_sec": 7611.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 781685,
-      "end_height": 781692,
-      "count": 8,
-      "start_time": "2023-03-20T16:32:18+00:00",
-      "end_time": "2023-03-20T17:49:13+00:00",
-      "duration_sec": 4615.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 941879,
-      "end_height": 941885,
-      "count": 7,
-      "start_time": "2026-03-23T15:43:07+00:00",
-      "end_time": "2026-03-23T16:04:46+00:00",
-      "duration_sec": 1299.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 940315,
-      "end_height": 940321,
-      "count": 7,
-      "start_time": "2026-03-11T22:15:15+00:00",
-      "end_time": "2026-03-11T23:46:32+00:00",
-      "duration_sec": 5477.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 915473,
-      "end_height": 915479,
-      "count": 7,
-      "start_time": "2025-09-19T21:42:43+00:00",
-      "end_time": "2025-09-19T22:25:16+00:00",
-      "duration_sec": 2553.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 903899,
-      "end_height": 903905,
-      "count": 7,
-      "start_time": "2025-07-04T00:43:24+00:00",
-      "end_time": "2025-07-04T02:11:54+00:00",
-      "duration_sec": 5310.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 887187,
-      "end_height": 887193,
-      "count": 7,
-      "start_time": "2025-03-10T15:46:06+00:00",
-      "end_time": "2025-03-10T17:01:00+00:00",
-      "duration_sec": 4494.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 880822,
-      "end_height": 880828,
-      "count": 7,
-      "start_time": "2025-01-25T23:26:25+00:00",
-      "end_time": "2025-01-26T00:14:10+00:00",
-      "duration_sec": 2865.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 879910,
-      "end_height": 879916,
-      "count": 7,
-      "start_time": "2025-01-19T10:03:10+00:00",
-      "end_time": "2025-01-19T11:01:39+00:00",
-      "duration_sec": 3509.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 879818,
-      "end_height": 879824,
-      "count": 7,
-      "start_time": "2025-01-18T20:40:40+00:00",
-      "end_time": "2025-01-18T21:22:49+00:00",
-      "duration_sec": 2529.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 878086,
-      "end_height": 878092,
-      "count": 7,
-      "start_time": "2025-01-06T11:52:55+00:00",
-      "end_time": "2025-01-06T13:06:20+00:00",
-      "duration_sec": 4405.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 877811,
-      "end_height": 877817,
-      "count": 7,
-      "start_time": "2025-01-04T16:31:00+00:00",
-      "end_time": "2025-01-04T17:09:20+00:00",
-      "duration_sec": 2300.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 853872,
-      "end_height": 853878,
-      "count": 7,
-      "start_time": "2024-07-25T13:32:28+00:00",
-      "end_time": "2024-07-25T13:54:46+00:00",
-      "duration_sec": 1338.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 845507,
-      "end_height": 845513,
-      "count": 7,
-      "start_time": "2024-05-28T12:21:02+00:00",
-      "end_time": "2024-05-28T13:43:55+00:00",
-      "duration_sec": 4973.0
-    },
-    {
-      "pool": "antpool",
-      "start_height": 843898,
-      "end_height": 843904,
-      "count": 7,
-      "start_time": "2024-05-17T18:08:34+00:00",
-      "end_time": "2024-05-17T20:06:55+00:00",
-      "duration_sec": 7101.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 840850,
-      "end_height": 840856,
-      "count": 7,
-      "start_time": "2024-04-25T18:58:31+00:00",
-      "end_time": "2024-04-25T19:39:09+00:00",
-      "duration_sec": 2438.0
-    },
-    {
-      "pool": "antpool",
-      "start_height": 828320,
-      "end_height": 828326,
-      "count": 7,
-      "start_time": "2024-02-01T03:05:14+00:00",
-      "end_time": "2024-02-01T03:52:52+00:00",
-      "duration_sec": 2858.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 812588,
-      "end_height": 812594,
-      "count": 7,
-      "start_time": "2023-10-17T08:32:01+00:00",
-      "end_time": "2023-10-17T10:42:07+00:00",
-      "duration_sec": 7806.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 806858,
-      "end_height": 806864,
-      "count": 7,
-      "start_time": "2023-09-09T11:30:47+00:00",
-      "end_time": "2023-09-09T12:39:49+00:00",
-      "duration_sec": 4142.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 803238,
-      "end_height": 803244,
-      "count": 7,
-      "start_time": "2023-08-15T05:35:32+00:00",
-      "end_time": "2023-08-15T05:57:20+00:00",
-      "duration_sec": 1308.0
-    },
-    {
-      "pool": "antpool",
-      "start_height": 801403,
-      "end_height": 801409,
-      "count": 7,
-      "start_time": "2023-08-02T20:09:44+00:00",
-      "end_time": "2023-08-02T21:21:07+00:00",
-      "duration_sec": 4283.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 796923,
-      "end_height": 796929,
-      "count": 7,
-      "start_time": "2023-07-02T22:37:32+00:00",
-      "end_time": "2023-07-02T23:20:31+00:00",
-      "duration_sec": 2579.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 796416,
-      "end_height": 796422,
-      "count": 7,
-      "start_time": "2023-06-29T14:06:00+00:00",
-      "end_time": "2023-06-29T15:06:39+00:00",
-      "duration_sec": 3639.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 793348,
-      "end_height": 793354,
-      "count": 7,
-      "start_time": "2023-06-08T05:51:12+00:00",
-      "end_time": "2023-06-08T07:33:31+00:00",
-      "duration_sec": 6139.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 789346,
-      "end_height": 789352,
-      "count": 7,
-      "start_time": "2023-05-12T06:32:32+00:00",
-      "end_time": "2023-05-12T07:35:48+00:00",
-      "duration_sec": 3796.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 787090,
-      "end_height": 787096,
-      "count": 7,
-      "start_time": "2023-04-26T13:37:00+00:00",
-      "end_time": "2023-04-26T14:18:33+00:00",
-      "duration_sec": 2493.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 779624,
-      "end_height": 779630,
-      "count": 7,
-      "start_time": "2023-03-06T20:59:34+00:00",
-      "end_time": "2023-03-06T22:17:07+00:00",
-      "duration_sec": 4653.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 776564,
-      "end_height": 776570,
-      "count": 7,
-      "start_time": "2023-02-14T22:00:53+00:00",
-      "end_time": "2023-02-14T23:09:08+00:00",
-      "duration_sec": 4095.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 775368,
-      "end_height": 775374,
-      "count": 7,
-      "start_time": "2023-02-07T00:54:13+00:00",
-      "end_time": "2023-02-07T02:26:13+00:00",
-      "duration_sec": 5520.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 775242,
-      "end_height": 775248,
-      "count": 7,
-      "start_time": "2023-02-06T05:10:31+00:00",
-      "end_time": "2023-02-06T05:59:38+00:00",
-      "duration_sec": 2947.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 761899,
-      "end_height": 761905,
-      "count": 7,
-      "start_time": "2022-11-05T23:38:37+00:00",
-      "end_time": "2022-11-06T00:31:24+00:00",
-      "duration_sec": 3167.0
+      "total_events": 4,
+      "max_streak": 8,
+      "pool_share": 19.12,
+      "propensity": 1.9,
+      "distribution": {
+        "8": 1,
+        "7": 3
+      },
+      "events": [
+        {
+          "pool": "antpool",
+          "start_height": 794465,
+          "end_height": 794472,
+          "count": 8,
+          "start_time": "2023-06-15T13:02:15+00:00",
+          "end_time": "2023-06-15T14:48:26+00:00",
+          "duration_sec": 6371.0,
+          "pool_share": 19.12,
+          "expected_1_in_years": 13.14,
+          "propensity_score": 2.48
+        },
+        {
+          "pool": "antpool",
+          "start_height": 843898,
+          "end_height": 843904,
+          "count": 7,
+          "start_time": "2024-05-17T18:08:34+00:00",
+          "end_time": "2024-05-17T20:06:55+00:00",
+          "duration_sec": 7101.0,
+          "pool_share": 19.12,
+          "expected_1_in_years": 2.51,
+          "propensity_score": 1.9
+        },
+        {
+          "pool": "antpool",
+          "start_height": 828320,
+          "end_height": 828326,
+          "count": 7,
+          "start_time": "2024-02-01T03:05:14+00:00",
+          "end_time": "2024-02-01T03:52:52+00:00",
+          "duration_sec": 2858.0,
+          "pool_share": 19.12,
+          "expected_1_in_years": 2.51,
+          "propensity_score": 1.9
+        },
+        {
+          "pool": "antpool",
+          "start_height": 801403,
+          "end_height": 801409,
+          "count": 7,
+          "start_time": "2023-08-02T20:09:44+00:00",
+          "end_time": "2023-08-02T21:21:07+00:00",
+          "duration_sec": 4283.0,
+          "pool_share": 19.12,
+          "expected_1_in_years": 2.51,
+          "propensity_score": 1.9
+        }
+      ]
     },
     {
       "pool": "f2pool",
-      "start_height": 715912,
-      "end_height": 715918,
-      "count": 7,
-      "start_time": "2021-12-27T01:31:20+00:00",
-      "end_time": "2021-12-27T02:20:46+00:00",
-      "duration_sec": 2966.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 942082,
-      "end_height": 942087,
-      "count": 6,
-      "start_time": "2026-03-25T02:20:07+00:00",
-      "end_time": "2026-03-25T03:32:14+00:00",
-      "duration_sec": 4327.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 939097,
-      "end_height": 939102,
-      "count": 6,
-      "start_time": "2026-03-03T06:16:28+00:00",
-      "end_time": "2026-03-03T07:01:23+00:00",
-      "duration_sec": 2695.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 937777,
-      "end_height": 937782,
-      "count": 6,
-      "start_time": "2026-02-22T05:56:56+00:00",
-      "end_time": "2026-02-22T06:27:47+00:00",
-      "duration_sec": 1851.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 933867,
-      "end_height": 933872,
-      "count": 6,
-      "start_time": "2026-01-26T16:18:49+00:00",
-      "end_time": "2026-01-26T16:50:22+00:00",
-      "duration_sec": 1893.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 933342,
-      "end_height": 933347,
-      "count": 6,
-      "start_time": "2026-01-22T08:17:30+00:00",
-      "end_time": "2026-01-22T08:42:24+00:00",
-      "duration_sec": 1494.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 928334,
-      "end_height": 928339,
-      "count": 6,
-      "start_time": "2025-12-18T00:24:01+00:00",
-      "end_time": "2025-12-18T00:47:00+00:00",
-      "duration_sec": 1379.0
-    },
-    {
-      "pool": "antpool",
-      "start_height": 925669,
-      "end_height": 925674,
-      "count": 6,
-      "start_time": "2025-11-29T05:38:46+00:00",
-      "end_time": "2025-11-29T06:22:43+00:00",
-      "duration_sec": 2637.0
-    },
-    {
-      "pool": "antpool",
-      "start_height": 924679,
-      "end_height": 924684,
-      "count": 6,
-      "start_time": "2025-11-22T07:47:05+00:00",
-      "end_time": "2025-11-22T09:17:41+00:00",
-      "duration_sec": 5436.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 923359,
-      "end_height": 923364,
-      "count": 6,
-      "start_time": "2025-11-12T23:15:41+00:00",
-      "end_time": "2025-11-13T00:00:52+00:00",
-      "duration_sec": 2711.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 921086,
-      "end_height": 921091,
-      "count": 6,
-      "start_time": "2025-10-27T22:00:12+00:00",
-      "end_time": "2025-10-27T22:39:45+00:00",
-      "duration_sec": 2373.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 915435,
-      "end_height": 915440,
-      "count": 6,
-      "start_time": "2025-09-19T16:09:38+00:00",
-      "end_time": "2025-09-19T17:14:09+00:00",
-      "duration_sec": 3871.0
-    },
-    {
-      "pool": "foundryusa",
-      "start_height": 911821,
-      "end_height": 911826,
-      "count": 6,
-      "start_time": "2025-08-26T19:24:15+00:00",
-      "end_time": "2025-08-26T20:15:19+00:00",
-      "duration_sec": 3064.0
+      "total_events": 1,
+      "max_streak": 7,
+      "pool_share": 12.97,
+      "propensity": 6.69,
+      "distribution": {
+        "7": 1
+      },
+      "events": [
+        {
+          "pool": "f2pool",
+          "start_height": 715912,
+          "end_height": 715918,
+          "count": 7,
+          "start_time": "2021-12-27T01:31:20+00:00",
+          "end_time": "2021-12-27T02:20:46+00:00",
+          "duration_sec": 2966.0,
+          "pool_share": 12.97,
+          "expected_1_in_years": 35.43,
+          "propensity_score": 6.69
+        }
+      ]
     }
   ],
   "kpi2_funnel": [
@@ -18247,7 +18293,15 @@
         "sub_5m": 4035,
         "slow": 11421
       },
-      "total_consecutive": 18847
+      "buckets_empty": {
+        "sub_30s": 0,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 18847,
+      "total_blocks": 67531
     },
     {
       "pool": "antpool",
@@ -18260,7 +18314,15 @@
         "sub_5m": 2391,
         "slow": 6278
       },
-      "total_consecutive": 10620
+      "buckets_empty": {
+        "sub_30s": 31,
+        "sub_60s": 4,
+        "sub_2m": 1,
+        "sub_5m": 0,
+        "slow": 3
+      },
+      "total_consecutive": 10620,
+      "total_blocks": 53242
     },
     {
       "pool": "f2pool",
@@ -18273,7 +18335,15 @@
         "sub_5m": 1099,
         "slow": 2895
       },
-      "total_consecutive": 4877
+      "buckets_empty": {
+        "sub_30s": 14,
+        "sub_60s": 4,
+        "sub_2m": 1,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 4877,
+      "total_blocks": 36101
     },
     {
       "pool": "viabtc",
@@ -18286,7 +18356,15 @@
         "sub_5m": 701,
         "slow": 2055
       },
-      "total_consecutive": 3369
+      "buckets_empty": {
+        "sub_30s": 5,
+        "sub_60s": 0,
+        "sub_2m": 1,
+        "sub_5m": 2,
+        "slow": 0
+      },
+      "total_consecutive": 3369,
+      "total_blocks": 30911
     },
     {
       "pool": "binancepool",
@@ -18299,7 +18377,15 @@
         "sub_5m": 395,
         "slow": 1115
       },
-      "total_consecutive": 1820
+      "buckets_empty": {
+        "sub_30s": 3,
+        "sub_60s": 2,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 1820,
+      "total_blocks": 19268
     },
     {
       "pool": "poolin",
@@ -18312,7 +18398,15 @@
         "sub_5m": 278,
         "slow": 805
       },
-      "total_consecutive": 1341
+      "buckets_empty": {
+        "sub_30s": 1,
+        "sub_60s": 1,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 1341,
+      "total_blocks": 12336
     },
     {
       "pool": "btccom",
@@ -18325,7 +18419,15 @@
         "sub_5m": 152,
         "slow": 371
       },
-      "total_consecutive": 620
+      "buckets_empty": {
+        "sub_30s": 0,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 620,
+      "total_blocks": 9184
     },
     {
       "pool": "marapool",
@@ -18338,7 +18440,15 @@
         "sub_5m": 64,
         "slow": 209
       },
-      "total_consecutive": 327
+      "buckets_empty": {
+        "sub_30s": 0,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 327,
+      "total_blocks": 8141
     },
     {
       "pool": "braiinspool",
@@ -18351,7 +18461,15 @@
         "sub_5m": 56,
         "slow": 174
       },
-      "total_consecutive": 282
+      "buckets_empty": {
+        "sub_30s": 0,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 282,
+      "total_blocks": 6755
     },
     {
       "pool": "luxor",
@@ -18364,7 +18482,15 @@
         "sub_5m": 46,
         "slow": 123
       },
-      "total_consecutive": 196
+      "buckets_empty": {
+        "sub_30s": 0,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 196,
+      "total_blocks": 6200
     },
     {
       "pool": "spiderpool",
@@ -18377,7 +18503,15 @@
         "sub_5m": 83,
         "slow": 215
       },
-      "total_consecutive": 377
+      "buckets_empty": {
+        "sub_30s": 2,
+        "sub_60s": 4,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 377,
+      "total_blocks": 5963
     },
     {
       "pool": "sbicrypto",
@@ -18390,7 +18524,15 @@
         "sub_5m": 10,
         "slow": 35
       },
-      "total_consecutive": 54
+      "buckets_empty": {
+        "sub_30s": 0,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 54,
+      "total_blocks": 4306
     },
     {
       "pool": "secpool",
@@ -18403,7 +18545,15 @@
         "sub_5m": 31,
         "slow": 70
       },
-      "total_consecutive": 124
+      "buckets_empty": {
+        "sub_30s": 1,
+        "sub_60s": 0,
+        "sub_2m": 0,
+        "sub_5m": 0,
+        "slow": 0
+      },
+      "total_consecutive": 124,
+      "total_blocks": 3556
     }
   ],
   "kpi5_empty_blocks": {
@@ -51940,5 +52090,5 @@
       }
     ]
   },
-  "last_updated": "2026-03-29T16:47:43.567766"
+  "last_updated": "2026-03-29T19:12:28.055668"
 }
