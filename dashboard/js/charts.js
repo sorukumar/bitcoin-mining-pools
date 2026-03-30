@@ -1002,7 +1002,7 @@ export function renderStreaksLeaderboard(poolSummaries) {
           return `
                    <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: var(--text-secondary); line-height:1.5;">
                      <strong style="color: var(--accent); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; display: block; margin-bottom: 5px;">Network Reconnaissance Brief</strong>
-                     <strong>STATISTICAL ANOMALY:</strong> Foundry USA exhibits a 3.17x Propensity shift. Under standard Poisson distribution, a 10-block streak for 24% share is a "generational event" expected once in 35 years; Foundry has bypassed this hurdle in real-time. This suggests a <strong>Critical Network Topology Advantage</strong>. By utilizing low-latency propagation relays (FIBRE) and North American node clustering, Foundry is mining on its own headers with near-zero overhead, creating a "local consensus" that stacks blocks before the network can synchronize.
+                     <strong>STREAK FREQUENCY ANOMALY:</strong> Foundry USA's 7+ block streaks occur <strong>${p.propensity}× more often</strong> than a memoryless Poisson process at their hash share would predict — this is a streak <em>frequency</em> metric, not a second-block conversion rate. Notably, their Second Block Uplift (KPI4b) sits near baseline (~1.1×), which argues against header-first / spy-mining as the cause. The more likely explanation is <strong>hashrate variance and geographic clustering</strong> of US-based miners consolidating under one pool — producing run-length anomalies without the mempool-skipping fingerprint.
                    </div>
                  `;
         }
@@ -1652,7 +1652,7 @@ export function renderSyncHistogram(syncData) {
 
   const poolNames = sortedData.map(d => d.pool);
 
-  // ── Spy Mining Callout Strip ─────────────────────────────────────────────────
+  // ── Header-First Mining Callout Strip ──────────────────────────────────────────
   // Shows per-pool "X% of fast blocks were empty" badges above the chart
   const calloutEl = document.getElementById('chart-sync-spy-callout');
   if (calloutEl) {
@@ -1670,7 +1670,7 @@ export function renderSyncHistogram(syncData) {
     calloutEl.innerHTML = badges
       ? `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;margin-bottom:10px;background:rgba(255,77,79,0.05);border:1px solid rgba(255,77,79,0.2);border-radius:6px;">
            <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#ff4d4f;flex-shrink:0;margin-right:4px;">
-             <i class="fa-solid fa-triangle-exclamation"></i> Spy Mining Detected
+             <i class="fa-solid fa-triangle-exclamation"></i> Empty Blocks Within 30s — Skipping Validation
            </span>
            ${badges}
          </div>`
@@ -1678,9 +1678,9 @@ export function renderSyncHistogram(syncData) {
   }
 
   // ── Series: split sub_30s into spy (empty) + normal ──────────────────────────
-  // Series 0: Empty blocks within <30s → the definitive spy mining signal
+  // Series 0: Empty blocks within <30s → header-first mining signal (pool skipped validation before starting next block)
   const spySeries = {
-    name: '< 30s Empty (Spy Mining)',
+    name: '< 30s Empty (Skipping Validation)',
     type: 'bar',
     stack: 'total',
     itemStyle: { color: '#7B1515' },  // deep crimson — distinct from normal <30s
@@ -1755,7 +1755,7 @@ export function renderSyncHistogram(syncData) {
       formatter: (params) => {
         const d = params[0].data;
         const consecRatio = d.totalBlocks > 0 ? (d.totalConsec / d.totalBlocks * 100).toFixed(1) : 0;
-        const spyItem = params.find(p => p.seriesName === '< 30s Empty (Spy Mining)');
+        const spyItem = params.find(p => p.seriesName === '< 30s Empty (Skipping Validation)');
         const spyScore = spyItem?.data?.spy_pct ?? 0;
 
         let h = `<div style="margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:5px;">
@@ -1767,7 +1767,7 @@ export function renderSyncHistogram(syncData) {
         if (spyScore > 0) {
           const sc = spyScore >= 50 ? '#ff4d4f' : '#E2A34A';
           h += `<div style="margin:6px 0;padding:5px 8px;background:rgba(255,77,79,0.1);border-left:2px solid ${sc};border-radius:2px;">
-                  <span style="color:${sc};font-weight:bold;">⚠ Spy Mining: ${spyScore}% of &lt;30s blocks were empty</span>
+                  <span style="color:${sc};font-weight:bold;">⚠ ${spyScore}% of &lt;30s blocks were empty — header-first mining signal</span>
                 </div>`;
         } else {
           h += '<br/>';
