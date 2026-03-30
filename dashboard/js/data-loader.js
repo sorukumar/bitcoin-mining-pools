@@ -81,7 +81,7 @@ async function loadEcosystem() {
 
 /** Fetch Forensics Data JSON */
 export async function loadForensics() {
-  const res = await fetch('./data/forensics_data.json');
+  const res = await fetch('./data/forensics_data.json?v=2');
   if (!res.ok) throw new Error(`Failed to fetch forensics: ${res.status}`);
   return res.json();
 }
@@ -147,7 +147,7 @@ export async function loadData(period = 'post') {
   const minDate = blocks[0].date;
   const maxDate = blocks[blocks.length - 1].date;
 
-  return { blocks, poolMeta, poolsInfo, timelines, ecosystem, minDate, maxDate };
+  return { blocks, poolMeta, poolsInfo, timelines, ecosystem, minDate, maxDate, slugToName: lookup };
 }
 
 /** Helper for background loading – just blocks, normalized and sorted */

@@ -45,13 +45,20 @@ All state lives as module-level `let` variables in `main.js`.
 There is no state management library, no store, no reactive framework.
 
 ```js
-let allBlocks    = [];       // full dataset, never mutated after load
-let poolMeta     = {};       // { [poolName]: { link } }, never mutated
-let post2020Blocks   = null;   // cached after first load
+let allBlocks         = [];     // full dataset, never mutated after load
+let poolMeta          = {};     // { [poolName]: { link } }, never mutated
+let slugToName        = {};     // { [poolSlug]: displayName } — from lookup_slug_to_name.json
+let post2021Blocks    = null;   // cached after first load
 let fullHistoryBlocks = null;   // cached after background load finishes
-let activeRange       = '1Y';     // time range button: '1M'|'3M'|'6M'|'1Y'|'2Y'|'ALL'
-let activePeriod      = 'post';   // active dataset period: 'pre' or 'post'
+let forensics         = null;   // forensics_data.json payload, loaded in parallel with blocks
+let activeRange       = '1Y';   // time range button: '1M'|'3M'|'6M'|'1Y'|'2Y'|'ALL'
+let activePeriod      = 'post'; // active dataset period: 'pre' or 'post'
 ```
+
+`slugToName` is populated from `dataset.slugToName` returned by `loadData()`. It is passed
+into `renderTopMinersTable` so forensics maps (kpi5/kpi6, keyed by raw pool slug) can be
+resolved to display names before the lookup — avoiding slugify mismatches like
+`Ocean.xyz` → `oceanxyz` vs forensics key `ocean`.
 
 **Invariants:**
 - `activeRange` time filters are hidden when `activePeriod` is `'pre'`, as that dataset is historical and fixed.
@@ -120,6 +127,12 @@ initApp() / loadAndRender(period)
             │
             ├── wire profile card click events
             │       └── attaches showProfileCard() to donut clicks and table rows
+            │
+            ├── aggregateByPool(topPoolsFiltered)   → topPoolsAgg[]  (independent range)
+            │       └── renderTopMinersTable(topPoolsAgg, poolsInfo, forensics, slugToName)
+            │           ├── Empty Block % column  ← forensics.kpi5_empty_blocks.leaderboard
+            │           │   (slug resolved to display name via slugToName before map lookup)
+            │           └── Avg Txs / Blk column  ← forensics.kpi6_density
             │
             ├── aggregateMonthly(filtered, 12)      → { months, series, poolNames }
             │       └── renderAreaChart(monthly)

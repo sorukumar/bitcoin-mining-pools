@@ -1,16 +1,17 @@
-import { loadData, loadParquetOnly, loadForensics, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=13';
+import { loadData, loadParquetOnly, loadForensics, filterBlocks, aggregateByPool, aggregateByCountry, aggregateMonthly } from './data-loader.js?v=14';
 import { 
   renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, 
-  renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram, renderEmptyBlockChart,
+  renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram, renderConsecutiveAdvantage, renderEmptyBlockChart, renderEmptyTrendChart,
   renderBip110Signaling, renderBip110Efficiency, renderBip110Overhead,
   resizeAllCharts, donutChart, growthChart 
-} from './charts.js?v=13';
+} from './charts.js?v=14';
 
 let allBlocks   = [];
 let poolMeta    = {};
 let poolsInfo   = [];
 let timelines   = [];
 let lookupTable = {}; // Cached for background load
+let slugToName  = {}; // slug → display name, used for forensics lookups
 let ecosystem   = null;
 let forensics   = null;
 
@@ -291,7 +292,7 @@ function renderAll() {
   // 3. Top Mining Pools Table (Independent range filter)
   const topPoolsFiltered = filterBlocks(snapshotBlocks, { range: activeTopPoolsRange });
   const topPoolsAgg = aggregateByPool(topPoolsFiltered);
-  renderTopMinersTable(topPoolsAgg, poolsInfo);
+  renderTopMinersTable(topPoolsAgg, poolsInfo, forensics, slugToName);
 
   // 4. Ecosystem chart uses entirely global data (spanning from genesis to present)
   renderEcosystemGrowthChart(ecosystem, poolMeta);
@@ -302,7 +303,9 @@ function renderAll() {
     renderZScoreFunnel(forensics.kpi2_funnel);
     renderEntropyHeatmap(forensics.kpi3_entropy);
     renderSyncHistogram(forensics.kpi4_sync);
+    renderConsecutiveAdvantage(forensics.kpi4_sync);
     renderEmptyBlockChart(forensics.kpi5_empty_blocks);
+    renderEmptyTrendChart(forensics.kpi5_empty_blocks.monthly_trend);
     
     // BIP 110 Battleground
     if (forensics.kpi7_bip110) {
@@ -458,6 +461,7 @@ async function loadAndRender(period) {
     poolsInfo = dataset.poolsInfo;
     timelines = dataset.timelines;
     ecosystem = dataset.ecosystem;
+    if (dataset.slugToName) slugToName = dataset.slugToName;
     
     // Cache the lookup table and blocks for background loading
       if (period === 'post') {
@@ -548,4 +552,12 @@ function initTabs() {
   if (window.location.hash) {
     switchTab(window.location.hash);
   }
+
+  // Debounced global resize: guarantees all ECharts canvases reflow after
+  // the CSS grid has finished re-calculating column widths.
+  let _resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(resizeAllCharts, 120);
+  });
 }

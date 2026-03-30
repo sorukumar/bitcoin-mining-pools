@@ -500,41 +500,41 @@
   "kpi2_funnel": [
     {
       "pool": "foundryusa",
-      "share": 33.53,
-      "luck": 74.56,
-      "z": -1.77,
+      "share": 34.62,
+      "luck": 72.21,
+      "z": -1.96,
       "blocks": 36,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
       "pool": "antpool",
-      "share": 17.61,
-      "luck": 149.86,
-      "z": 2.51,
+      "share": 16.77,
+      "luck": 157.4,
+      "z": 2.82,
       "blocks": 38,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 10.37,
-      "luck": 60.29,
-      "z": -1.53,
+      "share": 10.62,
+      "luck": 58.88,
+      "z": -1.61,
       "blocks": 9,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
       "pool": "spiderpool",
-      "share": 9.28,
-      "luck": 142.25,
-      "z": 1.54,
+      "share": 9.03,
+      "luck": 146.15,
+      "z": 1.66,
       "blocks": 19,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
       "pool": "viabtc",
-      "share": 9.08,
-      "luck": 76.5,
-      "z": -0.85,
+      "share": 8.98,
+      "luck": 77.35,
+      "z": -0.81,
       "blocks": 10,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
@@ -548,113 +548,105 @@
     },
     {
       "pool": "secpool",
-      "share": 4.02,
-      "luck": 103.7,
-      "z": 0.09,
+      "share": 3.97,
+      "luck": 105.0,
+      "z": 0.12,
       "blocks": 6,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
       "pool": "luxor",
-      "share": 3.03,
-      "luck": 114.75,
-      "z": 0.31,
+      "share": 3.08,
+      "luck": 112.9,
+      "z": 0.27,
       "blocks": 5,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
-      "pool": "binancepool",
-      "share": 1.88,
-      "luck": 221.05,
-      "z": 1.99,
-      "blocks": 6,
-      "timestamp": "2026-03-27T10:51:58+00:00"
-    },
-    {
       "pool": "sbicrypto",
-      "share": 1.74,
+      "share": 1.88,
       "luck": 0.0,
-      "z": -1.58,
+      "z": -1.65,
       "blocks": 0,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
-      "pool": "braiinspool",
-      "share": 1.09,
-      "luck": 127.27,
-      "z": 0.34,
-      "blocks": 2,
+      "pool": "binancepool",
+      "share": 1.64,
+      "luck": 254.55,
+      "z": 2.37,
+      "blocks": 6,
       "timestamp": "2026-03-27T10:51:58+00:00"
     },
     {
       "pool": "foundryusa",
-      "share": 34.62,
-      "luck": 114.33,
-      "z": 1.01,
+      "share": 34.67,
+      "luck": 114.16,
+      "z": 1.0,
       "blocks": 57,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
       "pool": "antpool",
-      "share": 16.77,
-      "luck": 95.27,
-      "z": -0.23,
+      "share": 16.47,
+      "luck": 96.99,
+      "z": -0.15,
       "blocks": 23,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 10.62,
-      "luck": 58.88,
-      "z": -1.61,
+      "share": 10.86,
+      "luck": 57.53,
+      "z": -1.68,
       "blocks": 9,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
-      "pool": "spiderpool",
-      "share": 9.03,
-      "luck": 123.08,
-      "z": 0.83,
-      "blocks": 16,
-      "timestamp": "2026-03-26T13:00:00+00:00"
-    },
-    {
       "pool": "viabtc",
-      "share": 8.98,
-      "luck": 61.88,
-      "z": -1.37,
+      "share": 9.13,
+      "luck": 60.87,
+      "z": -1.42,
       "blocks": 8,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
+      "pool": "spiderpool",
+      "share": 8.78,
+      "luck": 126.55,
+      "z": 0.94,
+      "blocks": 16,
+      "timestamp": "2026-03-26T13:00:00+00:00"
+    },
+    {
       "pool": "marapool",
-      "share": 4.51,
-      "luck": 61.54,
-      "z": -0.98,
+      "share": 4.66,
+      "luck": 59.57,
+      "z": -1.05,
       "blocks": 4,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
       "pool": "secpool",
-      "share": 3.97,
-      "luck": 105.0,
-      "z": 0.12,
+      "share": 4.12,
+      "luck": 101.2,
+      "z": 0.03,
       "blocks": 6,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
       "pool": "luxor",
-      "share": 3.08,
-      "luck": 203.23,
-      "z": 2.17,
+      "share": 2.83,
+      "luck": 221.05,
+      "z": 2.44,
       "blocks": 9,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
     {
       "pool": "sbicrypto",
-      "share": 1.88,
-      "luck": 36.84,
-      "z": -1.04,
+      "share": 1.98,
+      "luck": 35.0,
+      "z": -1.1,
       "blocks": 1,
       "timestamp": "2026-03-26T13:00:00+00:00"
     },
@@ -668,65 +660,65 @@
     },
     {
       "pool": "foundryusa",
-      "share": 34.67,
-      "luck": 110.16,
-      "z": 0.72,
+      "share": 34.13,
+      "luck": 111.92,
+      "z": 0.84,
       "blocks": 55,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "antpool",
-      "share": 16.47,
-      "luck": 84.34,
-      "z": -0.76,
+      "share": 16.77,
+      "luck": 82.84,
+      "z": -0.84,
       "blocks": 20,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 10.86,
-      "luck": 121.46,
-      "z": 0.85,
+      "share": 10.71,
+      "luck": 123.15,
+      "z": 0.91,
       "blocks": 19,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "viabtc",
-      "share": 9.13,
-      "luck": 114.13,
-      "z": 0.51,
+      "share": 8.88,
+      "luck": 117.32,
+      "z": 0.62,
       "blocks": 15,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "spiderpool",
-      "share": 8.78,
-      "luck": 102.82,
-      "z": 0.1,
+      "share": 8.48,
+      "luck": 106.43,
+      "z": 0.22,
       "blocks": 13,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "marapool",
-      "share": 4.66,
-      "luck": 74.47,
-      "z": -0.66,
+      "share": 5.01,
+      "luck": 69.31,
+      "z": -0.82,
       "blocks": 5,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "secpool",
-      "share": 4.12,
-      "luck": 151.81,
-      "z": 1.26,
+      "share": 4.02,
+      "luck": 155.56,
+      "z": 1.34,
       "blocks": 9,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "luxor",
-      "share": 2.83,
-      "luck": 24.56,
-      "z": -1.52,
+      "share": 3.17,
+      "luck": 21.88,
+      "z": -1.67,
       "blocks": 1,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
@@ -740,65 +732,65 @@
     },
     {
       "pool": "binancepool",
-      "share": 1.64,
+      "share": 1.79,
       "luck": 0.0,
-      "z": -1.54,
+      "z": -1.6,
       "blocks": 0,
       "timestamp": "2026-03-25T15:07:14+00:00"
     },
     {
       "pool": "foundryusa",
-      "share": 34.13,
-      "luck": 109.88,
-      "z": 0.69,
+      "share": 33.78,
+      "luck": 111.01,
+      "z": 0.77,
       "blocks": 54,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
     {
       "pool": "antpool",
-      "share": 16.77,
-      "luck": 82.84,
-      "z": -0.84,
+      "share": 17.06,
+      "luck": 81.4,
+      "z": -0.92,
       "blocks": 20,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 10.71,
-      "luck": 110.19,
-      "z": 0.4,
+      "share": 10.76,
+      "luck": 109.68,
+      "z": 0.38,
       "blocks": 17,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
     {
       "pool": "viabtc",
-      "share": 8.88,
-      "luck": 86.03,
-      "z": -0.5,
+      "share": 8.78,
+      "luck": 87.01,
+      "z": -0.46,
       "blocks": 11,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
     {
       "pool": "spiderpool",
-      "share": 8.48,
-      "luck": 98.25,
-      "z": -0.06,
+      "share": 8.13,
+      "luck": 102.44,
+      "z": 0.08,
       "blocks": 12,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
     {
       "pool": "marapool",
-      "share": 5.01,
-      "luck": 83.17,
-      "z": -0.45,
+      "share": 5.21,
+      "luck": 80.0,
+      "z": -0.55,
       "blocks": 6,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
     {
       "pool": "secpool",
-      "share": 4.02,
-      "luck": 120.99,
-      "z": 0.5,
+      "share": 4.07,
+      "luck": 119.51,
+      "z": 0.47,
       "blocks": 7,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
@@ -812,9 +804,9 @@
     },
     {
       "pool": "sbicrypto",
-      "share": 1.98,
-      "luck": 70.0,
-      "z": -0.51,
+      "share": 2.08,
+      "luck": 66.67,
+      "z": -0.58,
       "blocks": 2,
       "timestamp": "2026-03-24T17:48:57+00:00"
     },
@@ -828,91 +820,11 @@
     },
     {
       "pool": "foundryusa",
-      "share": 33.78,
-      "luck": 84.29,
-      "z": -1.1,
-      "blocks": 41,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "antpool",
-      "share": 17.06,
-      "luck": 118.02,
-      "z": 0.89,
-      "blocks": 29,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "f2pool",
-      "share": 10.76,
-      "luck": 77.42,
-      "z": -0.89,
-      "blocks": 12,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "viabtc",
-      "share": 8.78,
-      "luck": 79.1,
-      "z": -0.74,
-      "blocks": 10,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "spiderpool",
-      "share": 8.13,
-      "luck": 136.59,
-      "z": 1.25,
-      "blocks": 16,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "marapool",
-      "share": 5.21,
-      "luck": 133.33,
-      "z": 0.91,
-      "blocks": 10,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "secpool",
-      "share": 4.07,
-      "luck": 85.37,
-      "z": -0.35,
-      "blocks": 5,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "luxor",
-      "share": 3.17,
-      "luck": 153.12,
-      "z": 1.14,
-      "blocks": 7,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "sbicrypto",
-      "share": 2.08,
-      "luck": 100.0,
-      "z": 0.0,
-      "blocks": 3,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "binancepool",
-      "share": 1.79,
-      "luck": 194.44,
-      "z": 1.51,
-      "blocks": 5,
-      "timestamp": "2026-03-23T15:54:49+00:00"
-    },
-    {
-      "pool": "foundryusa",
       "share": 34.23,
       "luck": 83.19,
       "z": -1.18,
       "blocks": 41,
-      "timestamp": "2026-03-22T17:35:47+00:00"
+      "timestamp": "2026-03-23T15:54:49+00:00"
     },
     {
       "pool": "antpool",
@@ -920,53 +832,141 @@
       "luck": 122.29,
       "z": 1.09,
       "blocks": 29,
-      "timestamp": "2026-03-22T17:35:47+00:00"
+      "timestamp": "2026-03-23T15:54:49+00:00"
     },
     {
       "pool": "f2pool",
       "share": 11.11,
-      "luck": 118.75,
-      "z": 0.75,
-      "blocks": 19,
-      "timestamp": "2026-03-22T17:35:47+00:00"
+      "luck": 75.0,
+      "z": -1.0,
+      "blocks": 12,
+      "timestamp": "2026-03-23T15:54:49+00:00"
     },
     {
       "pool": "viabtc",
       "share": 8.83,
-      "luck": 180.9,
-      "z": 2.88,
-      "blocks": 23,
-      "timestamp": "2026-03-22T17:35:47+00:00"
+      "luck": 78.65,
+      "z": -0.76,
+      "blocks": 10,
+      "timestamp": "2026-03-23T15:54:49+00:00"
     },
     {
       "pool": "spiderpool",
       "share": 8.18,
-      "luck": 67.88,
-      "z": -1.1,
-      "blocks": 8,
-      "timestamp": "2026-03-22T17:35:47+00:00"
+      "luck": 135.76,
+      "z": 1.23,
+      "blocks": 16,
+      "timestamp": "2026-03-23T15:54:49+00:00"
     },
     {
       "pool": "marapool",
       "share": 4.96,
-      "luck": 84.0,
-      "z": -0.43,
+      "luck": 140.0,
+      "z": 1.07,
+      "blocks": 10,
+      "timestamp": "2026-03-23T15:54:49+00:00"
+    },
+    {
+      "pool": "secpool",
+      "share": 4.02,
+      "luck": 86.42,
+      "z": -0.33,
+      "blocks": 5,
+      "timestamp": "2026-03-23T15:54:49+00:00"
+    },
+    {
+      "pool": "luxor",
+      "share": 3.08,
+      "luck": 158.06,
+      "z": 1.22,
+      "blocks": 7,
+      "timestamp": "2026-03-23T15:54:49+00:00"
+    },
+    {
+      "pool": "sbicrypto",
+      "share": 2.18,
+      "luck": 95.45,
+      "z": -0.08,
+      "blocks": 3,
+      "timestamp": "2026-03-23T15:54:49+00:00"
+    },
+    {
+      "pool": "binancepool",
+      "share": 1.64,
+      "luck": 212.12,
+      "z": 1.72,
+      "blocks": 5,
+      "timestamp": "2026-03-23T15:54:49+00:00"
+    },
+    {
+      "pool": "ocean",
+      "share": 1.04,
+      "luck": 0.0,
+      "z": -1.22,
+      "blocks": 0,
+      "timestamp": "2026-03-23T15:54:49+00:00"
+    },
+    {
+      "pool": "foundryusa",
+      "share": 34.52,
+      "luck": 82.47,
+      "z": -1.24,
+      "blocks": 41,
+      "timestamp": "2026-03-22T17:35:47+00:00"
+    },
+    {
+      "pool": "antpool",
+      "share": 16.37,
+      "luck": 123.03,
+      "z": 1.12,
+      "blocks": 29,
+      "timestamp": "2026-03-22T17:35:47+00:00"
+    },
+    {
+      "pool": "f2pool",
+      "share": 10.71,
+      "luck": 123.15,
+      "z": 0.91,
+      "blocks": 19,
+      "timestamp": "2026-03-22T17:35:47+00:00"
+    },
+    {
+      "pool": "spiderpool",
+      "share": 8.33,
+      "luck": 66.67,
+      "z": -1.15,
+      "blocks": 8,
+      "timestamp": "2026-03-22T17:35:47+00:00"
+    },
+    {
+      "pool": "viabtc",
+      "share": 8.23,
+      "luck": 193.98,
+      "z": 3.24,
+      "blocks": 23,
+      "timestamp": "2026-03-22T17:35:47+00:00"
+    },
+    {
+      "pool": "marapool",
+      "share": 5.21,
+      "luck": 80.0,
+      "z": -0.55,
       "blocks": 6,
       "timestamp": "2026-03-22T17:35:47+00:00"
     },
     {
       "pool": "secpool",
-      "share": 4.02,
-      "luck": 69.14,
-      "z": -0.74,
+      "share": 4.17,
+      "luck": 66.67,
+      "z": -0.82,
       "blocks": 4,
       "timestamp": "2026-03-22T17:35:47+00:00"
     },
     {
       "pool": "luxor",
-      "share": 3.08,
-      "luck": 67.74,
-      "z": -0.68,
+      "share": 3.22,
+      "luck": 64.62,
+      "z": -0.76,
       "blocks": 3,
       "timestamp": "2026-03-22T17:35:47+00:00"
     },
@@ -980,102 +980,110 @@
     },
     {
       "pool": "binancepool",
-      "share": 1.64,
-      "luck": 84.85,
-      "z": -0.23,
+      "share": 1.69,
+      "luck": 82.35,
+      "z": -0.28,
       "blocks": 2,
       "timestamp": "2026-03-22T17:35:47+00:00"
     },
     {
       "pool": "ocean",
-      "share": 1.04,
+      "share": 1.19,
       "luck": 0.0,
-      "z": -1.22,
+      "z": -1.31,
       "blocks": 0,
       "timestamp": "2026-03-22T17:35:47+00:00"
     },
     {
       "pool": "foundryusa",
-      "share": 34.52,
-      "luck": 110.63,
-      "z": 0.75,
+      "share": 33.28,
+      "luck": 114.75,
+      "z": 1.02,
       "blocks": 55,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "antpool",
-      "share": 16.37,
-      "luck": 97.58,
-      "z": -0.12,
+      "share": 16.17,
+      "luck": 98.77,
+      "z": -0.06,
       "blocks": 23,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 10.71,
-      "luck": 129.63,
-      "z": 1.16,
+      "share": 10.62,
+      "luck": 130.84,
+      "z": 1.21,
       "blocks": 20,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "spiderpool",
-      "share": 8.33,
-      "luck": 58.33,
-      "z": -1.44,
+      "share": 8.68,
+      "luck": 56.0,
+      "z": -1.56,
       "blocks": 7,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "viabtc",
-      "share": 8.23,
-      "luck": 143.37,
-      "z": 1.49,
+      "share": 7.99,
+      "luck": 147.83,
+      "z": 1.62,
       "blocks": 17,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "marapool",
-      "share": 5.21,
-      "luck": 40.0,
-      "z": -1.64,
+      "share": 5.9,
+      "luck": 35.29,
+      "z": -1.89,
       "blocks": 3,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "secpool",
-      "share": 4.17,
-      "luck": 66.67,
-      "z": -0.82,
+      "share": 4.27,
+      "luck": 65.12,
+      "z": -0.86,
       "blocks": 4,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "luxor",
-      "share": 3.22,
-      "luck": 86.15,
-      "z": -0.3,
+      "share": 3.42,
+      "luck": 81.16,
+      "z": -0.42,
       "blocks": 4,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "sbicrypto",
-      "share": 2.18,
-      "luck": 95.45,
-      "z": -0.08,
+      "share": 2.23,
+      "luck": 93.33,
+      "z": -0.12,
       "blocks": 3,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "binancepool",
-      "share": 1.69,
-      "luck": 123.53,
-      "z": 0.37,
+      "share": 1.88,
+      "luck": 110.53,
+      "z": 0.17,
       "blocks": 3,
       "timestamp": "2026-03-21T17:12:29+00:00"
     },
     {
       "pool": "ocean",
+      "share": 1.29,
+      "luck": 0.0,
+      "z": -1.36,
+      "blocks": 0,
+      "timestamp": "2026-03-21T17:12:29+00:00"
+    },
+    {
+      "pool": "slushpool",
       "share": 1.19,
       "luck": 0.0,
       "z": -1.31,
@@ -1084,49 +1092,49 @@
     },
     {
       "pool": "foundryusa",
-      "share": 33.28,
-      "luck": 108.49,
-      "z": 0.59,
+      "share": 33.18,
+      "luck": 108.82,
+      "z": 0.61,
       "blocks": 52,
       "timestamp": "2026-03-20T16:12:01+00:00"
     },
     {
       "pool": "antpool",
-      "share": 16.17,
-      "luck": 90.18,
-      "z": -0.47,
+      "share": 16.12,
+      "luck": 90.46,
+      "z": -0.46,
       "blocks": 21,
       "timestamp": "2026-03-20T16:12:01+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 10.62,
-      "luck": 85.05,
-      "z": -0.58,
+      "share": 10.91,
+      "luck": 82.73,
+      "z": -0.68,
       "blocks": 13,
       "timestamp": "2026-03-20T16:12:01+00:00"
     },
     {
       "pool": "spiderpool",
-      "share": 8.68,
-      "luck": 56.0,
-      "z": -1.56,
+      "share": 9.33,
+      "luck": 52.13,
+      "z": -1.75,
       "blocks": 7,
       "timestamp": "2026-03-20T16:12:01+00:00"
     },
     {
       "pool": "viabtc",
-      "share": 7.99,
-      "luck": 130.43,
-      "z": 1.03,
+      "share": 7.59,
+      "luck": 137.25,
+      "z": 1.23,
       "blocks": 15,
       "timestamp": "2026-03-20T16:12:01+00:00"
     },
     {
       "pool": "marapool",
-      "share": 5.9,
-      "luck": 164.71,
-      "z": 1.89,
+      "share": 5.51,
+      "luck": 176.58,
+      "z": 2.16,
       "blocks": 14,
       "timestamp": "2026-03-20T16:12:01+00:00"
     },
@@ -1156,113 +1164,113 @@
     },
     {
       "pool": "binancepool",
-      "share": 1.88,
-      "luck": 110.53,
-      "z": 0.17,
-      "blocks": 3,
-      "timestamp": "2026-03-20T16:12:01+00:00"
-    },
-    {
-      "pool": "ocean",
-      "share": 1.29,
-      "luck": 0.0,
-      "z": -1.36,
-      "blocks": 0,
-      "timestamp": "2026-03-20T16:12:01+00:00"
-    },
-    {
-      "pool": "slushpool",
-      "share": 1.19,
-      "luck": 0.0,
-      "z": -1.31,
-      "blocks": 0,
-      "timestamp": "2026-03-20T16:12:01+00:00"
-    },
-    {
-      "pool": "foundryusa",
-      "share": 33.18,
-      "luck": 108.82,
-      "z": 0.61,
-      "blocks": 52,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "antpool",
-      "share": 16.12,
-      "luck": 107.69,
-      "z": 0.37,
-      "blocks": 25,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "f2pool",
-      "share": 10.91,
-      "luck": 89.09,
-      "z": -0.43,
-      "blocks": 14,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "spiderpool",
-      "share": 9.33,
-      "luck": 126.6,
-      "z": 0.97,
-      "blocks": 17,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "viabtc",
-      "share": 7.59,
-      "luck": 155.56,
-      "z": 1.84,
-      "blocks": 17,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "marapool",
-      "share": 5.51,
-      "luck": 37.84,
-      "z": -1.75,
-      "blocks": 3,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "secpool",
-      "share": 4.27,
-      "luck": 48.84,
-      "z": -1.27,
-      "blocks": 3,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "luxor",
-      "share": 3.42,
-      "luck": 60.87,
-      "z": -0.87,
-      "blocks": 3,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "sbicrypto",
-      "share": 2.23,
-      "luck": 93.33,
-      "z": -0.12,
-      "blocks": 3,
-      "timestamp": "2026-03-19T13:42:34+00:00"
-    },
-    {
-      "pool": "binancepool",
       "share": 1.93,
-      "luck": 71.79,
-      "z": -0.47,
-      "blocks": 2,
-      "timestamp": "2026-03-19T13:42:34+00:00"
+      "luck": 107.69,
+      "z": 0.13,
+      "blocks": 3,
+      "timestamp": "2026-03-20T16:12:01+00:00"
     },
     {
       "pool": "ocean",
       "share": 1.44,
       "luck": 0.0,
       "z": -1.44,
+      "blocks": 0,
+      "timestamp": "2026-03-20T16:12:01+00:00"
+    },
+    {
+      "pool": "slushpool",
+      "share": 1.24,
+      "luck": 0.0,
+      "z": -1.34,
+      "blocks": 0,
+      "timestamp": "2026-03-20T16:12:01+00:00"
+    },
+    {
+      "pool": "foundryusa",
+      "share": 32.74,
+      "luck": 110.3,
+      "z": 0.71,
+      "blocks": 52,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "antpool",
+      "share": 15.87,
+      "luck": 109.38,
+      "z": 0.45,
+      "blocks": 25,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "f2pool",
+      "share": 11.21,
+      "luck": 86.73,
+      "z": -0.53,
+      "blocks": 14,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "spiderpool",
+      "share": 8.93,
+      "luck": 132.22,
+      "z": 1.16,
+      "blocks": 17,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "viabtc",
+      "share": 7.34,
+      "luck": 160.81,
+      "z": 1.98,
+      "blocks": 17,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "marapool",
+      "share": 5.9,
+      "luck": 35.29,
+      "z": -1.89,
+      "blocks": 3,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "secpool",
+      "share": 4.46,
+      "luck": 46.67,
+      "z": -1.35,
+      "blocks": 3,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "luxor",
+      "share": 3.52,
+      "luck": 59.15,
+      "z": -0.92,
+      "blocks": 3,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "sbicrypto",
+      "share": 2.18,
+      "luck": 95.45,
+      "z": -0.08,
+      "blocks": 3,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "binancepool",
+      "share": 1.98,
+      "luck": 70.0,
+      "z": -0.51,
+      "blocks": 2,
+      "timestamp": "2026-03-19T13:42:34+00:00"
+    },
+    {
+      "pool": "ocean",
+      "share": 1.79,
+      "luck": 0.0,
+      "z": -1.6,
       "blocks": 0,
       "timestamp": "2026-03-19T13:42:34+00:00"
     },
@@ -1276,65 +1284,65 @@
     },
     {
       "pool": "foundryusa",
-      "share": 32.74,
-      "luck": 95.45,
-      "z": -0.31,
+      "share": 33.23,
+      "luck": 94.03,
+      "z": -0.41,
       "blocks": 45,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "antpool",
-      "share": 15.87,
-      "luck": 157.5,
-      "z": 2.75,
+      "share": 15.03,
+      "luck": 166.34,
+      "z": 3.09,
       "blocks": 36,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "f2pool",
-      "share": 11.21,
-      "luck": 105.31,
-      "z": 0.21,
+      "share": 11.11,
+      "luck": 106.25,
+      "z": 0.25,
       "blocks": 17,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "spiderpool",
-      "share": 8.93,
-      "luck": 108.89,
-      "z": 0.32,
+      "share": 8.88,
+      "luck": 109.5,
+      "z": 0.34,
       "blocks": 14,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "viabtc",
-      "share": 7.34,
-      "luck": 85.14,
-      "z": -0.48,
+      "share": 7.24,
+      "luck": 86.3,
+      "z": -0.44,
       "blocks": 9,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "marapool",
-      "share": 5.9,
-      "luck": 23.53,
-      "z": -2.23,
+      "share": 6.3,
+      "luck": 22.05,
+      "z": -2.35,
       "blocks": 2,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "secpool",
-      "share": 4.46,
-      "luck": 46.67,
-      "z": -1.35,
+      "share": 4.56,
+      "luck": 45.65,
+      "z": -1.39,
       "blocks": 3,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "luxor",
-      "share": 3.52,
-      "luck": 98.59,
-      "z": -0.03,
+      "share": 3.62,
+      "luck": 95.89,
+      "z": -0.09,
       "blocks": 5,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
@@ -1348,25 +1356,25 @@
     },
     {
       "pool": "binancepool",
-      "share": 1.98,
-      "luck": 70.0,
-      "z": -0.51,
+      "share": 1.93,
+      "luck": 71.79,
+      "z": -0.47,
       "blocks": 2,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "ocean",
-      "share": 1.79,
+      "share": 1.88,
       "luck": 0.0,
-      "z": -1.6,
+      "z": -1.65,
       "blocks": 0,
       "timestamp": "2026-03-18T14:39:47+00:00"
     },
     {
       "pool": "slushpool",
-      "share": 1.24,
+      "share": 1.44,
       "luck": 0.0,
-      "z": -1.34,
+      "z": -1.44,
       "blocks": 0,
       "timestamp": "2026-03-18T14:39:47+00:00"
     }
@@ -18284,10 +18292,10 @@
   "kpi4_sync": [
     {
       "pool": "foundryusa",
-      "avg_strike_delta": 594.27,
-      "median_strike_delta": 414.0,
+      "avg_strike_delta": 596.07,
+      "median_strike_delta": 416.0,
       "buckets": {
-        "sub_30s": 748,
+        "sub_30s": 694,
         "sub_60s": 974,
         "sub_2m": 1669,
         "sub_5m": 4035,
@@ -18300,57 +18308,57 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 18847,
+      "total_consecutive": 18793,
       "total_blocks": 67531
     },
     {
       "pool": "antpool",
-      "avg_strike_delta": 580.32,
-      "median_strike_delta": 396.5,
+      "avg_strike_delta": 581.06,
+      "median_strike_delta": 397.0,
       "buckets": {
-        "sub_30s": 494,
+        "sub_30s": 481,
         "sub_60s": 483,
         "sub_2m": 974,
         "sub_5m": 2391,
         "slow": 6278
       },
       "buckets_empty": {
-        "sub_30s": 31,
+        "sub_30s": 30,
         "sub_60s": 4,
         "sub_2m": 1,
         "sub_5m": 0,
         "slow": 3
       },
-      "total_consecutive": 10620,
+      "total_consecutive": 10607,
       "total_blocks": 53242
     },
     {
       "pool": "f2pool",
-      "avg_strike_delta": 586.7,
-      "median_strike_delta": 397.0,
+      "avg_strike_delta": 589.83,
+      "median_strike_delta": 401.0,
       "buckets": {
-        "sub_30s": 207,
+        "sub_30s": 185,
         "sub_60s": 253,
         "sub_2m": 423,
         "sub_5m": 1099,
         "slow": 2895
       },
       "buckets_empty": {
-        "sub_30s": 14,
+        "sub_30s": 13,
         "sub_60s": 4,
         "sub_2m": 1,
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 4877,
+      "total_consecutive": 4855,
       "total_blocks": 36101
     },
     {
       "pool": "viabtc",
-      "avg_strike_delta": 613.05,
-      "median_strike_delta": 425.0,
+      "avg_strike_delta": 615.7,
+      "median_strike_delta": 428.0,
       "buckets": {
-        "sub_30s": 171,
+        "sub_30s": 158,
         "sub_60s": 151,
         "sub_2m": 291,
         "sub_5m": 701,
@@ -18363,15 +18371,15 @@
         "sub_5m": 2,
         "slow": 0
       },
-      "total_consecutive": 3369,
+      "total_consecutive": 3356,
       "total_blocks": 30911
     },
     {
       "pool": "binancepool",
-      "avg_strike_delta": 587.27,
-      "median_strike_delta": 419.0,
+      "avg_strike_delta": 589.64,
+      "median_strike_delta": 422.5,
       "buckets": {
-        "sub_30s": 57,
+        "sub_30s": 51,
         "sub_60s": 103,
         "sub_2m": 150,
         "sub_5m": 395,
@@ -18384,15 +18392,15 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 1820,
+      "total_consecutive": 1814,
       "total_blocks": 19268
     },
     {
       "pool": "poolin",
-      "avg_strike_delta": 589.61,
-      "median_strike_delta": 407.0,
+      "avg_strike_delta": 591.87,
+      "median_strike_delta": 411.0,
       "buckets": {
-        "sub_30s": 70,
+        "sub_30s": 65,
         "sub_60s": 65,
         "sub_2m": 123,
         "sub_5m": 278,
@@ -18405,15 +18413,15 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 1341,
+      "total_consecutive": 1336,
       "total_blocks": 12336
     },
     {
       "pool": "btccom",
-      "avg_strike_delta": 609.36,
+      "avg_strike_delta": 610.37,
       "median_strike_delta": 419.0,
       "buckets": {
-        "sub_30s": 18,
+        "sub_30s": 17,
         "sub_60s": 36,
         "sub_2m": 43,
         "sub_5m": 152,
@@ -18426,15 +18434,15 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 620,
+      "total_consecutive": 619,
       "total_blocks": 9184
     },
     {
       "pool": "marapool",
-      "avg_strike_delta": 607.6,
-      "median_strike_delta": 445.0,
+      "avg_strike_delta": 617.36,
+      "median_strike_delta": 454.5,
       "buckets": {
-        "sub_30s": 16,
+        "sub_30s": 11,
         "sub_60s": 13,
         "sub_2m": 25,
         "sub_5m": 64,
@@ -18447,15 +18455,15 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 327,
+      "total_consecutive": 322,
       "total_blocks": 8141
     },
     {
       "pool": "braiinspool",
-      "avg_strike_delta": 642.21,
-      "median_strike_delta": 436.5,
+      "avg_strike_delta": 644.51,
+      "median_strike_delta": 438.0,
       "buckets": {
-        "sub_30s": 11,
+        "sub_30s": 10,
         "sub_60s": 16,
         "sub_2m": 25,
         "sub_5m": 56,
@@ -18468,15 +18476,15 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 282,
+      "total_consecutive": 281,
       "total_blocks": 6755
     },
     {
       "pool": "luxor",
-      "avg_strike_delta": 612.57,
-      "median_strike_delta": 464.0,
+      "avg_strike_delta": 615.87,
+      "median_strike_delta": 467.0,
       "buckets": {
-        "sub_30s": 5,
+        "sub_30s": 4,
         "sub_60s": 6,
         "sub_2m": 16,
         "sub_5m": 46,
@@ -18489,15 +18497,15 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 196,
+      "total_consecutive": 195,
       "total_blocks": 6200
     },
     {
       "pool": "spiderpool",
-      "avg_strike_delta": 572.28,
-      "median_strike_delta": 400.0,
+      "avg_strike_delta": 598.42,
+      "median_strike_delta": 423.5,
       "buckets": {
-        "sub_30s": 21,
+        "sub_30s": 8,
         "sub_60s": 18,
         "sub_2m": 40,
         "sub_5m": 83,
@@ -18510,7 +18518,7 @@
         "sub_5m": 0,
         "slow": 0
       },
-      "total_consecutive": 377,
+      "total_consecutive": 364,
       "total_blocks": 5963
     },
     {
@@ -18568,6 +18576,33 @@
         "ratio_30d": 0.54
       },
       {
+        "pool": "okexpool",
+        "total_all": 331,
+        "empty_all": 4,
+        "ratio_all": 1.21,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "huobipool",
+        "total_all": 2249,
+        "empty_all": 24,
+        "ratio_all": 1.07,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "kucoinpool",
+        "total_all": 272,
+        "empty_all": 2,
+        "ratio_all": 0.74,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
         "pool": "secpool",
         "total_all": 3556,
         "empty_all": 21,
@@ -18575,6 +18610,15 @@
         "total_30d": 174,
         "empty_30d": 1,
         "ratio_30d": 0.57
+      },
+      {
+        "pool": "ocean",
+        "total_all": 746,
+        "empty_all": 4,
+        "ratio_all": 0.54,
+        "total_30d": 52,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
       },
       {
         "pool": "binancepool",
@@ -18591,6 +18635,24 @@
         "empty_all": 196,
         "ratio_all": 0.37,
         "total_30d": 694,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "btctop",
+        "total_all": 548,
+        "empty_all": 2,
+        "ratio_all": 0.36,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "unknown",
+        "total_all": 1731,
+        "empty_all": 6,
+        "ratio_all": 0.35,
+        "total_30d": 14,
         "empty_30d": 0,
         "ratio_30d": 0.0
       },
@@ -18658,6 +18720,51 @@
         "ratio_30d": 0.0
       },
       {
+        "pool": "whitepool",
+        "total_all": 881,
+        "empty_all": 2,
+        "ratio_all": 0.23,
+        "total_30d": 18,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "ultimuspool",
+        "total_all": 905,
+        "empty_all": 2,
+        "ratio_all": 0.22,
+        "total_30d": 13,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "slushpool",
+        "total_all": 966,
+        "empty_all": 2,
+        "ratio_all": 0.21,
+        "total_30d": 45,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "1thash",
+        "total_all": 1188,
+        "empty_all": 2,
+        "ratio_all": 0.17,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "emcdpool",
+        "total_all": 859,
+        "empty_all": 1,
+        "ratio_all": 0.12,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
         "pool": "marapool",
         "total_all": 8141,
         "empty_all": 4,
@@ -18667,11 +18774,155 @@
         "ratio_30d": 0.0
       },
       {
+        "pool": "lubiancom",
+        "total_all": 279,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "wayicn",
+        "total_all": 138,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "novablock",
+        "total_all": 53,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
         "pool": "foundryusa",
         "total_all": 67531,
         "empty_all": 0,
         "ratio_all": 0.0,
         "total_30d": 1351,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "okkong",
+        "total_all": 144,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "sigmapoolcom",
+        "total_all": 127,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "rawpool",
+        "total_all": 463,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "arkpool",
+        "total_all": 61,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "carbonnegative",
+        "total_all": 1056,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "terrapool",
+        "total_all": 202,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "pegapool",
+        "total_all": 350,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "nicehash",
+        "total_all": 331,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 4,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "ckpool",
+        "total_all": 50,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 1,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "carbonnegative(unidentified)",
+        "total_all": 207,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 0,
+        "empty_30d": 0,
+        "ratio_30d": 0
+      },
+      {
+        "pool": "miningsquared",
+        "total_all": 372,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 12,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "innopolistech",
+        "total_all": 97,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 14,
+        "empty_30d": 0,
+        "ratio_30d": 0.0
+      },
+      {
+        "pool": "dpool",
+        "total_all": 102,
+        "empty_all": 0,
+        "ratio_all": 0.0,
+        "total_30d": 8,
         "empty_30d": 0,
         "ratio_30d": 0.0
       }
@@ -18693,38 +18944,24 @@
       },
       {
         "month": "2021-01",
-        "pool_name": "braiinspool",
-        "total": 149,
+        "pool_name": "btctop",
+        "total": 91,
         "empty": 1,
-        "ratio": 0.67
+        "ratio": 1.1
       },
       {
         "month": "2021-01",
-        "pool_name": "btccom",
-        "total": 491,
-        "empty": 3,
-        "ratio": 0.61
+        "pool_name": "huobipool",
+        "total": 432,
+        "empty": 6,
+        "ratio": 1.39
       },
       {
         "month": "2021-01",
-        "pool_name": "f2pool",
-        "total": 746,
-        "empty": 4,
-        "ratio": 0.54
-      },
-      {
-        "month": "2021-01",
-        "pool_name": "poolin",
-        "total": 557,
-        "empty": 3,
-        "ratio": 0.54
-      },
-      {
-        "month": "2021-01",
-        "pool_name": "sbicrypto",
-        "total": 34,
-        "empty": 0,
-        "ratio": 0.0
+        "pool_name": "okexpool",
+        "total": 25,
+        "empty": 2,
+        "ratio": 8.0
       },
       {
         "month": "2021-01",
@@ -18735,10 +18972,10 @@
       },
       {
         "month": "2021-01",
-        "pool_name": "viabtc",
-        "total": 344,
-        "empty": 1,
-        "ratio": 0.29
+        "pool_name": "unknown",
+        "total": 101,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-02",
@@ -18756,36 +18993,22 @@
       },
       {
         "month": "2021-02",
-        "pool_name": "braiinspool",
-        "total": 142,
+        "pool_name": "btctop",
+        "total": 76,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-02",
-        "pool_name": "btccom",
-        "total": 417,
+        "pool_name": "huobipool",
+        "total": 421,
         "empty": 4,
-        "ratio": 0.96
+        "ratio": 0.95
       },
       {
         "month": "2021-02",
-        "pool_name": "f2pool",
-        "total": 665,
-        "empty": 3,
-        "ratio": 0.45
-      },
-      {
-        "month": "2021-02",
-        "pool_name": "poolin",
-        "total": 564,
-        "empty": 3,
-        "ratio": 0.53
-      },
-      {
-        "month": "2021-02",
-        "pool_name": "sbicrypto",
-        "total": 28,
+        "pool_name": "okexpool",
+        "total": 22,
         "empty": 0,
         "ratio": 0.0
       },
@@ -18798,10 +19021,10 @@
       },
       {
         "month": "2021-02",
-        "pool_name": "viabtc",
-        "total": 293,
-        "empty": 1,
-        "ratio": 0.34
+        "pool_name": "unknown",
+        "total": 46,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-03",
@@ -18819,36 +19042,22 @@
       },
       {
         "month": "2021-03",
-        "pool_name": "braiinspool",
-        "total": 129,
-        "empty": 1,
-        "ratio": 0.78
+        "pool_name": "btctop",
+        "total": 124,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-03",
-        "pool_name": "btccom",
-        "total": 494,
-        "empty": 4,
-        "ratio": 0.81
+        "pool_name": "huobipool",
+        "total": 404,
+        "empty": 7,
+        "ratio": 1.73
       },
       {
         "month": "2021-03",
-        "pool_name": "f2pool",
-        "total": 755,
-        "empty": 5,
-        "ratio": 0.66
-      },
-      {
-        "month": "2021-03",
-        "pool_name": "poolin",
-        "total": 699,
-        "empty": 3,
-        "ratio": 0.43
-      },
-      {
-        "month": "2021-03",
-        "pool_name": "sbicrypto",
-        "total": 51,
+        "pool_name": "okexpool",
+        "total": 35,
         "empty": 0,
         "ratio": 0.0
       },
@@ -18861,10 +19070,10 @@
       },
       {
         "month": "2021-03",
-        "pool_name": "viabtc",
-        "total": 401,
-        "empty": 1,
-        "ratio": 0.25
+        "pool_name": "unknown",
+        "total": 43,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-04",
@@ -18882,36 +19091,22 @@
       },
       {
         "month": "2021-04",
-        "pool_name": "braiinspool",
-        "total": 118,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2021-04",
-        "pool_name": "btccom",
-        "total": 409,
+        "pool_name": "btctop",
+        "total": 89,
         "empty": 1,
-        "ratio": 0.24
+        "ratio": 1.12
       },
       {
         "month": "2021-04",
-        "pool_name": "f2pool",
-        "total": 675,
-        "empty": 5,
-        "ratio": 0.74
+        "pool_name": "huobipool",
+        "total": 295,
+        "empty": 1,
+        "ratio": 0.34
       },
       {
         "month": "2021-04",
-        "pool_name": "poolin",
-        "total": 561,
-        "empty": 3,
-        "ratio": 0.53
-      },
-      {
-        "month": "2021-04",
-        "pool_name": "sbicrypto",
-        "total": 22,
+        "pool_name": "okexpool",
+        "total": 38,
         "empty": 0,
         "ratio": 0.0
       },
@@ -18924,10 +19119,10 @@
       },
       {
         "month": "2021-04",
-        "pool_name": "viabtc",
-        "total": 409,
-        "empty": 2,
-        "ratio": 0.49
+        "pool_name": "unknown",
+        "total": 43,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-05",
@@ -18945,38 +19140,24 @@
       },
       {
         "month": "2021-05",
-        "pool_name": "braiinspool",
-        "total": 130,
+        "pool_name": "btctop",
+        "total": 108,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-05",
-        "pool_name": "btccom",
-        "total": 402,
+        "pool_name": "huobipool",
+        "total": 275,
+        "empty": 3,
+        "ratio": 1.09
+      },
+      {
+        "month": "2021-05",
+        "pool_name": "okexpool",
+        "total": 39,
         "empty": 2,
-        "ratio": 0.5
-      },
-      {
-        "month": "2021-05",
-        "pool_name": "f2pool",
-        "total": 719,
-        "empty": 5,
-        "ratio": 0.7
-      },
-      {
-        "month": "2021-05",
-        "pool_name": "poolin",
-        "total": 581,
-        "empty": 5,
-        "ratio": 0.86
-      },
-      {
-        "month": "2021-05",
-        "pool_name": "sbicrypto",
-        "total": 37,
-        "empty": 0,
-        "ratio": 0.0
+        "ratio": 5.13
       },
       {
         "month": "2021-05",
@@ -18987,10 +19168,10 @@
       },
       {
         "month": "2021-05",
-        "pool_name": "viabtc",
-        "total": 416,
-        "empty": 5,
-        "ratio": 1.2
+        "pool_name": "unknown",
+        "total": 52,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-06",
@@ -19008,38 +19189,24 @@
       },
       {
         "month": "2021-06",
-        "pool_name": "braiinspool",
-        "total": 132,
+        "pool_name": "btctop",
+        "total": 57,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-06",
-        "pool_name": "btccom",
-        "total": 363,
+        "pool_name": "huobipool",
+        "total": 91,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-06",
-        "pool_name": "f2pool",
-        "total": 626,
-        "empty": 5,
-        "ratio": 0.8
-      },
-      {
-        "month": "2021-06",
-        "pool_name": "poolin",
-        "total": 438,
-        "empty": 1,
-        "ratio": 0.23
-      },
-      {
-        "month": "2021-06",
-        "pool_name": "sbicrypto",
-        "total": 35,
-        "empty": 1,
-        "ratio": 2.86
+        "pool_name": "okexpool",
+        "total": 33,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-06",
@@ -19050,10 +19217,10 @@
       },
       {
         "month": "2021-06",
-        "pool_name": "viabtc",
-        "total": 410,
-        "empty": 2,
-        "ratio": 0.49
+        "pool_name": "unknown",
+        "total": 10,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-07",
@@ -19071,36 +19238,22 @@
       },
       {
         "month": "2021-07",
-        "pool_name": "braiinspool",
-        "total": 220,
-        "empty": 1,
-        "ratio": 0.45
-      },
-      {
-        "month": "2021-07",
-        "pool_name": "btccom",
-        "total": 446,
+        "pool_name": "btctop",
+        "total": 3,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-07",
-        "pool_name": "f2pool",
-        "total": 573,
+        "pool_name": "huobipool",
+        "total": 51,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-07",
-        "pool_name": "poolin",
-        "total": 461,
-        "empty": 2,
-        "ratio": 0.43
-      },
-      {
-        "month": "2021-07",
-        "pool_name": "sbicrypto",
-        "total": 73,
+        "pool_name": "okexpool",
+        "total": 25,
         "empty": 0,
         "ratio": 0.0
       },
@@ -19113,10 +19266,10 @@
       },
       {
         "month": "2021-07",
-        "pool_name": "viabtc",
-        "total": 584,
-        "empty": 3,
-        "ratio": 0.51
+        "pool_name": "unknown",
+        "total": 208,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-08",
@@ -19134,36 +19287,15 @@
       },
       {
         "month": "2021-08",
-        "pool_name": "braiinspool",
-        "total": 235,
-        "empty": 1,
-        "ratio": 0.43
-      },
-      {
-        "month": "2021-08",
-        "pool_name": "btccom",
-        "total": 444,
+        "pool_name": "huobipool",
+        "total": 84,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-08",
-        "pool_name": "f2pool",
-        "total": 472,
-        "empty": 1,
-        "ratio": 0.21
-      },
-      {
-        "month": "2021-08",
-        "pool_name": "poolin",
-        "total": 616,
-        "empty": 2,
-        "ratio": 0.32
-      },
-      {
-        "month": "2021-08",
-        "pool_name": "sbicrypto",
-        "total": 88,
+        "pool_name": "okexpool",
+        "total": 27,
         "empty": 0,
         "ratio": 0.0
       },
@@ -19176,10 +19308,10 @@
       },
       {
         "month": "2021-08",
-        "pool_name": "viabtc",
-        "total": 602,
-        "empty": 4,
-        "ratio": 0.66
+        "pool_name": "unknown",
+        "total": 317,
+        "empty": 3,
+        "ratio": 0.95
       },
       {
         "month": "2021-09",
@@ -19197,38 +19329,24 @@
       },
       {
         "month": "2021-09",
-        "pool_name": "braiinspool",
-        "total": 206,
+        "pool_name": "huobipool",
+        "total": 77,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-09",
-        "pool_name": "btccom",
-        "total": 387,
+        "pool_name": "kucoinpool",
+        "total": 4,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-09",
-        "pool_name": "f2pool",
-        "total": 697,
-        "empty": 2,
-        "ratio": 0.29
-      },
-      {
-        "month": "2021-09",
-        "pool_name": "poolin",
-        "total": 588,
-        "empty": 1,
-        "ratio": 0.17
-      },
-      {
-        "month": "2021-09",
-        "pool_name": "sbicrypto",
-        "total": 62,
-        "empty": 1,
-        "ratio": 1.61
+        "pool_name": "okexpool",
+        "total": 21,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-09",
@@ -19239,10 +19357,10 @@
       },
       {
         "month": "2021-09",
-        "pool_name": "viabtc",
-        "total": 563,
-        "empty": 4,
-        "ratio": 0.71
+        "pool_name": "unknown",
+        "total": 112,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-10",
@@ -19260,36 +19378,22 @@
       },
       {
         "month": "2021-10",
-        "pool_name": "braiinspool",
-        "total": 223,
+        "pool_name": "huobipool",
+        "total": 81,
+        "empty": 2,
+        "ratio": 2.47
+      },
+      {
+        "month": "2021-10",
+        "pool_name": "kucoinpool",
+        "total": 9,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-10",
-        "pool_name": "btccom",
-        "total": 421,
-        "empty": 1,
-        "ratio": 0.24
-      },
-      {
-        "month": "2021-10",
-        "pool_name": "f2pool",
-        "total": 771,
-        "empty": 1,
-        "ratio": 0.13
-      },
-      {
-        "month": "2021-10",
-        "pool_name": "poolin",
-        "total": 531,
-        "empty": 1,
-        "ratio": 0.19
-      },
-      {
-        "month": "2021-10",
-        "pool_name": "sbicrypto",
-        "total": 68,
+        "pool_name": "okexpool",
+        "total": 18,
         "empty": 0,
         "ratio": 0.0
       },
@@ -19302,10 +19406,10 @@
       },
       {
         "month": "2021-10",
-        "pool_name": "viabtc",
-        "total": 537,
-        "empty": 1,
-        "ratio": 0.19
+        "pool_name": "unknown",
+        "total": 114,
+        "empty": 2,
+        "ratio": 1.75
       },
       {
         "month": "2021-11",
@@ -19323,45 +19427,31 @@
       },
       {
         "month": "2021-11",
-        "pool_name": "braiinspool",
-        "total": 249,
-        "empty": 2,
-        "ratio": 0.8
+        "pool_name": "huobipool",
+        "total": 38,
+        "empty": 1,
+        "ratio": 2.63
       },
       {
         "month": "2021-11",
-        "pool_name": "btccom",
-        "total": 354,
+        "pool_name": "kucoinpool",
+        "total": 5,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-11",
-        "pool_name": "f2pool",
-        "total": 696,
-        "empty": 5,
-        "ratio": 0.72
+        "pool_name": "okexpool",
+        "total": 16,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-11",
-        "pool_name": "poolin",
-        "total": 528,
-        "empty": 5,
-        "ratio": 0.95
-      },
-      {
-        "month": "2021-11",
-        "pool_name": "sbicrypto",
-        "total": 74,
-        "empty": 1,
-        "ratio": 1.35
-      },
-      {
-        "month": "2021-11",
-        "pool_name": "viabtc",
-        "total": 539,
-        "empty": 3,
-        "ratio": 0.56
+        "pool_name": "unknown",
+        "total": 44,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2021-12",
@@ -19379,45 +19469,24 @@
       },
       {
         "month": "2021-12",
-        "pool_name": "braiinspool",
-        "total": 251,
-        "empty": 1,
-        "ratio": 0.4
-      },
-      {
-        "month": "2021-12",
-        "pool_name": "btccom",
-        "total": 287,
-        "empty": 1,
-        "ratio": 0.35
-      },
-      {
-        "month": "2021-12",
-        "pool_name": "f2pool",
-        "total": 660,
-        "empty": 4,
-        "ratio": 0.61
-      },
-      {
-        "month": "2021-12",
-        "pool_name": "poolin",
-        "total": 467,
+        "pool_name": "kucoinpool",
+        "total": 3,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-12",
-        "pool_name": "sbicrypto",
-        "total": 109,
+        "pool_name": "okexpool",
+        "total": 23,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2021-12",
-        "pool_name": "viabtc",
-        "total": 524,
-        "empty": 5,
-        "ratio": 0.95
+        "pool_name": "unknown",
+        "total": 104,
+        "empty": 1,
+        "ratio": 0.96
       },
       {
         "month": "2022-01",
@@ -19435,45 +19504,24 @@
       },
       {
         "month": "2022-01",
-        "pool_name": "braiinspool",
-        "total": 269,
-        "empty": 1,
-        "ratio": 0.37
-      },
-      {
-        "month": "2022-01",
-        "pool_name": "btccom",
-        "total": 287,
-        "empty": 1,
-        "ratio": 0.35
-      },
-      {
-        "month": "2022-01",
-        "pool_name": "f2pool",
-        "total": 717,
-        "empty": 3,
-        "ratio": 0.42
-      },
-      {
-        "month": "2022-01",
-        "pool_name": "poolin",
-        "total": 559,
-        "empty": 4,
-        "ratio": 0.72
-      },
-      {
-        "month": "2022-01",
-        "pool_name": "sbicrypto",
-        "total": 125,
+        "pool_name": "kucoinpool",
+        "total": 1,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2022-01",
-        "pool_name": "viabtc",
-        "total": 510,
-        "empty": 3,
-        "ratio": 0.59
+        "pool_name": "okexpool",
+        "total": 9,
+        "empty": 0,
+        "ratio": 0.0
+      },
+      {
+        "month": "2022-01",
+        "pool_name": "unknown",
+        "total": 20,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2022-02",
@@ -19488,48 +19536,6 @@
         "total": 461,
         "empty": 5,
         "ratio": 1.08
-      },
-      {
-        "month": "2022-02",
-        "pool_name": "braiinspool",
-        "total": 251,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-02",
-        "pool_name": "btccom",
-        "total": 290,
-        "empty": 2,
-        "ratio": 0.69
-      },
-      {
-        "month": "2022-02",
-        "pool_name": "f2pool",
-        "total": 577,
-        "empty": 2,
-        "ratio": 0.35
-      },
-      {
-        "month": "2022-02",
-        "pool_name": "poolin",
-        "total": 508,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-02",
-        "pool_name": "sbicrypto",
-        "total": 124,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-02",
-        "pool_name": "viabtc",
-        "total": 396,
-        "empty": 6,
-        "ratio": 1.52
       },
       {
         "month": "2022-03",
@@ -19547,45 +19553,10 @@
       },
       {
         "month": "2022-03",
-        "pool_name": "braiinspool",
-        "total": 281,
-        "empty": 3,
-        "ratio": 1.07
-      },
-      {
-        "month": "2022-03",
-        "pool_name": "btccom",
-        "total": 276,
+        "pool_name": "unknown",
+        "total": 1,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-03",
-        "pool_name": "f2pool",
-        "total": 592,
-        "empty": 4,
-        "ratio": 0.68
-      },
-      {
-        "month": "2022-03",
-        "pool_name": "poolin",
-        "total": 527,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-03",
-        "pool_name": "sbicrypto",
-        "total": 106,
-        "empty": 1,
-        "ratio": 0.94
-      },
-      {
-        "month": "2022-03",
-        "pool_name": "viabtc",
-        "total": 475,
-        "empty": 5,
-        "ratio": 1.05
       },
       {
         "month": "2022-04",
@@ -19603,45 +19574,17 @@
       },
       {
         "month": "2022-04",
-        "pool_name": "braiinspool",
-        "total": 264,
+        "pool_name": "kucoinpool",
+        "total": 7,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2022-04",
-        "pool_name": "btccom",
-        "total": 248,
-        "empty": 1,
-        "ratio": 0.4
-      },
-      {
-        "month": "2022-04",
-        "pool_name": "f2pool",
-        "total": 595,
-        "empty": 2,
-        "ratio": 0.34
-      },
-      {
-        "month": "2022-04",
-        "pool_name": "poolin",
-        "total": 481,
+        "pool_name": "unknown",
+        "total": 1,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-04",
-        "pool_name": "sbicrypto",
-        "total": 119,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-04",
-        "pool_name": "viabtc",
-        "total": 455,
-        "empty": 1,
-        "ratio": 0.22
       },
       {
         "month": "2022-05",
@@ -19659,45 +19602,17 @@
       },
       {
         "month": "2022-05",
-        "pool_name": "braiinspool",
-        "total": 257,
+        "pool_name": "kucoinpool",
+        "total": 22,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2022-05",
-        "pool_name": "btccom",
-        "total": 237,
-        "empty": 2,
-        "ratio": 0.84
-      },
-      {
-        "month": "2022-05",
-        "pool_name": "f2pool",
-        "total": 641,
+        "pool_name": "unknown",
+        "total": 5,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-05",
-        "pool_name": "poolin",
-        "total": 487,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-05",
-        "pool_name": "sbicrypto",
-        "total": 94,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-05",
-        "pool_name": "viabtc",
-        "total": 474,
-        "empty": 2,
-        "ratio": 0.42
       },
       {
         "month": "2022-06",
@@ -19715,45 +19630,17 @@
       },
       {
         "month": "2022-06",
-        "pool_name": "braiinspool",
-        "total": 249,
+        "pool_name": "kucoinpool",
+        "total": 13,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2022-06",
-        "pool_name": "btccom",
-        "total": 201,
-        "empty": 2,
-        "ratio": 1.0
-      },
-      {
-        "month": "2022-06",
-        "pool_name": "f2pool",
-        "total": 595,
-        "empty": 1,
-        "ratio": 0.17
-      },
-      {
-        "month": "2022-06",
-        "pool_name": "poolin",
-        "total": 464,
+        "pool_name": "unknown",
+        "total": 2,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-06",
-        "pool_name": "sbicrypto",
-        "total": 67,
-        "empty": 1,
-        "ratio": 1.49
-      },
-      {
-        "month": "2022-06",
-        "pool_name": "viabtc",
-        "total": 419,
-        "empty": 3,
-        "ratio": 0.72
       },
       {
         "month": "2022-07",
@@ -19771,45 +19658,10 @@
       },
       {
         "month": "2022-07",
-        "pool_name": "braiinspool",
-        "total": 232,
-        "empty": 3,
-        "ratio": 1.29
-      },
-      {
-        "month": "2022-07",
-        "pool_name": "btccom",
-        "total": 156,
+        "pool_name": "kucoinpool",
+        "total": 14,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-07",
-        "pool_name": "f2pool",
-        "total": 636,
-        "empty": 3,
-        "ratio": 0.47
-      },
-      {
-        "month": "2022-07",
-        "pool_name": "poolin",
-        "total": 469,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-07",
-        "pool_name": "sbicrypto",
-        "total": 74,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-07",
-        "pool_name": "viabtc",
-        "total": 413,
-        "empty": 2,
-        "ratio": 0.48
       },
       {
         "month": "2022-08",
@@ -19827,45 +19679,10 @@
       },
       {
         "month": "2022-08",
-        "pool_name": "braiinspool",
-        "total": 252,
+        "pool_name": "kucoinpool",
+        "total": 10,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-08",
-        "pool_name": "btccom",
-        "total": 149,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-08",
-        "pool_name": "f2pool",
-        "total": 698,
-        "empty": 2,
-        "ratio": 0.29
-      },
-      {
-        "month": "2022-08",
-        "pool_name": "poolin",
-        "total": 474,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-08",
-        "pool_name": "sbicrypto",
-        "total": 69,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-08",
-        "pool_name": "viabtc",
-        "total": 416,
-        "empty": 2,
-        "ratio": 0.48
       },
       {
         "month": "2022-09",
@@ -19883,45 +19700,10 @@
       },
       {
         "month": "2022-09",
-        "pool_name": "braiinspool",
-        "total": 198,
-        "empty": 1,
-        "ratio": 0.51
-      },
-      {
-        "month": "2022-09",
-        "pool_name": "btccom",
-        "total": 104,
+        "pool_name": "kucoinpool",
+        "total": 2,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-09",
-        "pool_name": "f2pool",
-        "total": 713,
-        "empty": 6,
-        "ratio": 0.84
-      },
-      {
-        "month": "2022-09",
-        "pool_name": "poolin",
-        "total": 237,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-09",
-        "pool_name": "sbicrypto",
-        "total": 54,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-09",
-        "pool_name": "viabtc",
-        "total": 414,
-        "empty": 3,
-        "ratio": 0.72
       },
       {
         "month": "2022-10",
@@ -19939,45 +19721,17 @@
       },
       {
         "month": "2022-10",
-        "pool_name": "braiinspool",
-        "total": 220,
-        "empty": 2,
-        "ratio": 0.91
-      },
-      {
-        "month": "2022-10",
-        "pool_name": "btccom",
-        "total": 95,
+        "pool_name": "kucoinpool",
+        "total": 2,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2022-10",
-        "pool_name": "f2pool",
-        "total": 761,
-        "empty": 3,
-        "ratio": 0.39
-      },
-      {
-        "month": "2022-10",
-        "pool_name": "poolin",
-        "total": 117,
+        "pool_name": "unknown",
+        "total": 1,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-10",
-        "pool_name": "sbicrypto",
-        "total": 61,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-10",
-        "pool_name": "viabtc",
-        "total": 400,
-        "empty": 3,
-        "ratio": 0.75
       },
       {
         "month": "2022-11",
@@ -19995,45 +19749,10 @@
       },
       {
         "month": "2022-11",
-        "pool_name": "braiinspool",
-        "total": 184,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-11",
-        "pool_name": "btccom",
-        "total": 115,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-11",
-        "pool_name": "f2pool",
-        "total": 657,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-11",
-        "pool_name": "poolin",
-        "total": 98,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-11",
-        "pool_name": "sbicrypto",
-        "total": 34,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-11",
-        "pool_name": "viabtc",
-        "total": 347,
-        "empty": 2,
-        "ratio": 0.58
+        "pool_name": "kucoinpool",
+        "total": 12,
+        "empty": 1,
+        "ratio": 8.33
       },
       {
         "month": "2022-12",
@@ -20051,45 +19770,17 @@
       },
       {
         "month": "2022-12",
-        "pool_name": "braiinspool",
-        "total": 200,
-        "empty": 1,
-        "ratio": 0.5
-      },
-      {
-        "month": "2022-12",
-        "pool_name": "btccom",
-        "total": 79,
+        "pool_name": "kucoinpool",
+        "total": 18,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2022-12",
-        "pool_name": "f2pool",
-        "total": 666,
-        "empty": 3,
-        "ratio": 0.45
-      },
-      {
-        "month": "2022-12",
-        "pool_name": "poolin",
-        "total": 63,
+        "pool_name": "unknown",
+        "total": 1,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2022-12",
-        "pool_name": "sbicrypto",
-        "total": 36,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2022-12",
-        "pool_name": "viabtc",
-        "total": 443,
-        "empty": 2,
-        "ratio": 0.45
       },
       {
         "month": "2023-01",
@@ -20107,45 +19798,17 @@
       },
       {
         "month": "2023-01",
-        "pool_name": "braiinspool",
-        "total": 122,
+        "pool_name": "kucoinpool",
+        "total": 23,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2023-01",
-        "pool_name": "btccom",
-        "total": 126,
+        "pool_name": "unknown",
+        "total": 5,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2023-01",
-        "pool_name": "f2pool",
-        "total": 683,
-        "empty": 4,
-        "ratio": 0.59
-      },
-      {
-        "month": "2023-01",
-        "pool_name": "poolin",
-        "total": 106,
-        "empty": 1,
-        "ratio": 0.94
-      },
-      {
-        "month": "2023-01",
-        "pool_name": "sbicrypto",
-        "total": 47,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-01",
-        "pool_name": "viabtc",
-        "total": 410,
-        "empty": 2,
-        "ratio": 0.49
       },
       {
         "month": "2023-02",
@@ -20163,45 +19826,17 @@
       },
       {
         "month": "2023-02",
-        "pool_name": "braiinspool",
-        "total": 106,
+        "pool_name": "kucoinpool",
+        "total": 8,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2023-02",
-        "pool_name": "btccom",
-        "total": 92,
-        "empty": 1,
-        "ratio": 1.09
-      },
-      {
-        "month": "2023-02",
-        "pool_name": "f2pool",
-        "total": 615,
-        "empty": 1,
-        "ratio": 0.16
-      },
-      {
-        "month": "2023-02",
-        "pool_name": "poolin",
-        "total": 71,
+        "pool_name": "unknown",
+        "total": 2,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2023-02",
-        "pool_name": "sbicrypto",
-        "total": 49,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-02",
-        "pool_name": "viabtc",
-        "total": 350,
-        "empty": 4,
-        "ratio": 1.14
       },
       {
         "month": "2023-03",
@@ -20219,45 +19854,17 @@
       },
       {
         "month": "2023-03",
-        "pool_name": "braiinspool",
-        "total": 91,
+        "pool_name": "kucoinpool",
+        "total": 11,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2023-03",
-        "pool_name": "btccom",
-        "total": 111,
+        "pool_name": "unknown",
+        "total": 8,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2023-03",
-        "pool_name": "f2pool",
-        "total": 659,
-        "empty": 3,
-        "ratio": 0.46
-      },
-      {
-        "month": "2023-03",
-        "pool_name": "poolin",
-        "total": 74,
-        "empty": 3,
-        "ratio": 4.05
-      },
-      {
-        "month": "2023-03",
-        "pool_name": "sbicrypto",
-        "total": 39,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-03",
-        "pool_name": "viabtc",
-        "total": 380,
-        "empty": 3,
-        "ratio": 0.79
       },
       {
         "month": "2023-04",
@@ -20275,43 +19882,15 @@
       },
       {
         "month": "2023-04",
-        "pool_name": "braiinspool",
-        "total": 74,
+        "pool_name": "kucoinpool",
+        "total": 5,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2023-04",
-        "pool_name": "btccom",
-        "total": 85,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-04",
-        "pool_name": "f2pool",
-        "total": 596,
-        "empty": 1,
-        "ratio": 0.17
-      },
-      {
-        "month": "2023-04",
-        "pool_name": "poolin",
-        "total": 52,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-04",
-        "pool_name": "sbicrypto",
-        "total": 34,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-04",
-        "pool_name": "viabtc",
-        "total": 367,
+        "pool_name": "unknown",
+        "total": 7,
         "empty": 0,
         "ratio": 0.0
       },
@@ -20331,45 +19910,17 @@
       },
       {
         "month": "2023-05",
-        "pool_name": "braiinspool",
-        "total": 80,
-        "empty": 1,
-        "ratio": 1.25
-      },
-      {
-        "month": "2023-05",
-        "pool_name": "btccom",
-        "total": 89,
-        "empty": 2,
-        "ratio": 2.25
-      },
-      {
-        "month": "2023-05",
-        "pool_name": "f2pool",
-        "total": 619,
-        "empty": 2,
-        "ratio": 0.32
-      },
-      {
-        "month": "2023-05",
-        "pool_name": "poolin",
-        "total": 52,
+        "pool_name": "kucoinpool",
+        "total": 16,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2023-05",
-        "pool_name": "sbicrypto",
-        "total": 40,
-        "empty": 1,
-        "ratio": 2.5
-      },
-      {
-        "month": "2023-05",
-        "pool_name": "viabtc",
-        "total": 392,
-        "empty": 1,
-        "ratio": 0.26
+        "pool_name": "unknown",
+        "total": 8,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2023-06",
@@ -20387,43 +19938,15 @@
       },
       {
         "month": "2023-06",
-        "pool_name": "braiinspool",
-        "total": 58,
+        "pool_name": "kucoinpool",
+        "total": 15,
         "empty": 0,
         "ratio": 0.0
       },
       {
         "month": "2023-06",
-        "pool_name": "btccom",
-        "total": 56,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-06",
-        "pool_name": "f2pool",
-        "total": 595,
-        "empty": 1,
-        "ratio": 0.17
-      },
-      {
-        "month": "2023-06",
-        "pool_name": "poolin",
-        "total": 62,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-06",
-        "pool_name": "sbicrypto",
-        "total": 54,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-06",
-        "pool_name": "viabtc",
-        "total": 371,
+        "pool_name": "unknown",
+        "total": 9,
         "empty": 0,
         "ratio": 0.0
       },
@@ -20443,45 +19966,10 @@
       },
       {
         "month": "2023-07",
-        "pool_name": "braiinspool",
-        "total": 70,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-07",
-        "pool_name": "btccom",
-        "total": 66,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-07",
-        "pool_name": "f2pool",
-        "total": 623,
+        "pool_name": "kucoinpool",
+        "total": 56,
         "empty": 1,
-        "ratio": 0.16
-      },
-      {
-        "month": "2023-07",
-        "pool_name": "poolin",
-        "total": 53,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-07",
-        "pool_name": "sbicrypto",
-        "total": 72,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-07",
-        "pool_name": "viabtc",
-        "total": 405,
-        "empty": 0,
-        "ratio": 0.0
+        "ratio": 1.79
       },
       {
         "month": "2023-08",
@@ -20499,45 +19987,10 @@
       },
       {
         "month": "2023-08",
-        "pool_name": "braiinspool",
-        "total": 58,
+        "pool_name": "kucoinpool",
+        "total": 16,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2023-08",
-        "pool_name": "btccom",
-        "total": 80,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-08",
-        "pool_name": "f2pool",
-        "total": 637,
-        "empty": 1,
-        "ratio": 0.16
-      },
-      {
-        "month": "2023-08",
-        "pool_name": "poolin",
-        "total": 71,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-08",
-        "pool_name": "sbicrypto",
-        "total": 68,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-08",
-        "pool_name": "viabtc",
-        "total": 390,
-        "empty": 2,
-        "ratio": 0.51
       },
       {
         "month": "2023-09",
@@ -20555,41 +20008,6 @@
       },
       {
         "month": "2023-09",
-        "pool_name": "braiinspool",
-        "total": 65,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-09",
-        "pool_name": "btccom",
-        "total": 74,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-09",
-        "pool_name": "f2pool",
-        "total": 558,
-        "empty": 2,
-        "ratio": 0.36
-      },
-      {
-        "month": "2023-09",
-        "pool_name": "poolin",
-        "total": 34,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-09",
-        "pool_name": "sbicrypto",
-        "total": 93,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-09",
         "pool_name": "secpool",
         "total": 8,
         "empty": 0,
@@ -20597,10 +20015,10 @@
       },
       {
         "month": "2023-09",
-        "pool_name": "viabtc",
-        "total": 453,
-        "empty": 2,
-        "ratio": 0.44
+        "pool_name": "unknown",
+        "total": 1,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2023-10",
@@ -20618,41 +20036,6 @@
       },
       {
         "month": "2023-10",
-        "pool_name": "braiinspool",
-        "total": 61,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-10",
-        "pool_name": "btccom",
-        "total": 87,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-10",
-        "pool_name": "f2pool",
-        "total": 547,
-        "empty": 2,
-        "ratio": 0.37
-      },
-      {
-        "month": "2023-10",
-        "pool_name": "poolin",
-        "total": 47,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-10",
-        "pool_name": "sbicrypto",
-        "total": 68,
-        "empty": 1,
-        "ratio": 1.47
-      },
-      {
-        "month": "2023-10",
         "pool_name": "secpool",
         "total": 6,
         "empty": 0,
@@ -20660,10 +20043,10 @@
       },
       {
         "month": "2023-10",
-        "pool_name": "viabtc",
-        "total": 523,
-        "empty": 1,
-        "ratio": 0.19
+        "pool_name": "unknown",
+        "total": 2,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2023-11",
@@ -20681,41 +20064,6 @@
       },
       {
         "month": "2023-11",
-        "pool_name": "braiinspool",
-        "total": 48,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-11",
-        "pool_name": "btccom",
-        "total": 69,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-11",
-        "pool_name": "f2pool",
-        "total": 527,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-11",
-        "pool_name": "poolin",
-        "total": 38,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-11",
-        "pool_name": "sbicrypto",
-        "total": 85,
-        "empty": 1,
-        "ratio": 1.18
-      },
-      {
-        "month": "2023-11",
         "pool_name": "secpool",
         "total": 9,
         "empty": 0,
@@ -20730,10 +20078,10 @@
       },
       {
         "month": "2023-11",
-        "pool_name": "viabtc",
-        "total": 492,
-        "empty": 2,
-        "ratio": 0.41
+        "pool_name": "unknown",
+        "total": 13,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2023-12",
@@ -20751,38 +20099,10 @@
       },
       {
         "month": "2023-12",
-        "pool_name": "braiinspool",
-        "total": 54,
+        "pool_name": "ocean",
+        "total": 3,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2023-12",
-        "pool_name": "btccom",
-        "total": 44,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-12",
-        "pool_name": "f2pool",
-        "total": 540,
-        "empty": 2,
-        "ratio": 0.37
-      },
-      {
-        "month": "2023-12",
-        "pool_name": "poolin",
-        "total": 48,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2023-12",
-        "pool_name": "sbicrypto",
-        "total": 95,
-        "empty": 1,
-        "ratio": 1.05
       },
       {
         "month": "2023-12",
@@ -20793,10 +20113,10 @@
       },
       {
         "month": "2023-12",
-        "pool_name": "viabtc",
-        "total": 521,
-        "empty": 4,
-        "ratio": 0.77
+        "pool_name": "unknown",
+        "total": 19,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2024-01",
@@ -20814,38 +20134,10 @@
       },
       {
         "month": "2024-01",
-        "pool_name": "braiinspool",
-        "total": 69,
+        "pool_name": "ocean",
+        "total": 6,
         "empty": 1,
-        "ratio": 1.45
-      },
-      {
-        "month": "2024-01",
-        "pool_name": "btccom",
-        "total": 66,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-01",
-        "pool_name": "f2pool",
-        "total": 578,
-        "empty": 2,
-        "ratio": 0.35
-      },
-      {
-        "month": "2024-01",
-        "pool_name": "poolin",
-        "total": 42,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-01",
-        "pool_name": "sbicrypto",
-        "total": 96,
-        "empty": 0,
-        "ratio": 0.0
+        "ratio": 16.67
       },
       {
         "month": "2024-01",
@@ -20863,10 +20155,10 @@
       },
       {
         "month": "2024-01",
-        "pool_name": "viabtc",
-        "total": 542,
-        "empty": 3,
-        "ratio": 0.55
+        "pool_name": "unknown",
+        "total": 7,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2024-02",
@@ -20884,36 +20176,8 @@
       },
       {
         "month": "2024-02",
-        "pool_name": "braiinspool",
-        "total": 63,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-02",
-        "pool_name": "btccom",
-        "total": 65,
-        "empty": 1,
-        "ratio": 1.54
-      },
-      {
-        "month": "2024-02",
-        "pool_name": "f2pool",
-        "total": 531,
-        "empty": 3,
-        "ratio": 0.56
-      },
-      {
-        "month": "2024-02",
-        "pool_name": "poolin",
-        "total": 42,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-02",
-        "pool_name": "sbicrypto",
-        "total": 85,
+        "pool_name": "ocean",
+        "total": 8,
         "empty": 0,
         "ratio": 0.0
       },
@@ -20933,8 +20197,8 @@
       },
       {
         "month": "2024-02",
-        "pool_name": "viabtc",
-        "total": 532,
+        "pool_name": "unknown",
+        "total": 4,
         "empty": 0,
         "ratio": 0.0
       },
@@ -20954,38 +20218,10 @@
       },
       {
         "month": "2024-03",
-        "pool_name": "braiinspool",
-        "total": 95,
+        "pool_name": "ocean",
+        "total": 11,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2024-03",
-        "pool_name": "btccom",
-        "total": 72,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-03",
-        "pool_name": "f2pool",
-        "total": 554,
-        "empty": 3,
-        "ratio": 0.54
-      },
-      {
-        "month": "2024-03",
-        "pool_name": "poolin",
-        "total": 53,
-        "empty": 1,
-        "ratio": 1.89
-      },
-      {
-        "month": "2024-03",
-        "pool_name": "sbicrypto",
-        "total": 100,
-        "empty": 1,
-        "ratio": 1.0
       },
       {
         "month": "2024-03",
@@ -21003,10 +20239,10 @@
       },
       {
         "month": "2024-03",
-        "pool_name": "viabtc",
-        "total": 594,
-        "empty": 2,
-        "ratio": 0.34
+        "pool_name": "unknown",
+        "total": 2,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2024-04",
@@ -21024,36 +20260,8 @@
       },
       {
         "month": "2024-04",
-        "pool_name": "braiinspool",
-        "total": 94,
-        "empty": 1,
-        "ratio": 1.06
-      },
-      {
-        "month": "2024-04",
-        "pool_name": "btccom",
-        "total": 94,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-04",
-        "pool_name": "f2pool",
-        "total": 567,
-        "empty": 2,
-        "ratio": 0.35
-      },
-      {
-        "month": "2024-04",
-        "pool_name": "poolin",
-        "total": 47,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-04",
-        "pool_name": "sbicrypto",
-        "total": 118,
+        "pool_name": "ocean",
+        "total": 5,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21073,8 +20281,8 @@
       },
       {
         "month": "2024-04",
-        "pool_name": "viabtc",
-        "total": 535,
+        "pool_name": "unknown",
+        "total": 3,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21094,38 +20302,10 @@
       },
       {
         "month": "2024-05",
-        "pool_name": "braiinspool",
-        "total": 78,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-05",
-        "pool_name": "btccom",
-        "total": 55,
+        "pool_name": "ocean",
+        "total": 9,
         "empty": 2,
-        "ratio": 3.64
-      },
-      {
-        "month": "2024-05",
-        "pool_name": "f2pool",
-        "total": 428,
-        "empty": 2,
-        "ratio": 0.47
-      },
-      {
-        "month": "2024-05",
-        "pool_name": "poolin",
-        "total": 41,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-05",
-        "pool_name": "sbicrypto",
-        "total": 83,
-        "empty": 0,
-        "ratio": 0.0
+        "ratio": 22.22
       },
       {
         "month": "2024-05",
@@ -21140,13 +20320,6 @@
         "total": 76,
         "empty": 4,
         "ratio": 5.26
-      },
-      {
-        "month": "2024-05",
-        "pool_name": "viabtc",
-        "total": 609,
-        "empty": 0,
-        "ratio": 0.0
       },
       {
         "month": "2024-06",
@@ -21164,36 +20337,8 @@
       },
       {
         "month": "2024-06",
-        "pool_name": "braiinspool",
-        "total": 73,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-06",
-        "pool_name": "btccom",
-        "total": 54,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-06",
-        "pool_name": "f2pool",
-        "total": 496,
-        "empty": 1,
-        "ratio": 0.2
-      },
-      {
-        "month": "2024-06",
-        "pool_name": "poolin",
-        "total": 28,
-        "empty": 1,
-        "ratio": 3.57
-      },
-      {
-        "month": "2024-06",
-        "pool_name": "sbicrypto",
-        "total": 98,
+        "pool_name": "ocean",
+        "total": 7,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21213,10 +20358,10 @@
       },
       {
         "month": "2024-06",
-        "pool_name": "viabtc",
-        "total": 582,
-        "empty": 1,
-        "ratio": 0.17
+        "pool_name": "unknown",
+        "total": 4,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2024-07",
@@ -21234,36 +20379,8 @@
       },
       {
         "month": "2024-07",
-        "pool_name": "braiinspool",
-        "total": 78,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-07",
-        "pool_name": "btccom",
-        "total": 54,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-07",
-        "pool_name": "f2pool",
-        "total": 476,
-        "empty": 2,
-        "ratio": 0.42
-      },
-      {
-        "month": "2024-07",
-        "pool_name": "poolin",
-        "total": 16,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-07",
-        "pool_name": "sbicrypto",
-        "total": 95,
+        "pool_name": "ocean",
+        "total": 6,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21283,8 +20400,8 @@
       },
       {
         "month": "2024-07",
-        "pool_name": "viabtc",
-        "total": 601,
+        "pool_name": "unknown",
+        "total": 1,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21304,36 +20421,8 @@
       },
       {
         "month": "2024-08",
-        "pool_name": "braiinspool",
-        "total": 80,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-08",
-        "pool_name": "btccom",
-        "total": 44,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-08",
-        "pool_name": "f2pool",
-        "total": 458,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-08",
-        "pool_name": "poolin",
-        "total": 16,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-08",
-        "pool_name": "sbicrypto",
-        "total": 72,
+        "pool_name": "ocean",
+        "total": 12,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21353,10 +20442,10 @@
       },
       {
         "month": "2024-08",
-        "pool_name": "viabtc",
-        "total": 579,
-        "empty": 2,
-        "ratio": 0.35
+        "pool_name": "unknown",
+        "total": 5,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2024-09",
@@ -21374,36 +20463,8 @@
       },
       {
         "month": "2024-09",
-        "pool_name": "braiinspool",
-        "total": 64,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-09",
-        "pool_name": "btccom",
-        "total": 40,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-09",
-        "pool_name": "f2pool",
-        "total": 436,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-09",
-        "pool_name": "poolin",
-        "total": 13,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-09",
-        "pool_name": "sbicrypto",
-        "total": 44,
+        "pool_name": "ocean",
+        "total": 7,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21423,10 +20484,10 @@
       },
       {
         "month": "2024-09",
-        "pool_name": "viabtc",
-        "total": 560,
-        "empty": 1,
-        "ratio": 0.18
+        "pool_name": "unknown",
+        "total": 7,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2024-10",
@@ -21444,36 +20505,8 @@
       },
       {
         "month": "2024-10",
-        "pool_name": "braiinspool",
-        "total": 93,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-10",
-        "pool_name": "btccom",
-        "total": 44,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-10",
-        "pool_name": "f2pool",
-        "total": 469,
-        "empty": 1,
-        "ratio": 0.21
-      },
-      {
-        "month": "2024-10",
-        "pool_name": "poolin",
-        "total": 22,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-10",
-        "pool_name": "sbicrypto",
-        "total": 47,
+        "pool_name": "ocean",
+        "total": 20,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21493,8 +20526,8 @@
       },
       {
         "month": "2024-10",
-        "pool_name": "viabtc",
-        "total": 698,
+        "pool_name": "unknown",
+        "total": 11,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21514,36 +20547,8 @@
       },
       {
         "month": "2024-11",
-        "pool_name": "braiinspool",
-        "total": 18,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-11",
-        "pool_name": "btccom",
-        "total": 43,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-11",
-        "pool_name": "f2pool",
-        "total": 459,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-11",
-        "pool_name": "poolin",
-        "total": 13,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-11",
-        "pool_name": "sbicrypto",
-        "total": 40,
+        "pool_name": "ocean",
+        "total": 22,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21563,8 +20568,8 @@
       },
       {
         "month": "2024-11",
-        "pool_name": "viabtc",
-        "total": 581,
+        "pool_name": "unknown",
+        "total": 4,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21584,29 +20589,8 @@
       },
       {
         "month": "2024-12",
-        "pool_name": "btccom",
-        "total": 47,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-12",
-        "pool_name": "f2pool",
-        "total": 471,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-12",
-        "pool_name": "poolin",
-        "total": 22,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2024-12",
-        "pool_name": "sbicrypto",
-        "total": 46,
+        "pool_name": "ocean",
+        "total": 17,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21626,10 +20610,10 @@
       },
       {
         "month": "2024-12",
-        "pool_name": "viabtc",
-        "total": 656,
-        "empty": 1,
-        "ratio": 0.15
+        "pool_name": "unknown",
+        "total": 10,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2025-01",
@@ -21647,29 +20631,8 @@
       },
       {
         "month": "2025-01",
-        "pool_name": "btccom",
-        "total": 28,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-01",
-        "pool_name": "f2pool",
-        "total": 523,
-        "empty": 2,
-        "ratio": 0.38
-      },
-      {
-        "month": "2025-01",
-        "pool_name": "poolin",
-        "total": 20,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-01",
-        "pool_name": "sbicrypto",
-        "total": 46,
+        "pool_name": "ocean",
+        "total": 25,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21689,10 +20652,10 @@
       },
       {
         "month": "2025-01",
-        "pool_name": "viabtc",
-        "total": 629,
-        "empty": 2,
-        "ratio": 0.32
+        "pool_name": "unknown",
+        "total": 3,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2025-02",
@@ -21710,29 +20673,8 @@
       },
       {
         "month": "2025-02",
-        "pool_name": "btccom",
-        "total": 31,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-02",
-        "pool_name": "f2pool",
-        "total": 450,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-02",
-        "pool_name": "poolin",
-        "total": 22,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-02",
-        "pool_name": "sbicrypto",
-        "total": 58,
+        "pool_name": "ocean",
+        "total": 20,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21752,8 +20694,8 @@
       },
       {
         "month": "2025-02",
-        "pool_name": "viabtc",
-        "total": 601,
+        "pool_name": "unknown",
+        "total": 9,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21773,31 +20715,10 @@
       },
       {
         "month": "2025-03",
-        "pool_name": "btccom",
-        "total": 34,
+        "pool_name": "ocean",
+        "total": 27,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2025-03",
-        "pool_name": "f2pool",
-        "total": 459,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-03",
-        "pool_name": "poolin",
-        "total": 9,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-03",
-        "pool_name": "sbicrypto",
-        "total": 43,
-        "empty": 1,
-        "ratio": 2.33
       },
       {
         "month": "2025-03",
@@ -21815,10 +20736,10 @@
       },
       {
         "month": "2025-03",
-        "pool_name": "viabtc",
-        "total": 645,
-        "empty": 2,
-        "ratio": 0.31
+        "pool_name": "unknown",
+        "total": 12,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2025-04",
@@ -21836,31 +20757,10 @@
       },
       {
         "month": "2025-04",
-        "pool_name": "btccom",
-        "total": 39,
+        "pool_name": "ocean",
+        "total": 36,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2025-04",
-        "pool_name": "f2pool",
-        "total": 412,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-04",
-        "pool_name": "poolin",
-        "total": 24,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-04",
-        "pool_name": "sbicrypto",
-        "total": 49,
-        "empty": 1,
-        "ratio": 2.04
       },
       {
         "month": "2025-04",
@@ -21878,8 +20778,8 @@
       },
       {
         "month": "2025-04",
-        "pool_name": "viabtc",
-        "total": 629,
+        "pool_name": "unknown",
+        "total": 13,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21899,29 +20799,8 @@
       },
       {
         "month": "2025-05",
-        "pool_name": "btccom",
-        "total": 36,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-05",
-        "pool_name": "f2pool",
-        "total": 499,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-05",
-        "pool_name": "poolin",
-        "total": 18,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-05",
-        "pool_name": "sbicrypto",
-        "total": 55,
+        "pool_name": "ocean",
+        "total": 34,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21941,8 +20820,8 @@
       },
       {
         "month": "2025-05",
-        "pool_name": "viabtc",
-        "total": 556,
+        "pool_name": "unknown",
+        "total": 25,
         "empty": 0,
         "ratio": 0.0
       },
@@ -21962,29 +20841,8 @@
       },
       {
         "month": "2025-06",
-        "pool_name": "btccom",
-        "total": 23,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-06",
-        "pool_name": "f2pool",
-        "total": 404,
-        "empty": 1,
-        "ratio": 0.25
-      },
-      {
-        "month": "2025-06",
-        "pool_name": "poolin",
-        "total": 10,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-06",
-        "pool_name": "sbicrypto",
-        "total": 65,
+        "pool_name": "ocean",
+        "total": 25,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22004,8 +20862,8 @@
       },
       {
         "month": "2025-06",
-        "pool_name": "viabtc",
-        "total": 528,
+        "pool_name": "unknown",
+        "total": 18,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22025,29 +20883,8 @@
       },
       {
         "month": "2025-07",
-        "pool_name": "btccom",
-        "total": 31,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-07",
-        "pool_name": "f2pool",
-        "total": 497,
-        "empty": 2,
-        "ratio": 0.4
-      },
-      {
-        "month": "2025-07",
-        "pool_name": "poolin",
-        "total": 7,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-07",
-        "pool_name": "sbicrypto",
-        "total": 79,
+        "pool_name": "ocean",
+        "total": 53,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22067,8 +20904,8 @@
       },
       {
         "month": "2025-07",
-        "pool_name": "viabtc",
-        "total": 597,
+        "pool_name": "unknown",
+        "total": 53,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22088,29 +20925,8 @@
       },
       {
         "month": "2025-08",
-        "pool_name": "btccom",
-        "total": 28,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-08",
-        "pool_name": "f2pool",
-        "total": 474,
-        "empty": 2,
-        "ratio": 0.42
-      },
-      {
-        "month": "2025-08",
-        "pool_name": "poolin",
-        "total": 11,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-08",
-        "pool_name": "sbicrypto",
-        "total": 80,
+        "pool_name": "ocean",
+        "total": 49,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22130,10 +20946,10 @@
       },
       {
         "month": "2025-08",
-        "pool_name": "viabtc",
-        "total": 547,
-        "empty": 1,
-        "ratio": 0.18
+        "pool_name": "unknown",
+        "total": 60,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2025-09",
@@ -22151,29 +20967,8 @@
       },
       {
         "month": "2025-09",
-        "pool_name": "btccom",
-        "total": 19,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-09",
-        "pool_name": "f2pool",
-        "total": 506,
-        "empty": 1,
-        "ratio": 0.2
-      },
-      {
-        "month": "2025-09",
-        "pool_name": "poolin",
-        "total": 17,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-09",
-        "pool_name": "sbicrypto",
-        "total": 83,
+        "pool_name": "ocean",
+        "total": 51,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22193,8 +20988,8 @@
       },
       {
         "month": "2025-09",
-        "pool_name": "viabtc",
-        "total": 542,
+        "pool_name": "unknown",
+        "total": 50,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22214,31 +21009,10 @@
       },
       {
         "month": "2025-10",
-        "pool_name": "btccom",
-        "total": 18,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-10",
-        "pool_name": "f2pool",
-        "total": 530,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-10",
-        "pool_name": "poolin",
-        "total": 7,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-10",
-        "pool_name": "sbicrypto",
-        "total": 88,
+        "pool_name": "ocean",
+        "total": 58,
         "empty": 1,
-        "ratio": 1.14
+        "ratio": 1.72
       },
       {
         "month": "2025-10",
@@ -22256,8 +21030,8 @@
       },
       {
         "month": "2025-10",
-        "pool_name": "viabtc",
-        "total": 530,
+        "pool_name": "unknown",
+        "total": 48,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22277,31 +21051,10 @@
       },
       {
         "month": "2025-11",
-        "pool_name": "btccom",
-        "total": 27,
+        "pool_name": "ocean",
+        "total": 50,
         "empty": 0,
         "ratio": 0.0
-      },
-      {
-        "month": "2025-11",
-        "pool_name": "f2pool",
-        "total": 496,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-11",
-        "pool_name": "poolin",
-        "total": 10,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-11",
-        "pool_name": "sbicrypto",
-        "total": 66,
-        "empty": 1,
-        "ratio": 1.52
       },
       {
         "month": "2025-11",
@@ -22319,8 +21072,8 @@
       },
       {
         "month": "2025-11",
-        "pool_name": "viabtc",
-        "total": 463,
+        "pool_name": "unknown",
+        "total": 37,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22340,29 +21093,8 @@
       },
       {
         "month": "2025-12",
-        "pool_name": "btccom",
-        "total": 24,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-12",
-        "pool_name": "f2pool",
-        "total": 495,
-        "empty": 2,
-        "ratio": 0.4
-      },
-      {
-        "month": "2025-12",
-        "pool_name": "poolin",
-        "total": 18,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2025-12",
-        "pool_name": "sbicrypto",
-        "total": 61,
+        "pool_name": "ocean",
+        "total": 46,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22382,8 +21114,8 @@
       },
       {
         "month": "2025-12",
-        "pool_name": "viabtc",
-        "total": 501,
+        "pool_name": "unknown",
+        "total": 10,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22403,29 +21135,8 @@
       },
       {
         "month": "2026-01",
-        "pool_name": "btccom",
-        "total": 12,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-01",
-        "pool_name": "f2pool",
-        "total": 448,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-01",
-        "pool_name": "poolin",
-        "total": 12,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-01",
-        "pool_name": "sbicrypto",
-        "total": 78,
+        "pool_name": "ocean",
+        "total": 47,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22445,8 +21156,8 @@
       },
       {
         "month": "2026-01",
-        "pool_name": "viabtc",
-        "total": 466,
+        "pool_name": "unknown",
+        "total": 11,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22466,29 +21177,8 @@
       },
       {
         "month": "2026-02",
-        "pool_name": "btccom",
-        "total": 15,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-02",
-        "pool_name": "f2pool",
-        "total": 481,
-        "empty": 1,
-        "ratio": 0.21
-      },
-      {
-        "month": "2026-02",
-        "pool_name": "poolin",
-        "total": 8,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-02",
-        "pool_name": "sbicrypto",
-        "total": 71,
+        "pool_name": "ocean",
+        "total": 51,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22508,10 +21198,10 @@
       },
       {
         "month": "2026-02",
-        "pool_name": "viabtc",
-        "total": 464,
-        "empty": 1,
-        "ratio": 0.22
+        "pool_name": "unknown",
+        "total": 13,
+        "empty": 0,
+        "ratio": 0.0
       },
       {
         "month": "2026-03",
@@ -22529,36 +21219,8 @@
       },
       {
         "month": "2026-03",
-        "pool_name": "braiinspool",
-        "total": 22,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-03",
-        "pool_name": "btccom",
-        "total": 10,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-03",
-        "pool_name": "f2pool",
-        "total": 402,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-03",
-        "pool_name": "poolin",
-        "total": 5,
-        "empty": 0,
-        "ratio": 0.0
-      },
-      {
-        "month": "2026-03",
-        "pool_name": "sbicrypto",
-        "total": 72,
+        "pool_name": "ocean",
+        "total": 41,
         "empty": 0,
         "ratio": 0.0
       },
@@ -22578,14 +21240,38 @@
       },
       {
         "month": "2026-03",
-        "pool_name": "viabtc",
-        "total": 306,
-        "empty": 2,
-        "ratio": 0.65
+        "pool_name": "unknown",
+        "total": 12,
+        "empty": 0,
+        "ratio": 0.0
       }
     ]
   },
   "kpi6_density": [
+    {
+      "pool": "pegapool",
+      "avg_density": 0.4433,
+      "avg_tx_count": 2403.55,
+      "avg_bytes": 1636654.11
+    },
+    {
+      "pool": "nicehash",
+      "avg_density": 0.4339,
+      "avg_tx_count": 2912.18,
+      "avg_bytes": 1650917.44
+    },
+    {
+      "pool": "miningsquared",
+      "avg_density": 0.4307,
+      "avg_tx_count": 3097.71,
+      "avg_bytes": 1660834.34
+    },
+    {
+      "pool": "slushpool",
+      "avg_density": 0.4285,
+      "avg_tx_count": 3121.6,
+      "avg_bytes": 1679834.82
+    },
     {
       "pool": "secpool",
       "avg_density": 0.4257,
@@ -22605,6 +21291,18 @@
       "avg_bytes": 1648957.39
     },
     {
+      "pool": "carbonnegative(unidentified)",
+      "avg_density": 0.4191,
+      "avg_tx_count": 2908.22,
+      "avg_bytes": 1608661.86
+    },
+    {
+      "pool": "whitepool",
+      "avg_density": 0.418,
+      "avg_tx_count": 3340.79,
+      "avg_bytes": 1609622.05
+    },
+    {
       "pool": "foundryusa",
       "avg_density": 0.4172,
       "avg_tx_count": 2856.19,
@@ -22617,10 +21315,40 @@
       "avg_bytes": 1552147.43
     },
     {
+      "pool": "ultimuspool",
+      "avg_density": 0.4156,
+      "avg_tx_count": 2884.02,
+      "avg_bytes": 1575478.84
+    },
+    {
+      "pool": "emcdpool",
+      "avg_density": 0.415,
+      "avg_tx_count": 2370.14,
+      "avg_bytes": 1509283.6
+    },
+    {
       "pool": "antpool",
       "avg_density": 0.409,
       "avg_tx_count": 2793.24,
       "avg_bytes": 1528302.64
+    },
+    {
+      "pool": "kucoinpool",
+      "avg_density": 0.4089,
+      "avg_tx_count": 2381.31,
+      "avg_bytes": 1470567.16
+    },
+    {
+      "pool": "carbonnegative",
+      "avg_density": 0.4067,
+      "avg_tx_count": 2901.78,
+      "avg_bytes": 1551134.4
+    },
+    {
+      "pool": "dpool",
+      "avg_density": 0.4055,
+      "avg_tx_count": 2085.81,
+      "avg_bytes": 1044546.2
     },
     {
       "pool": "sbicrypto",
@@ -22629,10 +21357,22 @@
       "avg_bytes": 1382320.87
     },
     {
+      "pool": "terrapool",
+      "avg_density": 0.4014,
+      "avg_tx_count": 1796.55,
+      "avg_bytes": 1324665.47
+    },
+    {
       "pool": "viabtc",
       "avg_density": 0.3996,
       "avg_tx_count": 2514.48,
       "avg_bytes": 1407209.95
+    },
+    {
+      "pool": "ocean",
+      "avg_density": 0.3988,
+      "avg_tx_count": 2299.3,
+      "avg_bytes": 1229234.01
     },
     {
       "pool": "f2pool",
@@ -22653,6 +21393,12 @@
       "avg_bytes": 1320944.3
     },
     {
+      "pool": "unknown",
+      "avg_density": 0.3772,
+      "avg_tx_count": 2129.26,
+      "avg_bytes": 1257296.51
+    },
+    {
       "pool": "btccom",
       "avg_density": 0.3757,
       "avg_tx_count": 2092.43,
@@ -22663,6 +21409,60 @@
       "avg_density": 0.37,
       "avg_tx_count": 1900.57,
       "avg_bytes": 1234978.66
+    },
+    {
+      "pool": "okkong",
+      "avg_density": 0.3523,
+      "avg_tx_count": 1743.89,
+      "avg_bytes": 1175621.99
+    },
+    {
+      "pool": "okexpool",
+      "avg_density": 0.3516,
+      "avg_tx_count": 1865.09,
+      "avg_bytes": 1230645.68
+    },
+    {
+      "pool": "sigmapoolcom",
+      "avg_density": 0.3489,
+      "avg_tx_count": 1992.56,
+      "avg_bytes": 1247656.74
+    },
+    {
+      "pool": "rawpool",
+      "avg_density": 0.348,
+      "avg_tx_count": 1751.31,
+      "avg_bytes": 1212232.81
+    },
+    {
+      "pool": "1thash",
+      "avg_density": 0.3412,
+      "avg_tx_count": 2140.83,
+      "avg_bytes": 1335641.55
+    },
+    {
+      "pool": "wayicn",
+      "avg_density": 0.3381,
+      "avg_tx_count": 2130.7,
+      "avg_bytes": 1340834.4
+    },
+    {
+      "pool": "huobipool",
+      "avg_density": 0.3367,
+      "avg_tx_count": 2017.41,
+      "avg_bytes": 1283194.87
+    },
+    {
+      "pool": "btctop",
+      "avg_density": 0.335,
+      "avg_tx_count": 2045.53,
+      "avg_bytes": 1320576.42
+    },
+    {
+      "pool": "lubiancom",
+      "avg_density": 0.3317,
+      "avg_tx_count": 2230.65,
+      "avg_bytes": 1324452.09
     }
   ],
   "kpi7_bip110": {
@@ -52090,5 +50890,5 @@
       }
     ]
   },
-  "last_updated": "2026-03-29T19:12:28.055668"
+  "last_updated": "2026-03-30T15:07:03.602780"
 }

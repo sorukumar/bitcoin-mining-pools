@@ -254,9 +254,25 @@
             races</p>
         </div>
 
+        <!-- Thesis Strip -->
+        <div style="background: rgba(226,163,74,0.07); border: 1px solid rgba(226,163,74,0.2); border-radius: 8px; padding: 14px 20px; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 14px;">
+          <i class="fa-solid fa-magnifying-glass-chart" style="color: var(--accent); font-size: 1.1rem; margin-top: 2px; flex-shrink: 0;"></i>
+          <div>
+            <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; margin-bottom: 5px;">The Investigative Thesis</div>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">A small group of pools have built structural network advantages that let them win block races, skip transaction validation, and concentrate more hashrate than their public numbers suggest. Three signals reveal it — from incident, to mechanism, to identity.</p>
+          </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px;">
-          <!-- Top Row: Consecutive Blocks & Latency -->
-          <div class="forensic-box">
+
+          <!-- ── ACT I ───────────────────────────────────────────────────── -->
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px;">
+            <span style="background: rgba(226,163,74,0.15); border: 1px solid rgba(226,163,74,0.35); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; white-space: nowrap;">Act I</span>
+            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">The Incident — Anomalous Streaks & Reorg Exposure</span>
+            <div style="flex: 1; height: 1px; background: rgba(226,163,74,0.2);"></div>
+          </div>
+
+          <div class="forensic-box" style="grid-column: 1 / -1;">
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
@@ -284,136 +300,217 @@
             </div>
             <div id="forensics-streaks-table"></div>
           </div>
-          <div class="forensic-box">
+
+          <!-- ── ACT II ──────────────────────────────────────────────────── -->
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; margin-top: 10px;">
+            <span style="background: rgba(255,77,79,0.12); border: 1px solid rgba(255,77,79,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #ff4d4f; text-transform: uppercase; white-space: nowrap;">Act II</span>
+            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">The Mechanism — Spy Mining Signals</span>
+            <div style="flex: 1; height: 1px; background: rgba(255,77,79,0.15);"></div>
+          </div>
+
+          <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; align-items: start;">
+
+            <!-- Left: Second Block Uplift -->
+            <div class="forensic-box">
+              <div class="forensic-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (Post-2021)</div>
+                    <h4>Second Block Uplift</h4>
+                    <span class="forensic-sub">How many times more likely a pool is to mine block N+1 after mining block N, vs. what its hash share alone predicts. A value above 1× is a structural advantage — the quantitative fingerprint of header-first mining.</span>
+                  </div>
+                  <button class="info-toggle" data-target="info-consecutive"><i class="fa-solid fa-circle-info"></i></button>
+                </div>
+                <div class="info-card" id="info-consecutive">
+                  <p><strong>How to read it:</strong> Under a fair, memoryless mining process, each pool's probability of winning any given block equals its hash share. That means P(same pool mines block N+1 | same pool just mined block N) = hash share exactly — the 1× baseline. Bars longer than 1× mean a pool converts a first block into a second block far more often than chance allows.</p>
+                  <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                  <ul style="margin-left: 15px; margin-top: 4px;">
+                    <li><strong>Why pools beat 1×:</strong> Upon mining block N, a pool already holds the header and can begin hashing block N+1 immediately — while every competitor first downloads, validates, and acknowledges block N (~13 s lag). This head-start inflates consecutive win rates above the pure hash-share baseline.</li>
+                    <li><strong>Connecting Acts I & II:</strong> Act I showed these pools produce more 7+ streaks than statistics allow. This chart closes the loop — the same pools are winning the second block at a systemically elevated rate, not through luck but through latency monopoly.</li>
+                    <li><strong>Interpreting magnitude:</strong> A 1.3× lift on a pool with 20% hash share translates to ~6 extra consecutive blocks every 100 mined — thousands of extra block opportunities per year at scale.</li>
+                  </ul>
+                </div>
+              </div>
+              <div id="chart-consecutive-callout"></div>
+              <div id="chart-consecutive-advantage" style="height: 410px;"></div>
+            </div>
+
+            <!-- Right: Header-First Mining Evidence -->
+            <div class="forensic-box">
+              <div class="forensic-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (Post-2021)</div>
+                    <h4>Header-First Mining Evidence</h4>
+                    <span class="forensic-sub">Time gap between consecutive same-pool blocks. Intervals under 30s reveal pools
+                      skipping transaction validation — the hallmark of "spy mining" to win block races.</span>
+                  </div>
+                  <button class="info-toggle" data-target="info-latency"><i class="fa-solid fa-circle-info"></i></button>
+                </div>
+                <div class="info-card" id="info-latency">
+                  <p><strong>How to read it:</strong> This chart breaks down the time duration between consecutive blocks
+                    mined by the same pool into specific time buckets (e.g., &lt; 30s, 30s-60s). The &lt; 30s bucket is
+                    explicitly highlighted in red/orange.</p>
+                  <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                  <ul style="margin-left: 15px; margin-top: 4px;">
+                    <li><strong>The "Danger Zone":</strong> Blocks found within 15 to 30 seconds of the previous block are
+                      highly prone to causing network forks. Other mining pools (who often refresh stratum jobs every 30
+                      seconds) may not have received the previous block yet.</li>
+                    <li><strong>Propagational Advantage:</strong> Pools that consistently dominate the &lt; 30s bucket
+                      often possess significant network latency monopolies, allowing them to win tight block races and
+                      trigger multi-block reorgs.</li>
+                  </ul>
+                </div>
+              </div>
+              <div id="chart-sync-spy-callout"></div>
+              <div id="chart-sync-histogram" style="height: 410px;"></div>
+            </div>
+
+          </div><!-- end Act II side-by-side row -->
+
+          <div class="forensic-box" style="grid-column: 1 / -1;">
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                  <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (Post-2021)</div>
-                  <h4>Self-Sync Latency (Consecutive Blocks)</h4>
-                  <span class="forensic-sub">Time gap between two blocks mined in a row by the same pool. Shorter intervals (&lt; 30s) 
-                    suggest "Header-First" mining, a strategy used to win block races by skipping full transaction validation.</span>
+                  <div class="horizon-tag hist"><i class="fa-solid fa-layer-group"></i> Behavioral Verdict</div>
+                  <h4>Empty Block Auditor (Behavioral History)</h4>
+                  <span class="forensic-sub">Reform or persistence — all-time vs. 30-day pattern reveals who cleaned
+                    up and who doubled down.</span>
                 </div>
-                <button class="info-toggle" data-target="info-latency"><i class="fa-solid fa-circle-info"></i></button>
+                <button class="info-toggle" data-target="info-empty"><i class="fa-solid fa-circle-info"></i></button>
               </div>
-              <div class="info-card" id="info-latency">
-                <p><strong>How to read it:</strong> This chart breaks down the time duration between consecutive blocks
-                  mined by the same pool into specific time buckets (e.g., &lt; 30s, 30s-60s). The &lt; 30s bucket is
-                  explicitly highlighted in red/orange.</p>
-                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+              <div class="info-card" id="info-empty">
+                <p><strong>How to read it:</strong> The quadrant matrix plots each pool's all-time empty block rate
+                  (X-axis) against their last-30-day rate (Y-axis). The dotted diagonal is the "no change" reference —
+                  pools above it are getting worse, pools below it are improving. Threshold lines mark the
+                  network-weighted average.</p>
+                <p style="margin-top: 8px;"><strong>Quadrants:</strong></p>
                 <ul style="margin-left: 15px; margin-top: 4px;">
-                  <li><strong>The "Danger Zone":</strong> Blocks found within 15 to 30 seconds of the previous block are
-                    highly prone to causing network forks. Other mining pools (who often refresh stratum jobs every 30
-                    seconds) may not have received the previous block yet.</li>
-                  <li><strong>Propagational Advantage:</strong> Pools that consistently dominate the &lt; 30s bucket
-                    often possess significant network latency monopolies, allowing them to win tight block races and
-                    trigger multi-block reorgs.</li>
+                  <li><strong style="color:#ff4d4f;">🔴 Persistent Offenders:</strong> High historically AND recently —
+                    chronic spy-miners.</li>
+                  <li><strong style="color:#E2A34A;">🚨 Newly Suspicious:</strong> Previously clean, now deteriorating
+                    — worth watching.</li>
+                  <li><strong style="color:#56B6C2;">📉 Reformed:</strong> Historically bad but recently improving —
+                    behaviour change detected.</li>
+                  <li><strong style="color:#98C379;">✅ Clean:</strong> Consistently low empty block rates — good
+                    network stewards.</li>
                 </ul>
               </div>
             </div>
-            <div id="chart-sync-histogram" style="height: 350px;"></div>
+            <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: start;">
+              <div id="chart-empty-blocks" style="height: 420px;"></div>
+              <div>
+                <div style="padding-bottom: 6px; border-bottom: 1px solid rgba(48,54,61,0.7); margin-bottom: 4px;">
+                  <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); font-weight: 700;">Historical Trend</span>
+                  <span style="font-size: 0.7rem; color: var(--text-secondary); margin-left: 6px;">— monthly empty block rate, top offenders highlighted</span>
+                </div>
+                <div id="chart-empty-trend" style="height: 420px;"></div>
+              </div>
+            </div>
           </div>
 
-          <!-- Bottom Row: Z-Score & Entropy (Full Width or Grid) -->
+          <!-- ── ACT III ─────────────────────────────────────────────────── -->
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; margin-top: 10px;">
+            <span style="background: rgba(152,195,121,0.12); border: 1px solid rgba(152,195,121,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #98C379; text-transform: uppercase; white-space: nowrap;">Act III</span>
+            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Ghost Hashrate — Do the Numbers Add Up?</span>
+            <div style="flex: 1; height: 1px; background: rgba(152,195,121,0.15);"></div>
+          </div>
+
           <div class="forensic-box" style="grid-column: 1 / -1;">
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                   <div class="horizon-tag live"><i class="fa-solid fa-bolt"></i> Live Alert (24h Window / 14d Baseline)
                   </div>
-                  <h4>Reported vs. Actual Hashrate (Luck & Z-Score)</h4>
-                  <span class="forensic-sub">Pools exhibiting statistically improbable luck ($Z > 3$) may be
-                    misreporting hashrate.</span>
+                  <h4>Reported vs. Actual Hashrate (Z-Score Persistence)</h4>
+                  <span class="forensic-sub">Persistent $|Z| > 2$ across multiple daily windows is the ghost
+                    hashrate signal — occasional spikes are luck, sustained elevation is evidence.</span>
                 </div>
                 <button class="info-toggle" data-target="info-zscore"><i class="fa-solid fa-circle-info"></i></button>
               </div>
               <div class="info-card" id="info-zscore">
-                <p><strong>How to read it:</strong> This scatter plot compares a pool's expected block production (based
-                  on historical market share) against their actual block production over recent short-term windows. The
-                  Z-Score calculates the statistical probability of that variance.</p>
-                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <p><strong>How to read it:</strong> Each line tracks a pool's Z-Score across up to 10 daily 144-block
+                  windows (~10 days). Z-Score measures how many standard deviations a pool's block production deviates
+                  from the expectation given its market share.</p>
+                <p style="margin-top: 8px;"><strong>Threshold bands:</strong></p>
                 <ul style="margin-left: 15px; margin-top: 4px;">
-                  <li><strong>Hidden Hashrate:</strong> While short-term variance ("luck") is normal, a consistent
-                    Z-Score above 3 (or below -3) is a statistical anomaly.</li>
-                  <li><strong>Deception Indicator:</strong> If a pool remains in the extreme positive zone, it strongly
-                    suggests they are harboring "ghost" hashrate—controlling significantly more mining power on the
-                    network than their public pool statistics let on.</li>
+                  <li><strong style="color:#ff4d4f;">Red zone (|Z| ≥ 3):</strong> Statistically improbable — a
+                    single occurrence is a strong anomaly.</li>
+                  <li><strong style="color:#E2A34A;">Amber watch zone (|Z| ≥ 2):</strong> Elevated — worth
+                    monitoring, not conclusive alone.</li>
+                  <li><strong>Persistence rule:</strong> A pool that stays in the amber or red zone across multiple
+                    consecutive windows is a "ghost hashrate" suspect.</li>
                 </ul>
               </div>
             </div>
-            <div id="chart-zscore-funnel" style="height: 320px;"></div>
-          </div>
-          <div class="forensic-box" style="grid-column: 1 / -1;">
-            <div class="forensic-header">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                  <div class="horizon-tag hist"><i class="fa-solid fa-layer-group"></i> Legacy vs. Recent (30-Day
-                    Snapshot)</div>
-                  <h4>Empty Block Auditor (Propagational Latency)</h4>
-                  <span class="forensic-sub">Pools mining empty blocks (1 transaction) often indicate "spy mining" or
-                    skipping validation to save time.</span>
-                </div>
-                <button class="info-toggle" data-target="info-empty"><i class="fa-solid fa-circle-info"></i></button>
-              </div>
-              <div class="info-card" id="info-empty">
-                <p><strong>How to read it:</strong> This scatter plot identifies pools that mine "Empty Blocks" (blocks
-                  containing only the coinbase transaction). The X-axis shows the pool's market share, and the Y-axis
-                  shows the percentage of their blocks that were empty.</p>
-                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
-                <ul style="margin-left: 15px; margin-top: 4px;">
-                  <li><strong>Spy Mining:</strong> High-share pools with high empty block ratios are likely "spy
-                    mining"—starting to mine on the headers of a new block before they have fully validated its
-                    transactions.</li>
-                  <li><strong>Network Stewardship:</strong> Low ratios indicate pools that prioritize network health by
-                    ensuring all blocks carry maximum transaction utility.</li>
-                </ul>
-              </div>
-            </div>
-            <div id="chart-empty-blocks" style="height: 320px;"></div>
+            <div id="chart-zscore-funnel" style="height: 440px;"></div>
           </div>
 
-          <!-- Economic Efficiency (Moved from BIP 110) -->
-          <div class="forensic-box">
-            <div class="forensic-header">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                  <div class="horizon-tag recent"><i class="fa-solid fa-calendar-check"></i> Stewardship (Last 30 Days)
-                  </div>
-                  <h4>Economic Efficiency (The "Spam-to-Value" Index)</h4>
-                  <span class="forensic-sub">Transaction count vs. Total Block Size. Identifies data-heavy patterns
-                    (Inscriptions).</span>
-                </div>
-                <button class="info-toggle" data-target="info-efficiency"><i
-                    class="fa-solid fa-circle-info"></i></button>
-              </div>
-              <div class="info-card" id="info-efficiency">
-                <p><strong>How to read it:</strong> Efficient blocks contain many transactions in a small size
-                  (bottom-right cluster). Blocks with few transactions but 4MB size (top-left) indicate heavy "Blob"
-                  data use like Inscriptions.</p>
-              </div>
-            </div>
-            <div id="chart-bip110-efficiency" style="height: 350px;"></div>
+          <!-- ── ACT IV ──────────────────────────────────────────────────── -->
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; margin-top: 10px;">
+            <span style="background: rgba(86,182,194,0.12); border: 1px solid rgba(86,182,194,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #56B6C2; text-transform: uppercase; white-space: nowrap;">Act IV</span>
+            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">The Identity — Block Content & Behavioral Fingerprints</span>
+            <div style="flex: 1; height: 1px; background: rgba(86,182,194,0.15);"></div>
           </div>
 
-          <!-- Data Overhead Bar (Moved from BIP 110) -->
-          <div class="forensic-box">
-            <div class="forensic-header">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                  <div class="horizon-tag recent"><i class="fa-solid fa-calendar-check"></i> Stewardship (Last 30 Days)
+          <!-- Act IV charts: wrapped in full-width row so ECharts containers have unambiguous pixel widths on resize -->
+          <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+
+            <!-- Economic Efficiency -->
+            <div class="forensic-box">
+              <div class="forensic-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <div class="horizon-tag recent"><i class="fa-solid fa-calendar-check"></i> Stewardship (Last 30 Days)
+                    </div>
+                    <h4>Block Efficiency Fingerprint</h4>
+                    <span class="forensic-sub">Pool-level average TX count vs. block size — color reveals bytes-per-TX:
+                      green = compact fee transactions, red = inscription/Ordinals-heavy.</span>
                   </div>
-                  <h4>Average Data Overhead per Pool</h4>
-                  <span class="forensic-sub">Witness bytes per transaction. BIP 110 aims to soft-limit this to 256 bytes
-                    per push.</span>
+                  <button class="info-toggle" data-target="info-efficiency"><i
+                      class="fa-solid fa-circle-info"></i></button>
                 </div>
-                <button class="info-toggle" data-target="info-overhead"><i class="fa-solid fa-circle-info"></i></button>
+                <div class="info-card" id="info-efficiency">
+                  <p><strong>How to read it:</strong> Each bubble is a pool's 30-day average. X = avg transactions per
+                    block; Y = avg block size in MB; bubble size = sample weight (blocks mined). Color encodes
+                    bytes-per-transaction: <span style="color:#98C379">🟢 green = compact</span> (fee-optimizing), <span
+                      style="color:#E2A34A">🟡 amber = medium</span>, <span style="color:#ff4d4f">🔴 red =
+                      inscription-heavy</span>.</p>
+                  <p style="margin-top:8px"><strong>Fingerprint insight:</strong> Pools mining many small txs at the
+                    same block size as larger-tx pools are packing in more fee revenue per byte — a sign of active
+                    mempool management. High bytes-per-TX pools are filling blocks with witness-heavy data (Ordinals,
+                    Inscriptions).</p>
+                </div>
               </div>
-              <div class="info-card" id="info-overhead">
-                <p><strong>How to read it:</strong> This measures the "Witness density" of each pool. Red bars indicate
-                  pools that consistently mine data-heavy blocks that might exceed future soft-fork limits.</p>
-              </div>
+              <div id="chart-bip110-efficiency" style="height: 380px;"></div>
             </div>
-            <div id="chart-bip110-overhead" style="height: 350px;"></div>
-          </div>
+
+            <!-- Data Overhead Bar -->
+            <div class="forensic-box">
+              <div class="forensic-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <div class="horizon-tag recent"><i class="fa-solid fa-calendar-check"></i> Stewardship (Last 30 Days)
+                    </div>
+                    <h4>Average Data Overhead per Pool</h4>
+                    <span class="forensic-sub">Witness bytes per transaction. BIP 110 aims to soft-limit this to 256 bytes
+                      per push.</span>
+                  </div>
+                  <button class="info-toggle" data-target="info-overhead"><i class="fa-solid fa-circle-info"></i></button>
+                </div>
+                <div class="info-card" id="info-overhead">
+                  <p><strong>How to read it:</strong> Average witness-data overhead (bytes) per transaction on a
+                    log₁₀ scale. BIP 110 proposes a 256 B/tx soft-limit. The arrow (↑/↓) shows whether the pool is
+                    above or below that threshold; hover for the pool's peak single-block spike.</p>
+                  <p style="margin-top:8px"><strong>Note:</strong> <b>marapool</b>'s 5,141 B/tx average is driven by a
+                    deliberate Ordinals-mining policy — their per-block peak hit 332 kB/tx. All other pools cluster
+                    between 280–420 B/tx.</p>
+                </div>
+              </div>
+              <div id="chart-bip110-overhead" style="height: 380px;"></div>
+            </div>
+
+          </div><!-- end Act IV inner grid -->
 
           <div class="forensic-box" style="grid-column: 1 / -1;">
             <div class="forensic-header">
@@ -428,21 +525,19 @@
                 <button class="info-toggle" data-target="info-entropy"><i class="fa-solid fa-circle-info"></i></button>
               </div>
               <div class="info-card" id="info-entropy">
-                <p><strong>How to read it:</strong> This heatmap visualizes the "entropy" (Coefficient of Variation) of
-                  a pool's block-mining cadence over time. Cooler colors (High > 1.0) mean irregular arrival times.
-                  Warmer colors (Low < 0.7) mean highly consistent arrival times.</p>
-                    <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
-                    <ul style="margin-left: 15px; margin-top: 4px;">
-                      <li><strong>Actor Profiling:</strong> We can differentiate mining behaviors based on their
-                        timeline variance.</li>
-                      <li><strong>Corporate vs. Retail:</strong> Stable, low-entropy blocks typically map to heavily
-                        centralized, professional "Corporate" setups with stable connectivity. High-entropy maps to
-                        "Retail" or decentralized pools experiencing rapid hashrate fluctuations and connectivity
-                        turbulence.</li>
-                    </ul>
+                <p><strong>How to read it:</strong> Monthly coefficient of variation (CV) of inter-block arrival
+                  times since 2021 — aggregated from ~2,800 weekly snapshots. <span
+                    style="color:#ff4d4f">🔴 Red = low CV</span> (suspicious: consistent, industrial timing). <span
+                    style="color:#74add1">🔵 Blue = high CV</span> (normal: irregular, retail/decentralised). The
+                  China mining ban (2021) and 4th Halving (2024) are annotated as structural inflection points.</p>
+                <p style="margin-top: 8px;"><strong>Why it matters:</strong> Pools with chronically low entropy
+                  operate owned hardware at industrial scale — making them uniquely capable of running the multi-block
+                  streaks in Act I. The Actor Archetypes panel below cross-references this signal with the most recent
+                  6-month window.</p>
               </div>
             </div>
-            <div id="chart-entropy-heatmap" style="height: 400px;"></div>
+            <div id="chart-entropy-heatmap" style="height: 500px;"></div>
+            <div id="chart-entropy-archetypes"></div>
           </div>
         </div>
       </section>
@@ -472,7 +567,7 @@
 
     const boot = async () => {
       // Load main logic
-      const { initApp } = await import('./js/main.js?v=24');
+      const { initApp } = await import('./js/main.js?v=25');
 
       // Initialize shared components (Header, Nav)
       if (typeof BitcoinLabsAppComponents !== 'undefined') {

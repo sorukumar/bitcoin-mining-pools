@@ -5,6 +5,74 @@ extension tasks. Read `01-architecture.md` and `02-data-flow.md` first.
 
 ---
 
+## Pattern 0 — Add a New Column to the Top Miners Table
+
+The Top Miners table (Ecosystem & History tab) already receives `forensics` and
+`slugToName` and renders **Empty Block %** and **Avg Txs / Blk** columns.
+Use this pattern to add another per-pool metric (e.g. avg fee rate, block size).
+
+### Step 1: Add the metric to `process_forensics.py`
+
+Compute it in the KPI 5 or KPI 6 loop (or add a new KPI loop) using
+`extended_pools` — **not** `top_pools` — so all active pools are covered:
+
+```python
+for pool in extended_pools:
+    p_df = df[df['pool_name'] == pool]
+    if len(p_df) < 50: continue
+
+    your_stat = round(float(p_df['your_column'].mean()), 2)
+    your_stats.append({ "pool": pool, "your_stat": your_stat })
+```
+
+Add the list to the `output` dict at the bottom of `main()`:
+```python
+output = {
+    ...
+    "kpi_your_stat": your_stats,
+}
+```
+
+Re-run: `python3 scripts/process_forensics.py`
+
+### Step 2: Build the lookup map in `charts.js → renderTopMinersTable`
+
+The forensics keys are raw pool slugs. Resolve to display names via `slugToName`:
+
+```js
+const yourStatByName = {};
+(forensics.kpi_your_stat || []).forEach(e => {
+  const displayName = slugToName[e.pool] || e.pool;
+  yourStatByName[displayName] = e;
+});
+```
+
+### Step 3: Look up per-row and render the cell
+
+```js
+const yourData = yourStatByName[p.name];
+let yourCell = '<span style="color:var(--text-secondary);opacity:0.4;">—</span>';
+if (yourData) {
+  yourCell = yourData.your_stat.toFixed(2);
+}
+```
+
+### Step 4: Add the column header and cell to the table HTML
+
+```js
+// In the <thead> row:
+<th style="text-align: right; padding-right: 20px;" title="Your tooltip">Your Label</th>
+
+// In each <tr>:
+<td style="text-align: right; font-size: 0.85rem; padding-right: 20px;">${yourCell}</td>
+```
+
+**Key invariant:** Always resolve forensics slugs through `slugToName` before
+building display-name-keyed maps. Never re-slugify the display name — dots and
+other characters in names like `Ocean.xyz` will produce wrong keys.
+
+---
+
 ## Pattern 1 — Add a New Chart
 
 **Example:** Add a "Difficulty Over Time" line chart.

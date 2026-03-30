@@ -774,9 +774,27 @@ export function renderConcentrationChart({ months, top3, top5 }) {
 }
 
 // ── Top 30 Mining Pools Table ────────────────────────────────────────────────
-export function renderTopMinersTable(poolAgg, poolsInfo) {
+export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugToName = {}) {
   const el = document.getElementById('top-miners-table-container');
   if (!el) return;
+
+  // Build maps keyed by *display name* so the lookup is a direct p.name match.
+  // Resolving each forensics slug through slugToName (the same lookup used when
+  // building pool_name in data-loader) avoids re-slugify mismatches like
+  // Ocean.xyz → 'oceanxyz' vs forensics key 'ocean'.
+  const emptyByName = {};  // display name → kpi5 entry
+  const densityByName = {}; // display name → kpi6 entry
+
+  if (forensics) {
+    (forensics.kpi5_empty_blocks?.leaderboard || []).forEach(e => {
+      const displayName = slugToName[e.pool] || e.pool;
+      emptyByName[displayName] = e;
+    });
+    (forensics.kpi6_density || []).forEach(e => {
+      const displayName = slugToName[e.pool] || e.pool;
+      densityByName[displayName] = e;
+    });
+  }
 
   const rows = poolAgg.slice(0, 30).map((p, i) => {
     // Case-insensitive lookup for the pool metadata
@@ -789,6 +807,29 @@ export function renderTopMinersTable(poolAgg, poolsInfo) {
       else country = 'Unknown / Unmapped';
     }
 
+    // Match forensics data by display name directly
+    const emptyData   = emptyByName[p.name];
+    const densityData = densityByName[p.name];
+
+    // Empty block % — prefer 30-day, fall back to all-time
+    let emptyCell = '<span style="color:var(--text-secondary);opacity:0.4;">—</span>';
+    if (emptyData) {
+      const ratio = emptyData.ratio_30d != null ? emptyData.ratio_30d : emptyData.ratio_all;
+      let dotColor = '#98C379';  // green ≤ 0.3%
+      if (ratio > 1.5)      dotColor = '#ff4d4f';    // red
+      else if (ratio > 0.5) dotColor = '#ffe066';    // yellow
+      emptyCell = `<span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
+        ${ratio.toFixed(1)}%
+      </span>`;
+    }
+
+    // Avg tx count
+    let txCell = '<span style="color:var(--text-secondary);opacity:0.4;">—</span>';
+    if (densityData && densityData.avg_tx_count != null) {
+      txCell = Math.round(densityData.avg_tx_count).toLocaleString();
+    }
+
     return `
       <tr class="pool-row" data-pool="${p.name}">
         <td style="width: 40px; color: var(--text-secondary); font-size: 0.8rem;">${i + 1}</td>
@@ -798,6 +839,8 @@ export function renderTopMinersTable(poolAgg, poolsInfo) {
           ${country}
         </td>
         <td style="text-align: right; font-weight: 600; color: var(--accent); padding-right: 20px;">${p.pct.toFixed(2)}%</td>
+        <td style="text-align: right; font-size: 0.85rem; padding-right: 20px;">${emptyCell}</td>
+        <td style="text-align: right; font-size: 0.85rem; color: var(--text-secondary); padding-right: 20px;">${txCell}</td>
       </tr>
     `;
   }).join('');
@@ -811,6 +854,8 @@ export function renderTopMinersTable(poolAgg, poolsInfo) {
             <th>Miner / Pool Identity</th>
             <th>Base of Operations</th>
             <th style="text-align: right; padding-right: 20px;">Block Share</th>
+            <th style="text-align: right; padding-right: 20px;" title="% of blocks mined with no transactions (30-day)">Empty Blk %</th>
+            <th style="text-align: right; padding-right: 20px;" title="Average transaction count per block (post-2021)">Avg Txs / Blk</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -879,20 +924,37 @@ export function renderStreaksLeaderboard(poolSummaries) {
           ? `${(years * 12).toFixed(1)} Mos`
           : `${years.toFixed(1)} Yrs`);
 
-      const dates = lenEvents.length > 0
-        ? lenEvents.map(e => new Date(e.start_time).toLocaleDateString()).join(', ')
-        : '<span style="font-style: italic; opacity: 0.5;">Historical record (dates not in recent sample)</span>';
+      const occurrences = lenEvents.length > 0
+        ? lenEvents.map(e => {
+            const d = new Date(e.start_time);
+            const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const heightLabel = e.end_height && e.end_height !== e.start_height
+              ? `#${e.start_height.toLocaleString()} – ${e.end_height.toLocaleString()}`
+              : `#${e.start_height.toLocaleString()}`;
+            return `<a href="https://mempool.space/block/${e.start_height}" target="_blank" rel="noopener noreferrer"
+                       style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;
+                              background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+                              border-radius:5px;padding:5px 9px;text-decoration:none;"
+                       onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(226,163,74,0.08)'"
+                       onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='rgba(255,255,255,0.04)'">
+                <span style="font-size:0.78rem;color:var(--text-primary);font-weight:500;white-space:nowrap;">${dateStr}</span>
+                <span style="font-size:0.68rem;color:var(--accent);font-weight:600;font-family:monospace;">${heightLabel} ↗</span>
+              </a>`;
+          }).join('')
+        : '<span style="font-style: italic; opacity: 0.5;">Historical record (heights not in recent sample)</span>';
 
       return `
         <tr>
-          <td style="font-weight: 700; color: var(--accent); white-space: nowrap; padding: 10px 0;">
+          <td style="font-weight: 700; color: var(--accent); white-space: nowrap; padding: 10px 0; vertical-align: top;">
             ${len} Blocks
             <span style="display:block; font-size: 0.65rem; color: var(--text-secondary); font-weight: 400; margin-top: 2px;">
               ${count} Occurrence${count > 1 ? 's' : ''}
             </span>
           </td>
-          <td style="text-align: center; color: var(--text-primary); font-weight: 500;">1 in ${likelihoodStr}</td>
-          <td style="color: var(--text-secondary); padding-left: 15px; font-size: 0.8rem; line-height: 1.4;">${dates}</td>
+          <td style="text-align: center; color: var(--text-primary); font-weight: 500; vertical-align: top; padding-top: 12px;">1 in ${likelihoodStr}</td>
+          <td style="padding-left: 15px; vertical-align: top; padding-top: 8px;">
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">${occurrences}</div>
+          </td>
         </tr>
       `;
     }).join('');
@@ -929,7 +991,7 @@ export function renderStreaksLeaderboard(poolSummaries) {
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <th style="text-align: left; padding: 5px 0; color: var(--text-secondary); font-size: 0.75rem; width: 120px;">Length (Count)</th>
                 <th style="text-align: center; color: var(--text-secondary); font-size: 0.75rem; width: 120px;">Likelihood</th>
-                <th style="text-align: left; color: var(--text-secondary); font-size: 0.75rem; padding-left: 15px;">Historical Occurrences (Dates)</th>
+                <th style="text-align: left; color: var(--text-secondary); font-size: 0.75rem; padding-left: 15px;">Occurrences — click block height to explore on mempool.space</th>
               </tr>
             </thead>
             <tbody>${drillDownRows}</tbody>
@@ -992,57 +1054,170 @@ export function renderZScoreFunnel(funnelData) {
     window.addEventListener('resize', () => zscoreChart.resize());
   }
 
-  // Use only the most recent snapshot for the scatter plot
-  const latestTs = funnelData[0].timestamp;
-  const data = funnelData.filter(d => d.timestamp === latestTs);
+  // Group by pool; extract date (YYYY-MM-DD) from ISO timestamp
+  const toDate = ts => ts.slice(0, 10);
+  const poolMap = {};
+  funnelData.forEach(r => {
+    if (!poolMap[r.pool]) poolMap[r.pool] = {};
+    const dt = toDate(r.timestamp);
+    // keep latest entry if multiple on same date
+    if (!poolMap[r.pool][dt] || r.timestamp > poolMap[r.pool][dt].timestamp) {
+      poolMap[r.pool][dt] = r;
+    }
+  });
+
+  // Union of all dates, sorted chronologically (oldest → newest)
+  const allDates = [...new Set(funnelData.map(r => toDate(r.timestamp)))].sort();
+  const pools = Object.keys(poolMap);
+
+  // Sort pools: highest |latest Z| first
+  pools.sort((a, b) => {
+    const latestDate = allDates[allDates.length - 1];
+    const findLatest = (pm) => {
+      for (let i = allDates.length - 1; i >= 0; i--) {
+        if (pm[allDates[i]]) return Math.abs(pm[allDates[i]].z);
+      }
+      return 0;
+    };
+    return findLatest(poolMap[b]) - findLatest(poolMap[a]);
+  });
+
+  // Compute persistence score per pool: fraction of snapshots with |Z| ≥ 2
+  const persistScore = (pool) => {
+    const entries = Object.values(poolMap[pool]);
+    return entries.filter(r => Math.abs(r.z) >= 2).length / entries.length;
+  };
+
+  const series = pools.map((pool, i) => {
+    const color = POOL_COLORS[i % POOL_COLORS.length];
+    const ps = persistScore(pool);
+    const isHighPersist = ps >= 0.3; // ≥30% of windows in watch/danger zone
+    const zData = allDates.map(dt => {
+      const row = poolMap[pool][dt];
+      return row ? +row.z.toFixed(2) : null;
+    });
+    // Find last non-null index for endLabel
+    let lastIdx = -1;
+    for (let i = zData.length - 1; i >= 0; i--) { if (zData[i] !== null) { lastIdx = i; break; } }
+    const lastZ = lastIdx >= 0 ? zData[lastIdx] : null;
+    return {
+      name: pool,
+      type: 'line',
+      smooth: false,
+      symbol: 'circle',
+      symbolSize: 5,
+      connectNulls: true,
+      lineStyle: { color, width: isHighPersist ? 2.5 : 1.5, opacity: isHighPersist ? 1 : 0.55 },
+      itemStyle: { color },
+      endLabel: {
+        show: lastZ !== null && Math.abs(lastZ) >= 1.5,
+        formatter: () => `${pool} ${lastZ > 0 ? '+' : ''}${lastZ}`,
+        color,
+        fontSize: 11,
+        fontWeight: isHighPersist ? 'bold' : 'normal',
+        align: 'left',
+        padding: [0, 0, 0, 4],
+      },
+      tooltip: {
+        valueFormatter: (val) => val != null ? val.toFixed(2) : 'n/a',
+      },
+      data: zData,
+    };
+  });
+
+  // Threshold markArea bands (attached to a silent dummy series)
+  const bandSeries = {
+    name: '__bands',
+    type: 'line',
+    silent: true,
+    symbol: 'none',
+    lineStyle: { opacity: 0 },
+    data: allDates.map(() => null),
+    tooltip: { show: false },
+    legendHoverLink: false,
+    markArea: {
+      silent: true,
+      data: [
+        // Red danger zones |Z| ≥ 3
+        [{ yAxis: 3 },  { yAxis: 6,  name: 'Danger |Z|≥3', itemStyle: { color: 'rgba(255,77,79,0.12)' } }],
+        [{ yAxis: -6 }, { yAxis: -3, name: 'Danger |Z|≥3', itemStyle: { color: 'rgba(255,77,79,0.12)' } }],
+        // Amber watch zones 2 ≤ |Z| < 3
+        [{ yAxis: 2 },  { yAxis: 3,  name: 'Watch |Z|≥2', itemStyle: { color: 'rgba(226,163,74,0.09)' } }],
+        [{ yAxis: -3 }, { yAxis: -2, name: 'Watch |Z|≥2', itemStyle: { color: 'rgba(226,163,74,0.09)' } }],
+      ],
+    },
+    markLine: {
+      silent: true,
+      symbol: 'none',
+      data: [
+        { yAxis: 0,  lineStyle: { color: 'rgba(139,148,158,0.3)', type: 'dashed', width: 1 }, label: { show: false } },
+        { yAxis:  3, lineStyle: { color: 'rgba(255,77,79,0.4)',   type: 'dashed', width: 1 }, label: { show: true, formatter: '|Z|=3', color: '#ff4d4f', fontSize: 10, position: 'insideStartTop' } },
+        { yAxis: -3, lineStyle: { color: 'rgba(255,77,79,0.4)',   type: 'dashed', width: 1 }, label: { show: true, formatter: '|Z|=3', color: '#ff4d4f', fontSize: 10, position: 'insideStartBottom' } },
+        { yAxis:  2, lineStyle: { color: 'rgba(226,163,74,0.4)',  type: 'dashed', width: 1 }, label: { show: true, formatter: '|Z|=2 watch', color: THEME.accent, fontSize: 10, position: 'insideStartTop' } },
+        { yAxis: -2, lineStyle: { color: 'rgba(226,163,74,0.4)',  type: 'dashed', width: 1 }, label: { show: true, formatter: '|Z|=2 watch', color: THEME.accent, fontSize: 10, position: 'insideStartBottom' } },
+      ],
+    },
+  };
+
+  // Label the zones on the right side via graphic
+  const dangerLabel  = { type: 'text', right: 8, top: 28,  style: { text: 'Danger',    fill: 'rgba(255,77,79,0.55)',  fontSize: 8, fontWeight: 'bold' } };
+  const watchLabel   = { type: 'text', right: 8, top: 62,  style: { text: 'Watch',     fill: 'rgba(226,163,74,0.55)', fontSize: 8, fontWeight: 'bold' } };
+  const normalLabel  = { type: 'text', right: 8, top: 115, style: { text: 'Normal',    fill: 'rgba(139,148,158,0.45)', fontSize: 8 } };
+  const watchLabelN  = { type: 'text', right: 8, bottom: 62,  style: { text: 'Watch',  fill: 'rgba(226,163,74,0.55)', fontSize: 8, fontWeight: 'bold' } };
+  const dangerLabelN = { type: 'text', right: 8, bottom: 28, style: { text: 'Danger',  fill: 'rgba(255,77,79,0.55)',  fontSize: 8, fontWeight: 'bold' } };
+
+  // Format X labels: show only day (MM-DD) to save space
+  const shortDates = allDates.map(d => d.slice(5)); // "MM-DD"
 
   zscoreChart.setOption({
     backgroundColor: 'transparent',
     tooltip: {
       ...baseTooltip({ confine: true }),
-      trigger: 'item',
-      formatter: (p) => {
-        const d = p.data;
-        const color = Math.abs(d[2]) > 3 ? '#ff4d4f' : '#6db874';
-        return `<b style="color:${color}">${d[3]}</b><br/>Share: <b>${d[0]}%</b><br/>Luck: <b>${d[1]}%</b><br/>Z-Score: <b>${d[2]}</b>`;
-      }
+      trigger: 'axis',
+      axisPointer: { type: 'cross', lineStyle: { color: THEME.border } },
+      formatter: (params) => {
+        const date = allDates[params[0].dataIndex];
+        let h = `<b style="color:${THEME.accent}">${date}</b><br/>`;
+        const visible = params.filter(p => p.value != null);
+        visible.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+        visible.forEach(p => {
+          const z = p.value;
+          const zColor = Math.abs(z) >= 3 ? '#ff4d4f' : Math.abs(z) >= 2 ? THEME.accent : THEME.text;
+          const row = poolMap[p.seriesName]?.[date];
+          const extra = row ? ` <span style="color:${THEME.muted};font-size:10px">(luck ${row.luck}%, share ${row.share}%)</span>` : '';
+          h += `${p.marker} ${p.seriesName}: <b style="color:${zColor}">${z > 0 ? '+' : ''}${z.toFixed(2)}</b>${extra}<br/>`;
+        });
+        return h;
+      },
     },
-    grid: { top: 40, left: 50, right: 30, bottom: 40 },
+    legend: {
+      bottom: 0,
+      type: 'scroll',
+      textStyle: { color: THEME.muted, fontSize: 11 },
+      icon: 'circle',
+      itemWidth: 9,
+      pageIconColor: THEME.accent,
+      pageTextStyle: { color: THEME.muted },
+      data: pools,
+    },
+    graphic: [dangerLabel, watchLabel, normalLabel, watchLabelN, dangerLabelN],
+    grid: { top: 20, left: 58, right: 105, bottom: 65 },
     xAxis: {
-      name: 'Pool Share %',
-      nameLocation: 'middle',
-      nameGap: 30,
+      type: 'category',
+      data: shortDates,
+      axisLabel: { color: THEME.muted, fontSize: 11 },
+      axisLine: { lineStyle: { color: THEME.border } },
       splitLine: { show: false },
-      axisLabel: { color: THEME.muted },
-      axisLine: { lineStyle: { color: THEME.border } }
     },
     yAxis: {
-      name: 'Luck %',
-      nameLocation: 'middle',
-      nameGap: 35,
+      type: 'value',
+      name: 'Z-Score',
+      nameTextStyle: { color: THEME.muted, fontSize: 11 },
+      axisLabel: { color: THEME.muted, fontSize: 11 },
       splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
-      axisLabel: { color: THEME.muted },
-      axisLine: { lineStyle: { color: THEME.border } }
+      axisLine: { lineStyle: { color: THEME.border } },
     },
-    series: [{
-      type: 'scatter',
-      symbolSize: (val) => 10 + Math.sqrt(val[0]) * 3,
-      data: data.map(d => [d.share, d.luck, d.z, d.pool]),
-      itemStyle: {
-        color: (p) => Math.abs(p.data[2]) > 3 ? '#ff4d4f' : '#6db874',
-        opacity: 0.8,
-        borderColor: THEME.bg,
-        borderWidth: 1,
-        shadowBlur: 10,
-        shadowColor: 'rgba(0,0,0,0.3)'
-      },
-      markLine: {
-        silent: true,
-        symbol: 'none',
-        lineStyle: { color: THEME.muted, type: 'dashed', opacity: 0.3 },
-        data: [{ yAxis: 100 }]
-      }
-    }]
+    series: [bandSeries, ...series],
   }, true);
 }
 
@@ -1056,10 +1231,48 @@ export function renderEntropyHeatmap(entropyData) {
     window.addEventListener('resize', () => entropyChart.resize());
   }
 
-  const pools = [...new Set(entropyData.map(d => d.pool))];
-  const dates = [...new Set(entropyData.map(d => d.date))].sort();
+  // Aggregate to monthly (1104 raw dates → ~63 months) for readability
+  const monthAgg = {};
+  entropyData.forEach(d => {
+    const month = d.date.slice(0, 7);
+    const key = `${month}|||${d.pool}`;
+    if (!monthAgg[key]) monthAgg[key] = { month, pool: d.pool, wSum: 0, totalBlocks: 0 };
+    monthAgg[key].wSum += d.cv * d.blocks;
+    monthAgg[key].totalBlocks += d.blocks;
+  });
+  const monthlyData = Object.values(monthAgg).map(v => ({
+    month: v.month,
+    pool: v.pool,
+    cv: v.totalBlocks > 0 ? +(v.wSum / v.totalBlocks).toFixed(3) : 0,
+  }));
 
-  const data = entropyData.map(d => [dates.indexOf(d.date), pools.indexOf(d.pool), d.cv]);
+  const months = [...new Set(monthlyData.map(d => d.month))].sort();
+  const pools  = [...new Set(monthlyData.map(d => d.pool))].sort();
+  const data   = monthlyData.map(d => [months.indexOf(d.month), pools.indexOf(d.pool), d.cv]);
+
+  // Event annotation indices
+  const chinaStart = months.indexOf('2021-05');
+  const chinaEnd   = months.indexOf('2021-10');
+  const halvingIdx = months.indexOf('2024-04');
+  const halvingEnd = months.indexOf('2024-05') >= 0 ? months.indexOf('2024-05') : halvingIdx;
+
+  const markAreaData = [];
+  if (chinaStart >= 0 && chinaEnd >= 0) {
+    markAreaData.push([
+      { xAxis: months[chinaStart],
+        itemStyle: { color: 'rgba(255,77,79,0.1)', borderColor: 'rgba(255,77,79,0.25)', borderWidth: 1 },
+        label: { show: true, formatter: '🇨🇳 China Ban', color: '#ff4d4f', fontSize: 8, fontWeight: 'bold', position: 'insideTop' } },
+      { xAxis: months[chinaEnd] },
+    ]);
+  }
+  if (halvingIdx >= 0) {
+    markAreaData.push([
+      { xAxis: months[halvingIdx],
+        itemStyle: { color: 'rgba(226,163,74,0.12)', borderColor: 'rgba(226,163,74,0.3)', borderWidth: 1 },
+        label: { show: true, formatter: '₿ Halving', color: '#E2A34A', fontSize: 8, fontWeight: 'bold', position: 'insideTop' } },
+      { xAxis: months[halvingEnd] || months[halvingIdx] },
+    ]);
+  }
 
   entropyChart.setOption({
     backgroundColor: 'transparent',
@@ -1067,44 +1280,98 @@ export function renderEntropyHeatmap(entropyData) {
       ...baseTooltip({ confine: true }),
       position: 'top',
       formatter: (p) => {
-        const val = p.data[2];
-        const status = val < 0.7 ? 'Centralized/Industrial' : (val > 1.0 ? 'Decentralized/Retail' : 'Normal');
-        return `<b>${pools[p.data[1]]}</b> (${dates[p.data[0]]})<br/>Entropy (CV): <b>${val.toFixed(3)}</b><br/><span style="font-size:10px; opacity:0.8">${status}</span>`;
-      }
+        if (!Array.isArray(p.data) || p.data[2] == null) return '';
+        const cv = p.data[2];
+        const status = cv < 0.75 ? '🏭 Industrial (centralized)'
+                     : cv > 1.0  ? '🌐 Retail/decentralized'
+                     : '🏊 Professional pool';
+        const color  = cv < 0.75 ? '#ff4d4f' : cv > 1.0 ? '#74add1' : THEME.accent;
+        return `<b>${pools[p.data[1]]}</b> (${months[p.data[0]]})<br/>` +
+               `CV: <b style="color:${color}">${cv.toFixed(3)}</b><br/>` +
+               `<span style="font-size:10px;color:${color}">${status}</span>`;
+      },
     },
-    grid: { top: 10, left: 100, right: 20, bottom: 60 },
+    grid: { top: 20, left: 120, right: 20, bottom: 80 },
     xAxis: {
       type: 'category',
-      data: dates,
-      axisLabel: { color: THEME.muted, rotate: 30, fontSize: 10 },
-      axisLine: { lineStyle: { color: THEME.border } }
+      data: months,
+      axisLabel: { color: THEME.muted, rotate: 35, fontSize: 11, interval: Math.floor(months.length / 12) },
+      axisLine: { lineStyle: { color: THEME.border } },
     },
     yAxis: {
       type: 'category',
       data: pools,
-      axisLabel: { color: THEME.text, fontSize: 11 },
-      axisLine: { lineStyle: { color: THEME.border } }
+      axisLabel: { color: THEME.text, fontSize: 12 },
+      axisLine: { lineStyle: { color: THEME.border } },
     },
+    // INVERTED: Low CV (suspicious = red) → High CV (normal = blue)
     visualMap: {
       min: 0.5,
-      max: 1.2,
+      max: 1.3,
       calculable: true,
       orient: 'horizontal',
       left: 'center',
-      bottom: 0,
-      text: ['High Entropy', 'Low Entropy'],
-      textStyle: { color: THEME.muted, fontSize: 10 },
+      bottom: 5,
+      text: ['✅ Normal (High CV)', '🔴 Suspicious (Low CV)'],
+      textStyle: { color: THEME.muted, fontSize: 11 },
       inRange: {
-        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-      }
+        color: ['#a50026', '#d73027', '#f46d43', '#fdae61', '#fee090', '#ffffbf', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695'],
+      },
     },
     series: [{
       type: 'heatmap',
-      data: data,
+      data,
       label: { show: false },
-      emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
-    }]
+      emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } },
+      markArea: { silent: true, data: markAreaData },
+    }],
   }, true);
+
+  // Actor Archetypes panel (computed from last 6 months of data)
+  const archetypesEl = document.getElementById('chart-entropy-archetypes');
+  if (!archetypesEl) return;
+  const cutoff = months.slice(-6)[0] || months[0];
+  const recentMap = {};
+  monthlyData.filter(d => d.month >= cutoff).forEach(d => {
+    if (!recentMap[d.pool]) recentMap[d.pool] = { sum: 0, n: 0 };
+    recentMap[d.pool].sum += d.cv;
+    recentMap[d.pool].n  += 1;
+  });
+  const industrial = [], professional = [], retail = [];
+  Object.entries(recentMap).forEach(([pool, v]) => {
+    const avg = +(v.sum / v.n).toFixed(2);
+    if (avg < 0.75) industrial.push({ pool, avg });
+    else if (avg <= 1.0) professional.push({ pool, avg });
+    else retail.push({ pool, avg });
+  });
+  industrial.sort((a, b) => a.avg - b.avg);
+  professional.sort((a, b) => a.avg - b.avg);
+  retail.sort((a, b) => b.avg - a.avg);
+
+  const badge = (p, color) =>
+    `<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:3px;` +
+    `padding:1px 6px;font-size:9.5px;font-weight:700;margin:2px;display:inline-block;color:${color}">${p.pool} ` +
+    `<span style="opacity:0.55;font-weight:400">${p.avg}</span></span>`;
+
+  const none = `<span style="opacity:0.4;font-size:10px">none in last 6 months</span>`;
+  archetypesEl.innerHTML =
+    `<div style="margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">` +
+      `<div style="background:rgba(255,77,79,0.07);border:1px solid rgba(255,77,79,0.25);border-radius:6px;padding:10px;">` +
+        `<div style="font-size:0.68rem;font-weight:800;color:#ff4d4f;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:6px;">🏭 Industrial (CV &lt; 0.75)</div>` +
+        `<div style="font-size:0.76rem;color:var(--text-secondary);line-height:1.5;margin-bottom:6px;">Consistent sub-0.75 CV → owned hardware, central coordination. These are the same pools running multi-block streaks in Act I.</div>` +
+        `<div>${industrial.map(p => badge(p, '#ff4d4f')).join('') || none}</div>` +
+      `</div>` +
+      `<div style="background:rgba(226,163,74,0.07);border:1px solid rgba(226,163,74,0.25);border-radius:6px;padding:10px;">` +
+        `<div style="font-size:0.68rem;font-weight:800;color:#E2A34A;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:6px;">🏊 Professional Pool (0.75–1.0)</div>` +
+        `<div style="font-size:0.76rem;color:var(--text-secondary);line-height:1.5;margin-bottom:6px;">Mixed hashrate sources with stable infrastructure. Variance reflects a diverse miner base without excessive central coordination.</div>` +
+        `<div>${professional.map(p => badge(p, '#E2A34A')).join('') || none}</div>` +
+      `</div>` +
+      `<div style="background:rgba(152,195,121,0.07);border:1px solid rgba(152,195,121,0.25);border-radius:6px;padding:10px;">` +
+        `<div style="font-size:0.68rem;font-weight:800;color:#98C379;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:6px;">🌐 Retail / Decentralized (CV &gt; 1.0)</div>` +
+        `<div style="font-size:0.76rem;color:var(--text-secondary);line-height:1.5;margin-bottom:6px;">High timing variance → many independent contributors, no single coordinator. These pools have the lowest streak risk by design.</div>` +
+        `<div>${retail.map(p => badge(p, '#98C379')).join('') || none}</div>` +
+      `</div>` +
+    `</div>`;
 }
 
 // ── KPI 5: Empty Block Auditor (Scatter) ──────────────────────────────────────
@@ -1117,17 +1384,82 @@ export function renderEmptyBlockChart(emptyData) {
     window.addEventListener('resize', () => emptyChart.resize());
   }
 
-  // Calculate Market Share for X-axis (if not provided, we derive it from leaderboard)
-  // Let's use the All-time ratio to start, or we could toggle to 30d
-  const data = emptyData.leaderboard.map(d => {
-    // We want: [X: Share %, Y: Empty %, R: Total Blocks, Name: Pool]
-    // Since we don't have global share here, we'll use a placeholder or have caller provide it.
-    // Actually, let's just use total_all as a proxy for share if needed, 
-    // but better to calculate actual share.
-    const totalGlobal = emptyData.leaderboard.reduce((s, x) => s + x.total_all, 0);
-    const share = (d.total_all / totalGlobal) * 100;
-    return [share, d.ratio_all, d.total_all, d.pool, d.ratio_30d];
+  const lb = emptyData.leaderboard;
+
+  // Weighted network average (all-time blocks as weights)
+  const totalBlks = lb.reduce((s, d) => s + d.total_all, 0);
+  const networkAvg = lb.reduce((s, d) => s + d.ratio_all * d.total_all, 0) / totalBlks;
+
+  // Axis range with headroom
+  const maxVal = Math.max(...lb.map(d => Math.max(d.ratio_all, d.ratio_30d)));
+  const axisMax = Math.ceil(maxVal * 1.2 * 10) / 10;
+
+  // Classify pools into 4 behavioural quadrants
+  const groups = {
+    persistent: { label: '🔴 Persistent Offenders', color: '#ff4d4f', items: [] },
+    worsening:  { label: '🚨 Newly Suspicious',     color: '#E2A34A', items: [] },
+    reformed:   { label: '📉 Reformed',             color: '#56B6C2', items: [] },
+    clean:      { label: '✅ Clean',                color: '#98C379', items: [] },
+  };
+  lb.forEach(d => {
+    const aboveAll = d.ratio_all > networkAvg;
+    const above30d = d.ratio_30d > networkAvg;
+    const key = aboveAll && above30d ? 'persistent'
+              : !aboveAll && above30d ? 'worsening'
+              : aboveAll && !above30d ? 'reformed'
+              : 'clean';
+    groups[key].items.push(d);
   });
+
+  const scatterSeries = Object.entries(groups).map(([key, g]) => ({
+    name: g.label,
+    type: 'scatter',
+    symbolSize: (val) => Math.max(7, 6 + Math.sqrt(val[2]) * 0.055),
+    itemStyle: { color: g.color, opacity: 0.9, borderColor: THEME.bg, borderWidth: 1.5 },
+    label: {
+      show: true,
+      position: 'top',
+      color: g.color,
+      fontSize: 9,
+      fontWeight: 'bold',
+      formatter: (p) => p.data[3],
+    },
+    // [ratio_all, ratio_30d, total_all, pool, empty_all, empty_30d, total_30d]
+    data: g.items.map(d => [d.ratio_all, d.ratio_30d, d.total_all, d.pool, d.empty_all, d.empty_30d, d.total_30d]),
+    ...(key === 'persistent' ? {
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        data: [
+          { xAxis: networkAvg, lineStyle: { color: 'rgba(255,77,79,0.35)', type: 'dashed', width: 1.5 },
+            label: { show: true, formatter: `Avg ${networkAvg.toFixed(2)}%`, color: '#ff4d4f', fontSize: 10, position: 'insideStartTop' } },
+          { yAxis: networkAvg, lineStyle: { color: 'rgba(255,77,79,0.35)', type: 'dashed', width: 1.5 },
+            label: { show: true, formatter: `Avg ${networkAvg.toFixed(2)}%`, color: '#ff4d4f', fontSize: 10, position: 'insideEndTop' } },
+        ],
+      },
+    } : key === 'clean' ? {
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        data: [
+          { xAxis: networkAvg, lineStyle: { color: 'rgba(255,77,79,0.35)', type: 'dashed', width: 1.5 }, label: { show: false } },
+          { yAxis: networkAvg, lineStyle: { color: 'rgba(255,77,79,0.35)', type: 'dashed', width: 1.5 }, label: { show: false } },
+        ],
+      },
+    } : {}),
+  }));
+
+  // Diagonal y = x "no change" reference line
+  const diagSeries = {
+    name: '⟵ No Change ⟶',
+    type: 'line',
+    silent: true,
+    symbol: 'none',
+    lineStyle: { color: 'rgba(139,148,158,0.28)', type: 'dotted', width: 1.5 },
+    tooltip: { show: false },
+    data: [[0, 0], [axisMax, axisMax]],
+    legendHoverLink: false,
+  };
 
   emptyChart.setOption({
     backgroundColor: 'transparent',
@@ -1135,48 +1467,169 @@ export function renderEmptyBlockChart(emptyData) {
       ...baseTooltip({ confine: true }),
       trigger: 'item',
       formatter: (p) => {
-        const d = p.data;
-        const color = d[1] > 1.0 ? '#ff4d4f' : THEME.accent;
-        return `<b style="color:${color}">${d[3]}</b><br/>All-Time Share: <b>${d[0].toFixed(2)}%</b><br/>Empty Ratio (All-time): <b>${d[1]}%</b><br/>Empty Ratio (Last 30d): <b>${d[4]}%</b><br/>Total Blocks: <b>${d[2].toLocaleString()}</b>`;
-      }
+        if (p.seriesType === 'line') return '';
+        const [ratioAll, ratio30d, totalAll, poolName, emptyAll, empty30d, total30d] = p.data;
+        const trend = ratio30d > ratioAll + 0.05 ? '↑ Worsening'
+                    : ratio30d < ratioAll - 0.05  ? '↓ Improving'
+                    : '→ Stable';
+        const trendColor = trend.startsWith('↑') ? '#ff4d4f' : trend.startsWith('↓') ? '#98C379' : THEME.muted;
+        return `<b style="color:${THEME.accent}">${poolName}</b><br/>` +
+          `All-time: <b>${ratioAll}%</b> (${emptyAll} / ${totalAll.toLocaleString()})<br/>` +
+          `Last 30d: <b>${ratio30d}%</b> (${empty30d} / ${total30d.toLocaleString()})<br/>` +
+          `Trend: <b style="color:${trendColor}">${trend}</b><br/>` +
+          `<span style="color:${THEME.muted};font-size:11px;">Network avg: ${networkAvg.toFixed(2)}%</span>`;
+      },
     },
-    grid: { top: 40, left: 50, right: 30, bottom: 40 },
+    legend: {
+      bottom: 0,
+      type: 'scroll',
+      textStyle: { color: THEME.muted, fontSize: 11 },
+      icon: 'circle',
+      itemWidth: 10,
+    },
+    graphic: [
+      { type: 'text', style: { text: '✅ Clean',                fill: '#98C379', fontSize: 10, fontWeight: 'bold', opacity: 0.55 }, left: 67,  bottom: 60 },
+      { type: 'text', style: { text: '🚨 Newly Suspicious',     fill: '#E2A34A', fontSize: 10, fontWeight: 'bold', opacity: 0.55 }, left: 67,  top: 33   },
+      { type: 'text', style: { text: '🔴 Persistent Offenders', fill: '#ff4d4f', fontSize: 10, fontWeight: 'bold', opacity: 0.55 }, right: 32, top: 33   },
+      { type: 'text', style: { text: '📉 Reformed',             fill: '#56B6C2', fontSize: 10, fontWeight: 'bold', opacity: 0.55 }, right: 32, bottom: 60 },
+    ],
+    grid: { top: 35, left: 80, right: 35, bottom: 70 },
     xAxis: {
-      name: 'All-Time Market Share %',
+      type: 'value',
+      name: 'All-Time Empty %',
       nameLocation: 'middle',
-      nameGap: 30,
-      splitLine: { show: false },
-      axisLabel: { color: THEME.muted },
-      axisLine: { lineStyle: { color: THEME.border } }
+      nameGap: 32,
+      min: 0,
+      max: axisMax,
+      axisLabel: { color: THEME.muted, fontSize: 12, formatter: '{value}%' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLine: { lineStyle: { color: THEME.border } },
     },
     yAxis: {
-      name: 'Empty Block %',
+      type: 'value',
+      name: 'Last 30d Empty %',
       nameLocation: 'middle',
-      nameGap: 35,
+      nameGap: 50,
+      min: 0,
+      max: axisMax,
+      axisLabel: { color: THEME.muted, fontSize: 12, formatter: '{value}%' },
       splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
-      axisLabel: { color: THEME.muted },
-      axisLine: { lineStyle: { color: THEME.border } }
+      axisLine: { lineStyle: { color: THEME.border } },
     },
-    series: [{
-      type: 'scatter',
-      symbolSize: (val) => 10 + Math.sqrt(val[2]) * 0.1,
-      data: data,
-      itemStyle: {
-        color: (p) => p.data[1] > 1.0 ? '#ff4d4f' : THEME.accent,
-        opacity: 0.8,
-        borderColor: THEME.bg,
-        borderWidth: 1,
-        shadowBlur: 10,
-        shadowColor: 'rgba(0,0,0,0.3)'
+    series: [...scatterSeries, diagSeries],
+  }, true);
+}
+
+export let emptyTrendChart = null;
+export function renderEmptyTrendChart(monthlyTrend) {
+  if (!monthlyTrend || !monthlyTrend.length) return;
+  const el = document.getElementById('chart-empty-trend');
+  if (!el) return;
+  if (!emptyTrendChart) {
+    emptyTrendChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => emptyTrendChart.resize());
+  }
+
+  // Group by pool
+  const poolMap = {};
+  monthlyTrend.forEach(r => {
+    if (!poolMap[r.pool_name]) poolMap[r.pool_name] = {};
+    poolMap[r.pool_name][r.month] = r.ratio;
+  });
+
+  const months = [...new Set(monthlyTrend.map(r => r.month))].sort();
+  const pools = Object.keys(poolMap);
+
+  // Sort by all-time average empty ratio descending (top offenders first)
+  pools.sort((a, b) => {
+    const avg = pm => { const v = Object.values(pm); return v.reduce((s, x) => s + x, 0) / v.length; };
+    return avg(poolMap[b]) - avg(poolMap[a]);
+  });
+
+  const topN = 5;
+  const series = pools.map((pool, i) => {
+    const isTop = i < topN;
+    return {
+      name: pool,
+      type: 'line',
+      smooth: true,
+      symbol: 'none',
+      lineStyle: {
+        color: POOL_COLORS[i % POOL_COLORS.length],
+        width: isTop ? 2 : 1,
+        opacity: isTop ? 0.9 : 0.35,
       },
-      markLine: {
-        silent: true,
-        symbol: 'none',
-        lineStyle: { color: '#ff4d4f', type: 'dashed', opacity: 0.5 },
-        label: { show: true, formatter: 'Anomaly Threshold (1%)', position: 'end', color: '#ff4d4f', fontSize: 10 },
-        data: [{ yAxis: 1.0 }]
-      }
-    }]
+      itemStyle: { color: POOL_COLORS[i % POOL_COLORS.length] },
+      areaStyle: isTop ? { color: POOL_COLORS[i % POOL_COLORS.length], opacity: 0.06 } : null,
+      data: months.map(m => poolMap[pool][m] ?? null),
+      connectNulls: true,
+    };
+  });
+
+  // Monthly unweighted network average across pools present that month
+  const netAvgData = months.map(m => {
+    const vals = pools.map(p => poolMap[p][m] ?? null).filter(v => v !== null);
+    return vals.length ? +(vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(3) : null;
+  });
+  series.push({
+    name: 'Network Avg',
+    type: 'line',
+    smooth: true,
+    symbol: 'none',
+    lineStyle: { color: THEME.muted, type: 'dashed', width: 1, opacity: 0.5 },
+    itemStyle: { color: THEME.muted },
+    data: netAvgData,
+    connectNulls: true,
+    z: 0,
+  });
+
+  emptyTrendChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'axis',
+      axisPointer: { type: 'cross', lineStyle: { color: THEME.border } },
+      formatter: (params) => {
+        const month = params[0].axisValue;
+        let h = `<b style="color:${THEME.accent}">${month}</b><br/>`;
+        [...params]
+          .filter(p => p.value != null)
+          .sort((a, b) => (b.value || 0) - (a.value || 0))
+          .forEach(p => {
+            h += `${p.marker} ${p.seriesName}: <b>${(p.value ?? 0).toFixed(2)}%</b><br/>`;
+          });
+        return h;
+      },
+    },
+    legend: {
+      bottom: 0,
+      type: 'scroll',
+      textStyle: { color: THEME.muted, fontSize: 11 },
+      icon: 'circle',
+      itemWidth: 9,
+      pageIconColor: THEME.accent,
+      pageTextStyle: { color: THEME.muted },
+    },
+    grid: { top: 10, left: 58, right: 15, bottom: 65 },
+    xAxis: {
+      type: 'category',
+      data: months,
+      axisLabel: {
+        color: THEME.muted,
+        fontSize: 11,
+        interval: Math.floor(months.length / 10),
+      },
+      axisLine: { lineStyle: { color: THEME.border } },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Empty %',
+      nameTextStyle: { color: THEME.muted, fontSize: 11 },
+      axisLabel: { color: THEME.muted, fontSize: 11, formatter: '{value}%' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+    },
+    series,
   }, true);
 }
 
@@ -1190,34 +1643,104 @@ export function renderSyncHistogram(syncData) {
     window.addEventListener('resize', () => syncChart.resize());
   }
 
-  // Sort by sub_30s to keep it intuitive
+  // Sort by sub_30s % descending — worst offenders first
   const sortedData = [...syncData].sort((a, b) => {
     const a30 = (a.buckets.sub_30s / a.total_consecutive);
     const b30 = (b.buckets.sub_30s / b.total_consecutive);
     return b30 - a30;
   });
 
-  const keys = ['sub_30s', 'sub_60s', 'sub_2m', 'sub_5m', 'slow'];
   const poolNames = sortedData.map(d => d.pool);
 
-  // Highlight sub_30s in red/orange to indicate fork/reorg risk
-  const colors = ['#ff4d4f', '#E2A34A', '#E5C07B', '#98C379', '#56B6C2'];
+  // ── Spy Mining Callout Strip ─────────────────────────────────────────────────
+  // Shows per-pool "X% of fast blocks were empty" badges above the chart
+  const calloutEl = document.getElementById('chart-sync-spy-callout');
+  if (calloutEl) {
+    const badges = sortedData.map(d => {
+      const sub30 = d.buckets.sub_30s || 0;
+      const emptyIn30 = d.buckets_empty?.sub_30s || 0;
+      if (sub30 === 0 || emptyIn30 === 0) return '';
+      const spyPct = Math.round(emptyIn30 / sub30 * 100);
+      const color = spyPct >= 50 ? '#ff4d4f' : spyPct >= 20 ? '#E2A34A' : '#8b949e';
+      return `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid ${color}44;border-radius:4px;padding:3px 9px;font-size:0.7rem;color:${color};font-weight:600;">
+        ${d.pool} <b>${spyPct}%</b> <span style="font-weight:400;opacity:0.7;">fast blocks empty</span>
+      </span>`;
+    }).filter(Boolean).join('');
 
-  const series = keys.map((key, i) => ({
-    name: key.replace('sub_', '< ').replace('s', 's').replace('m', 'm').replace('slow', '> 5m'),
+    calloutEl.innerHTML = badges
+      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;margin-bottom:10px;background:rgba(255,77,79,0.05);border:1px solid rgba(255,77,79,0.2);border-radius:6px;">
+           <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#ff4d4f;flex-shrink:0;margin-right:4px;">
+             <i class="fa-solid fa-triangle-exclamation"></i> Spy Mining Detected
+           </span>
+           ${badges}
+         </div>`
+      : '';
+  }
+
+  // ── Series: split sub_30s into spy (empty) + normal ──────────────────────────
+  // Series 0: Empty blocks within <30s → the definitive spy mining signal
+  const spySeries = {
+    name: '< 30s Empty (Spy Mining)',
     type: 'bar',
     stack: 'total',
-    itemStyle: { color: colors[i] },
+    itemStyle: { color: '#7B1515' },  // deep crimson — distinct from normal <30s
+    label: {
+      show: true,
+      position: 'inside',
+      color: '#ffaaaa',
+      fontSize: 9,
+      fontWeight: 'bold',
+      formatter: (p) => (p.data?.spy_pct >= 10 ? `${p.data.spy_pct}%` : '')
+    },
+    data: sortedData.map(d => {
+      const totalConsec = d.total_consecutive;
+      const sub30 = d.buckets.sub_30s || 0;
+      const emptyCount = d.buckets_empty?.sub_30s || 0;
+      const spyPct = sub30 > 0 ? Math.round(emptyCount / sub30 * 100) : 0;
+      return {
+        value: totalConsec > 0 ? (emptyCount / totalConsec * 100) : 0,
+        count: emptyCount,
+        spy_pct: spyPct,
+        sub30Count: sub30,
+        totalConsec,
+        totalBlocks: d.total_blocks || 0
+      };
+    })
+  };
+
+  // Series 1: Non-empty sub_30s blocks (still dangerous, but no validation skip confirmed)
+  const normalSub30Series = {
+    name: '< 30s Normal',
+    type: 'bar',
+    stack: 'total',
+    itemStyle: { color: '#ff4d4f' },
+    data: sortedData.map(d => {
+      const totalConsec = d.total_consecutive;
+      const sub30 = d.buckets.sub_30s || 0;
+      const emptyCount = d.buckets_empty?.sub_30s || 0;
+      return {
+        value: totalConsec > 0 ? ((sub30 - emptyCount) / totalConsec * 100) : 0,
+        count: sub30 - emptyCount,
+        totalConsec,
+        totalBlocks: d.total_blocks || 0
+      };
+    })
+  };
+
+  // Series 2–5: Remaining time buckets, unchanged
+  const restSeries = ['sub_60s', 'sub_2m', 'sub_5m', 'slow'].map((key, i) => ({
+    name: ['< 60s', '< 2m', '< 5m', '> 5m'][i],
+    type: 'bar',
+    stack: 'total',
+    itemStyle: { color: ['#E2A34A', '#E5C07B', '#98C379', '#56B6C2'][i] },
     data: sortedData.map(d => {
       const totalConsec = d.total_consecutive;
       const val = d.buckets[key] || 0;
-      const valEmpty = d.buckets_empty?.[key] || 0;
-      const pct = totalConsec > 0 ? (val / totalConsec * 100) : 0;
       return {
-        value: pct,
+        value: totalConsec > 0 ? (val / totalConsec * 100) : 0,
         count: val,
-        count_empty: valEmpty,
-        totalConsec: totalConsec,
+        count_empty: d.buckets_empty?.[key] || 0,
+        totalConsec,
         totalBlocks: d.total_blocks || 0
       };
     })
@@ -1232,26 +1755,27 @@ export function renderSyncHistogram(syncData) {
       formatter: (params) => {
         const d = params[0].data;
         const consecRatio = d.totalBlocks > 0 ? (d.totalConsec / d.totalBlocks * 100).toFixed(1) : 0;
+        const spyItem = params.find(p => p.seriesName === '< 30s Empty (Spy Mining)');
+        const spyScore = spyItem?.data?.spy_pct ?? 0;
 
-        let h = `<div style="margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
-                  <b style="color:${THEME.accent}">${params[0].name}</b>
-                </div>
-                Lifetime Blocks: <b>${d.totalBlocks.toLocaleString()}</b><br/>
-                Consecutive Ratio: <b>${consecRatio}%</b> (${d.totalConsec.toLocaleString()} pairs)<br/><br/>`;
+        let h = `<div style="margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:5px;">
+                   <b style="color:${THEME.accent}">${params[0].name}</b>
+                 </div>
+                 Lifetime Blocks: <b>${d.totalBlocks.toLocaleString()}</b><br/>
+                 Consecutive Pairs: <b>${d.totalConsec.toLocaleString()}</b> (${consecRatio}%)`;
+
+        if (spyScore > 0) {
+          const sc = spyScore >= 50 ? '#ff4d4f' : '#E2A34A';
+          h += `<div style="margin:6px 0;padding:5px 8px;background:rgba(255,77,79,0.1);border-left:2px solid ${sc};border-radius:2px;">
+                  <span style="color:${sc};font-weight:bold;">⚠ Spy Mining: ${spyScore}% of &lt;30s blocks were empty</span>
+                </div>`;
+        } else {
+          h += '<br/>';
+        }
 
         params.forEach(p => {
-          if (p.data.count > 0) {
-            const emptyPct = p.data.count > 0 ? (p.data.count_empty / p.data.count * 100).toFixed(0) : 0;
-            const signal = p.data.count_empty > 0
-              ? `<span style="color:#ff4d4f; font-weight:bold; margin-left:8px;">(${emptyPct}% Empty)</span>`
-              : '';
-
-            // Header-First Mining Signal (Primary indicator if sub_30s and empty)
-            const hfSignal = (p.seriesIndex === 0 && p.data.count_empty > 0)
-              ? `<br/><span style="color:#ff4d4f; font-size:10px;">⚠️ Header-First Signal Detected</span>`
-              : '';
-
-            h += `<div style="margin-bottom:2px;">${p.marker} ${p.seriesName}: <b>${p.data.value.toFixed(1)}%</b> (${p.data.count})${signal}${hfSignal}</div>`;
+          if (p.data.value > 0.01) {
+            h += `<div style="margin-bottom:2px;">${p.marker} ${p.seriesName}: <b>${p.data.value.toFixed(1)}%</b> (${p.data.count ?? ''})</div>`;
           }
         });
         return h;
@@ -1259,24 +1783,171 @@ export function renderSyncHistogram(syncData) {
     },
     legend: {
       bottom: 0,
-      textStyle: { color: THEME.muted, fontSize: 10 },
+      textStyle: { color: THEME.muted, fontSize: 11 },
       icon: 'circle',
       itemWidth: 10
     },
-    grid: { top: 20, left: 100, right: 30, bottom: 60 },
+    grid: { top: 20, left: 115, right: 30, bottom: 70 },
     xAxis: {
       type: 'value',
       max: 100,
-      axisLabel: { color: THEME.muted, fontSize: 10, formatter: '{value}%' },
+      axisLabel: { color: THEME.muted, fontSize: 11, formatter: '{value}%' },
       splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
     },
     yAxis: {
       type: 'category',
       data: poolNames,
-      axisLabel: { color: THEME.text, fontSize: 11 },
+      axisLabel: { color: THEME.text, fontSize: 12 },
       axisLine: { lineStyle: { color: THEME.border } }
     },
-    series: series
+    series: [spySeries, normalSub30Series, ...restSeries]
+  }, true);
+}
+
+// ── KPI 4b: Second Block Uplift ───────────────────────────────────────────────
+// Measures how much more likely a pool is to mine block N+1 given it mined
+// block N, vs. what its raw hash share would predict (lift = actual / expected).
+export let consecutiveAdvantageChart = null;
+export function renderConsecutiveAdvantage(syncData) {
+  const el = document.getElementById('chart-consecutive-advantage');
+  if (!el || !syncData || syncData.length === 0) return;
+  if (!consecutiveAdvantageChart) {
+    consecutiveAdvantageChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => consecutiveAdvantageChart.resize());
+  }
+
+  const totalAllBlocks = syncData.reduce((s, p) => s + p.total_blocks, 0);
+
+  // Derive per-pool metrics entirely from kpi4_sync fields
+  const poolData = syncData.map(p => {
+    const hashShare = p.total_blocks / totalAllBlocks * 100;
+    const consecRate = p.total_consecutive / Math.max(p.total_blocks - 1, 1) * 100;
+    const lift = consecRate / hashShare;
+    return { pool: p.pool, hashShare, consecRate, lift, totalBlocks: p.total_blocks, totalConsec: p.total_consecutive };
+  }).sort((a, b) => a.lift - b.lift); // ascending → highest lift at top of horiz chart
+
+  // Callout strip: network-wide insight
+  const aboveParity = poolData.filter(d => d.lift > 1.0).length;
+  const topPool = poolData[poolData.length - 1];
+  const calloutEl = document.getElementById('chart-consecutive-callout');
+  if (calloutEl) {
+    const topColor = topPool.lift > 2 ? '#ff4d4f' : '#E2A34A';
+    calloutEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;margin-bottom:10px;background:rgba(226,163,74,0.05);border:1px solid rgba(226,163,74,0.2);border-radius:6px;font-size:0.78rem;color:var(--text-secondary);line-height:1.5;">
+      <i class="fa-solid fa-signal" style="color:var(--accent);flex-shrink:0;"></i>
+      <span><b style="color:var(--text-primary)">${aboveParity} of ${poolData.length}</b> pools mine block N+1 at a rate that exceeds their hash share — evidence of a systematic head-start on the next block.&nbsp;
+      Biggest uplift: <b style="color:${topColor}">${topPool.pool}</b> at <b style="color:${topColor}">${topPool.lift.toFixed(1)}×</b> its expected rate
+      <span style="color:var(--text-secondary);font-size:0.7rem;">(${topPool.consecRate.toFixed(1)}% actual vs ${topPool.hashShare.toFixed(1)}% expected)</span>.
+      </span>
+    </div>`;
+  }
+
+  const maxLift = Math.max(...poolData.map(d => d.lift));
+  const xMax = Math.ceil(maxLift * 1.1 * 10) / 10;
+
+  const barColors = poolData.map(d =>
+    d.lift > 2.0 ? '#ff4d4f' :
+    d.lift > 1.5 ? '#E87E51' :
+    d.lift > 1.0 ? '#E2A34A' :
+               '#56B6C2'
+  );
+
+  consecutiveAdvantageChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params) => {
+        const poolName = params[0].name;
+        const d = poolData.find(x => x.pool === poolName);
+        if (!d) return '';
+        const liftColor = d.lift > 2 ? '#ff4d4f' : d.lift > 1.0 ? '#E2A34A' : '#56B6C2';
+        const adv = d.consecRate - d.hashShare;
+        return `<b style="color:${THEME.accent}">${d.pool}</b><br/>` +
+          `Expected (hash share): <b>${d.hashShare.toFixed(2)}%</b><br/>` +
+          `Actual consecutive rate: <b>${d.consecRate.toFixed(2)}%</b><br/>` +
+          `<span style="color:${liftColor}">Second Block Lift: <b>${d.lift.toFixed(2)}×</b></span>` +
+          (adv > 0
+            ? `<br/><span style="color:${liftColor};font-size:11px;">+${adv.toFixed(2)} pp above hash share</span>`
+            : `<br/><span style="color:${THEME.muted};font-size:11px;">${adv.toFixed(2)} pp vs hash share</span>`) +
+          `<br/><span style="color:${THEME.muted};font-size:11px;">${d.totalConsec.toLocaleString()} pairs · ${d.totalBlocks.toLocaleString()} blocks</span>`;
+      },
+    },
+    graphic: [
+      {
+        type: 'text',
+        style: {
+          text: '◀ No structural advantage',
+          fill: 'rgba(86,182,194,0.45)',
+          fontSize: 9,
+          fontWeight: 'bold',
+          textAlign: 'center',
+        },
+        left: '15%',
+        top: 28,
+      },
+      {
+        type: 'text',
+        style: {
+          text: 'Structural advantage ▶',
+          fill: 'rgba(255,77,79,0.45)',
+          fontSize: 9,
+          fontWeight: 'bold',
+          textAlign: 'center',
+        },
+        right: 85,
+        top: 28,
+      },
+    ],
+    grid: { top: 46, left: 115, right: 90, bottom: 35 },
+    xAxis: {
+      type: 'value',
+      min: 0,
+      max: xMax,
+      axisLabel: { color: THEME.muted, fontSize: 11, formatter: v => v.toFixed(1) + '×' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLine: { lineStyle: { color: THEME.border } },
+    },
+    yAxis: {
+      type: 'category',
+      data: poolData.map(d => d.pool),
+      axisLabel: { color: THEME.text, fontSize: 11 },
+      axisLine: { lineStyle: { color: THEME.border } },
+    },
+    series: [
+      {
+        name: 'Second Block Lift',
+        type: 'bar',
+        barMaxWidth: 22,
+        data: poolData.map((d, i) => ({
+          value: +d.lift.toFixed(3),
+          itemStyle: { color: barColors[i] },
+        })),
+        label: {
+          show: true,
+          position: 'right',
+          color: THEME.muted,
+          fontSize: 10,
+          formatter: p => p.data.value.toFixed(2) + '×',
+        },
+        markLine: {
+          silent: true,
+          symbol: 'none',
+          data: [{
+            xAxis: 1.0,
+            lineStyle: { color: 'rgba(139,148,158,0.65)', type: 'dashed', width: 1.5 },
+            label: {
+              show: true,
+              position: 'insideStartTop',
+              formatter: '1× = Fair\nMining',
+              color: THEME.muted,
+              fontSize: 9,
+              lineHeight: 14,
+            },
+          }],
+        },
+      },
+    ],
   }, true);
 }
 
@@ -1499,55 +2170,93 @@ export function renderBip110Efficiency(efficiencyData) {
     window.addEventListener('resize', () => bip110EfficiencyChart.resize());
   }
 
-  // Group by pool for coloring
-  const poolGroups = {};
+  // Aggregate 4,000+ per-block rows to pool-level averages
+  const agg = {};
   efficiencyData.forEach(d => {
-    if (!poolGroups[d.pool_name]) poolGroups[d.pool_name] = [];
-    poolGroups[d.pool_name].push([d.tx_count, d.bytes_total, d.block_height]);
+    if (!agg[d.pool_name]) agg[d.pool_name] = { tx: 0, bytes: 0, n: 0 };
+    agg[d.pool_name].tx    += d.tx_count;
+    agg[d.pool_name].bytes += d.bytes_total;
+    agg[d.pool_name].n     += 1;
   });
 
-  const series = Object.keys(poolGroups).map((name, i) => ({
-    name,
-    type: 'scatter',
-    symbolSize: 6,
-    data: poolGroups[name],
-    itemStyle: {
-      color: POOL_COLORS[i % POOL_COLORS.length],
-      opacity: 0.6
-    },
-    emphasis: { focus: 'self' }
-  }));
+  const poolList = Object.entries(agg)
+    .filter(([, v]) => v.n >= 10)  // enough data to be meaningful
+    .map(([name, v]) => ({
+      name,
+      avg_tx: Math.round(v.tx / v.n),
+      avg_mb: +(v.bytes / v.n / 1e6).toFixed(3),
+      bpt:    Math.round(v.bytes / v.tx),  // bytes per transaction
+      n:      v.n,
+    }))
+    .sort((a, b) => b.bpt - a.bpt);  // most bloated first
+
+  const bpts  = poolList.map(d => d.bpt);
+  const minBpt = Math.min(...bpts);
+  const maxBpt = Math.max(...bpts);
+  const bptColor = (bpt) => {
+    const t = (bpt - minBpt) / (maxBpt - minBpt);
+    if (t > 0.65) return '#ff4d4f';   // inscription-heavy
+    if (t > 0.35) return THEME.accent; // medium
+    return '#98C379';                  // compact / fee-dense
+  };
 
   bip110EfficiencyChart.setOption({
     backgroundColor: 'transparent',
     tooltip: {
       ...baseTooltip({ confine: true }),
       trigger: 'item',
-      formatter: (p) => `<b>${p.seriesName}</b><br/>TXs: ${p.data[0]}<br/>Size: ${(p.data[1] / 1024 / 1024).toFixed(2)} MB<br/>Height: ${p.data[2]}`
+      formatter: (p) => {
+        const [avg_tx, avg_mb, n, bpt, name] = p.data;
+        const c   = bptColor(bpt);
+        const tag = bpt > minBpt + (maxBpt - minBpt) * 0.65 ? '🔴 inscription-heavy'
+                  : bpt < minBpt + (maxBpt - minBpt) * 0.35 ? '✅ compact'
+                  : '🟡 medium';
+        return `<b style="color:${THEME.accent}">${name}</b><br/>` +
+          `Avg TXs/block: <b>${avg_tx.toLocaleString()}</b><br/>` +
+          `Avg block size: <b>${avg_mb.toFixed(2)} MB</b><br/>` +
+          `<span style="color:${c}">Bytes/TX: <b>${bpt}</b> ${tag}</span><br/>` +
+          `<span style="color:${THEME.muted};font-size:10px">Sample: ${n.toLocaleString()} blocks</span>`;
+      },
     },
-    legend: {
-      type: 'scroll',
-      top: 0,
-      textStyle: { color: THEME.muted, fontSize: 10 }
-    },
-    grid: { top: 40, left: 60, right: 30, bottom: 40 },
+    grid: { top: 20, left: 75, right: 20, bottom: 55 },
     xAxis: {
-      name: 'Transaction Count',
-      nameLocation: 'middle',
-      nameGap: 25,
       type: 'value',
-      axisLabel: { color: THEME.muted },
-      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+      name: 'Avg TXs per Block',
+      nameLocation: 'middle',
+      nameGap: 32,
+      axisLabel: { color: THEME.muted, fontSize: 11 },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLine: { lineStyle: { color: THEME.border } },
     },
     yAxis: {
-      name: 'Block Size (Bytes)',
-      nameLocation: 'middle',
-      nameGap: 45,
       type: 'value',
-      axisLabel: { color: THEME.muted, formatter: (v) => (v / 1024 / 1024).toFixed(1) + ' MB' },
-      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+      name: 'Avg Block Size (MB)',
+      nameLocation: 'middle',
+      nameGap: 50,
+      axisLabel: { color: THEME.muted, fontSize: 11, formatter: (v) => v.toFixed(1) + ' MB' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
     },
-    series
+    series: [{
+      type: 'scatter',
+      // bubble size = sqrt(n_blocks) — shows statistical weight
+      symbolSize: (val) => Math.max(10, Math.sqrt(val[2]) * 1.4),
+      // [avg_tx, avg_mb, n, bpt, name]
+      data: poolList.map(d => [d.avg_tx, d.avg_mb, d.n, d.bpt, d.name]),
+      itemStyle: {
+        color: (p) => bptColor(p.data[3]),
+        opacity: 0.9,
+        borderColor: THEME.bg,
+        borderWidth: 1.5,
+      },
+      label: {
+        show: true,
+        formatter: (p) => p.data[4],
+        position: 'top',
+        fontSize: 11,
+        color: THEME.muted,
+        distance: 4,
+      },
+    }],
   }, true);
 }
 
@@ -1562,49 +2271,80 @@ export function renderBip110Overhead(overheadData) {
   }
 
   const data = [...overheadData].sort((a, b) => a.avg_overhead - b.avg_overhead);
-  const labels = data.map(d => d.pool);
-  const values = data.map(d => d.avg_overhead);
+
+  // 3-tier color scale: massive outlier → bright red, above threshold → amber-red, compliant → green
+  const barColor = (v) => v > 2000 ? '#ff4d4f' : v > 256 ? '#E06C75' : '#98C379';
 
   bip110OverheadChart.setOption({
     backgroundColor: 'transparent',
-    tooltip: { ...baseTooltip(), trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { top: 20, left: 100, right: 40, bottom: 40 },
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params) => {
+        const pool  = params[0].name;
+        const avg   = params[0].value;
+        const found = overheadData.find(d => d.pool === pool);
+        const max   = found ? found.max_overhead : 0;
+        const maxFmt = max >= 1024 ? `${(max / 1024).toFixed(1)} kB/tx` : `${Math.round(max)} B/tx`;
+        const c = barColor(avg);
+        return `<b style="color:${THEME.accent}">${pool}</b><br/>` +
+          `Avg overhead: <b style="color:${c}">${Math.round(avg)} B/tx</b><br/>` +
+          `Peak spike: <b>${maxFmt}</b><br/>` +
+          `<span style="color:${THEME.muted};font-size:10px">BIP 110 proposed limit: 256 B/tx</span>`;
+      },
+    },
+    grid: { top: 15, left: 120, right: 105, bottom: 52 },
     xAxis: {
-      type: 'value',
-      name: 'Bytes per TX',
+      type: 'log',
+      logBase: 10,
+      name: 'Witness Bytes per TX  (log₁₀ scale)',
       nameLocation: 'middle',
-      nameGap: 25,
-      axisLabel: { color: THEME.muted },
-      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } }
+      nameGap: 30,
+      min: 100,
+      axisLabel: {
+        color: THEME.muted,
+        fontSize: 11,
+        formatter: (v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v,
+      },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
     },
     yAxis: {
       type: 'category',
-      data: labels,
-      axisLabel: { color: THEME.text, fontSize: 11 },
-      axisLine: { lineStyle: { color: THEME.border } }
+      data: data.map(d => d.pool),
+      axisLabel: { color: THEME.text, fontSize: 12 },
+      axisLine: { lineStyle: { color: THEME.border } },
     },
     series: [{
+      name: 'Avg Overhead',
       type: 'bar',
-      data: values.map((v, i) => ({
-        value: v,
-        itemStyle: { color: v > 200 ? '#ff4d4f' : '#6db874' }
+      barWidth: 14,
+      data: data.map(d => ({
+        value: d.avg_overhead,
+        itemStyle: { color: barColor(d.avg_overhead), borderRadius: [0, 3, 3, 0] },
       })),
-      label: { show: true, position: 'right', color: THEME.muted, fontSize: 10, formatter: '{c} B' },
+      label: {
+        show: true,
+        position: 'right',
+        color: THEME.muted,
+        fontSize: 11,
+        formatter: (p) => `${Math.round(p.value).toLocaleString()} B/tx ${p.value > 256 ? '↑' : '↓'}`,
+      },
       markLine: {
         silent: true,
         symbol: 'none',
-        label: { formatter: 'Proposed Limit (256B)', position: 'end', color: '#ff4d4f', fontSize: 10 },
-        lineStyle: { color: '#ff4d4f', type: 'dashed', opacity: 0.6 },
-        data: [{ xAxis: 256 }]
-      }
-    }]
+        label: { formatter: 'BIP 110 limit (256B)', position: 'insideStartBottom', color: '#ff4d4f', fontSize: 9 },
+        lineStyle: { color: '#ff4d4f', type: 'dashed', opacity: 0.55 },
+        data: [{ xAxis: 256 }],
+      },
+    }],
   }, true);
 }
 
 export function resizeAllCharts() {
   const charts = [
     donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart,
-    zscoreChart, entropyChart, syncChart, emptyChart,
+    zscoreChart, entropyChart, syncChart, consecutiveAdvantageChart, emptyChart, emptyTrendChart,
     bip110SignalingChart, bip110EfficiencyChart, bip110OverheadChart
   ];
   charts.forEach(c => c && c.resize());

@@ -175,16 +175,17 @@ def main():
     # Let's just do it for the most recent 10 checkpoints (every 144 blocks)
     for i in range(0, 144 * 10, 144):
         tip_idx = len(df) - 1 - i
-        if tip_idx < window_baseline: break
+        # Need room for both the observed window AND the non-overlapping baseline before it
+        if tip_idx < window_baseline + window_observed: break
         
         obs_start = tip_idx - window_observed + 1
-        base_start = tip_idx - window_baseline + 1
+        base_start = obs_start - window_baseline  # baseline ends where observed begins
         
         obs_df = df.iloc[obs_start:tip_idx+1]
-        base_df = df.iloc[base_start:tip_idx+1]
+        base_df = df.iloc[base_start:obs_start]  # non-overlapping with observed window
         
         base_counts = base_df['pool_name'].value_counts()
-        base_shares = base_counts / window_baseline
+        base_shares = base_counts / len(base_df)  # use actual length, not hardcoded constant
         
         obs_counts = obs_df['pool_name'].value_counts()
         
@@ -217,10 +218,17 @@ def main():
     # We use resample on timestamp
     entropy_data = []
     
-    # Filter for pools with > 1% hashrate OVERALL to keep heatmap clean
+    # Filter for pools with > 1% hashrate OVERALL to keep heatmap/charts clean
     top_pools = df['pool_name'].value_counts(normalize=True)
     top_pools = top_pools[top_pools > 0.01].index.tolist()
     if "Unknown" in top_pools: top_pools.remove("Unknown")
+
+    # For lookup-table metrics (kpi5 empty blocks & kpi6 density) we include every
+    # identified pool — no hashrate threshold. The table already controls which pools
+    # are visible based on the active time range, and the loop's own `< 50 blocks`
+    # guard filters out truly tiny/noisy pools. "Unknown" is excluded as it doesn't
+    # map to a real entity.
+    extended_pools = [p for p in df['pool_name'].unique().tolist() if p != "Unknown"]
     
     weekly_stats = df[df['pool_name'].isin(top_pools)].copy()
     weekly_stats.set_index('timestamp', inplace=True)
@@ -253,13 +261,11 @@ def main():
     sync_stats = []
     for pool in top_pools:
         p_df_full = df[df['pool_name'] == pool]
-        p_deltas = sync_df[sync_df['pool_name'] == pool]['time_delta']
-        if len(p_deltas) < 50: continue
-        
-        # We want the distribution, so we'll bucket them
-        # 0-30s, 30-60s, 60-120s, 120-300s, 300s+
-        p_sync_pool = sync_df[sync_df['pool_name'] == pool]
+        # Exclude negative time_delta values: Bitcoin timestamps allow slight backward drift
+        # which produces spurious sub-30s hits unrelated to spy-mining behaviour
+        p_sync_pool = sync_df[(sync_df['pool_name'] == pool) & (sync_df['time_delta'] >= 0)]
         p_deltas = p_sync_pool['time_delta']
+        if len(p_deltas) < 50: continue
         
         buckets = {
             "sub_30s": int((p_deltas < 30).sum()),
@@ -296,7 +302,7 @@ def main():
     df_30d = df[df['timestamp'] >= thirty_days_ago]
     
     empty_stats = []
-    for pool in top_pools:
+    for pool in extended_pools:
         # All-time
         p_df = df[df['pool_name'] == pool]
         if len(p_df) < 50: continue
@@ -342,7 +348,7 @@ def main():
     df['density'] = df['bytes_total'] / df['block_weight']
     
     density_stats = []
-    for pool in top_pools:
+    for pool in extended_pools:
         p_df = df[df['pool_name'] == pool]
         if len(p_df) < 100: continue
         
