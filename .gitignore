@@ -16,3 +16,6 @@ __pycache__/
 
 # Product reference
 forref/
+
+# Social-media sharing data and charts (temp)
+social/

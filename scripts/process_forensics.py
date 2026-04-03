@@ -72,6 +72,19 @@ def main():
     total_blocks = len(df)
     pool_shares = (pool_counts / total_blocks).to_dict()
 
+    # Build monthly share lookup for block-weighted per-event analysis
+    print("  Building monthly share lookup (block-weighted baselines)...")
+    df['month'] = df['timestamp'].dt.to_period('M')
+    df['quarter'] = df['timestamp'].dt.to_period('Q')
+    _monthly_counts = df.groupby(['month', 'pool_name']).size().reset_index(name='_pool_blocks')
+    _monthly_totals = df.groupby('month').size().reset_index(name='_total_blocks_month')
+    _monthly_merged = _monthly_counts.merge(_monthly_totals, on='month')
+    _monthly_merged['_share'] = _monthly_merged['_pool_blocks'] / _monthly_merged['_total_blocks_month']
+    monthly_share_lookup = {
+        (row['month'], row['pool_name']): row['_share']
+        for _, row in _monthly_merged.iterrows()
+    }
+
     strikes = df.groupby('strike_id').agg({
         'pool_name': 'first',
         'block_height': ['min', 'max', 'count'],
@@ -101,20 +114,20 @@ def main():
         counts_dist = {str(k): int(v) for k, v in p_strikes['count'].value_counts().sort_index(ascending=False).to_dict().items()}
         max_n = int(p_strikes['count'].max())
         
-        # Streak events for this pool, converted for JSON
-        # Sort by count (longest first) then time (recent first) to ensure top ones are visible
-        events = p_strikes.sort_values(['count', 'start_time'], ascending=[False, False]).to_dict(orient='records')
-        for ev in events:
-            ev['pool'] = str(ev['pool'])
-            ev['start_time'] = ev['start_time'].isoformat()
-            ev['end_time'] = ev['end_time'].isoformat()
-            ev['start_height'] = int(ev['start_height'])
-            ev['end_height'] = int(ev['end_height'])
-            ev['count'] = int(ev['count'])
-            ev['duration_sec'] = float(ev['duration_sec']) if not pd.isna(ev['duration_sec']) else 0
-        p_val = float(pool_shares.get(pool, 0))
-        expected_7plus = total_blocks * (p_val**7) * (1-p_val)
-        actual_7plus = len(p_strikes) # Already filtered for >= 7
+        # Era block-weighted share: pool's share from its first streak month onward
+        _era_start_month = p_strikes['start_time'].min().to_period('M')
+        _era_months = _monthly_merged[
+            (_monthly_merged['pool_name'] == pool) &
+            (_monthly_merged['month'] >= _era_start_month)
+        ]
+        if len(_era_months) > 0:
+            era_bw_share = _era_months['_pool_blocks'].sum() / _era_months['_total_blocks_month'].sum()
+            era_total_blocks = int(_era_months['_total_blocks_month'].sum())
+        else:
+            era_bw_share = pool_shares.get(pool, 0)
+            era_total_blocks = total_blocks
+        expected_7plus = era_total_blocks * (era_bw_share**7) * (1 - era_bw_share)
+        actual_7plus = len(p_strikes)
         propensity_base = round(actual_7plus / expected_7plus, 2) if expected_7plus > 0 else 1.0
 
         # Streak events for this pool, converted for JSON
@@ -127,17 +140,18 @@ def main():
             ev['end_height'] = int(ev['end_height'])
             ev['count'] = int(ev['count'])
             ev['duration_sec'] = float(ev['duration_sec']) if not pd.isna(ev['duration_sec']) else 0
-            
-            p = float(pool_shares.get(pool, 0))
+
+            # Use monthly share at time of event for correct per-event expected values
+            _ev_month = pd.Timestamp(ev['start_time']).to_period('M')
+            p = monthly_share_lookup.get((_ev_month, pool), pool_shares.get(pool, 0))
             n = int(ev['count'])
             ev['pool_share'] = round(p * 100, 2)
             if p > 0 and p < 1:
-                prob_start = (p**n) * (1-p)
-                expected_blocks = 1 / prob_start if prob_start > 0 else 10**10 
-                years = round(expected_blocks / (144 * 365.25), 2)
+                prob_start = (p**n) * (1 - p)
+                years = round(1 / (prob_start * 144 * 365.25), 2)
                 ev['expected_1_in_years'] = min(years, 999.0)
-                # Specific propensity for THIS length
-                expected_this_n = total_blocks * prob_start
+                # Propensity: era block-weighted baseline for this streak length
+                expected_this_n = era_total_blocks * (era_bw_share**n) * (1 - era_bw_share)
                 actual_this_n = strikes[(strikes['pool'] == pool) & (strikes['count'] >= n)].shape[0]
                 ev['propensity_score'] = round(actual_this_n / expected_this_n, 2) if expected_this_n > 0 else 1.0
             else:
@@ -148,8 +162,8 @@ def main():
             "pool": str(pool),
             "total_events": int(len(p_strikes)),
             "max_streak": max_n,
-            "pool_share": round(float(pool_shares.get(pool, 0)) * 100, 2),
-            "propensity": propensity_base, # Stable base for 7+ streaks
+            "pool_share": round(era_bw_share * 100, 2),  # era block-weighted share
+            "propensity": propensity_base,
             "distribution": counts_dist,
             "events": events
         })
@@ -284,6 +298,72 @@ def main():
             "slow": int(((p_deltas >= 300) & p_sync_pool['is_empty']).sum())
         }
         
+        # Block-weighted expected consecutive pairs = sum_m(pool_blocks_m * monthly_share_m)
+        _pool_monthly = _monthly_merged[_monthly_merged['pool_name'] == pool].copy()
+        _expected_consec = float((_pool_monthly['_pool_blocks'] * _pool_monthly['_share']).sum())
+
+        # Per-month lift data for temporal analysis
+        _monthly_lift_rows = []
+        for _, _mrow in _pool_monthly.iterrows():
+            _m_pool_blk = int(_mrow['_pool_blocks'])
+            if _m_pool_blk < 10:
+                continue
+            _m_share = float(_mrow['_share'])
+            _m_consec = int(sync_df[
+                (sync_df['pool_name'] == pool) &
+                (sync_df['month'] == _mrow['month']) &
+                (sync_df['time_delta'] >= 0)
+            ].shape[0])
+            _m_expected = _m_pool_blk * _m_share
+            _m_lift = round(_m_consec / _m_expected, 3) if _m_expected > 0 else None
+            _monthly_lift_rows.append({
+                "month": str(_mrow['month']),
+                "pool_blocks": _m_pool_blk,
+                "monthly_share": round(_m_share * 100, 2),
+                "consec_pairs": _m_consec,
+                "expected_consec": round(_m_expected, 2),
+                "lift": _m_lift
+            })
+
+        # Task 1: consec_timing — median inter-block time for consecutive same-pool pairs
+        total_pairs = len(p_deltas)
+        _median_delta = float(p_deltas.median())
+        _pct_sub30 = round(float((p_deltas < 30).sum() / total_pairs * 100), 2) if total_pairs > 0 else 0.0
+        _pct_sub60 = round(float((p_deltas < 60).sum() / total_pairs * 100), 2) if total_pairs > 0 else 0.0
+        consec_timing = {
+            "median_delta_sec": round(_median_delta, 2),
+            "pct_sub30s": _pct_sub30,
+            "pct_sub60s": _pct_sub60,
+            # expected median from Exp(1/600) is 600*ln(2) ≈ 416 s; flag if meaningfully fast
+            "fast_flag": bool(_median_delta < 380)
+        }
+
+        # Task 3: quarterly_lift — split history into non-overlapping 3-month windows
+        _quarterly_lift_rows = []
+        _pool_quarters = df[df['pool_name'] == pool]
+        for _q in sorted(_pool_quarters['quarter'].unique()):
+            _q_all = df[df['quarter'] == _q]
+            _q_total = len(_q_all)
+            _q_pool_blocks = int((_pool_quarters['quarter'] == _q).sum())
+            if _q_pool_blocks < 10:
+                continue
+            _w_share = _q_pool_blocks / _q_total if _q_total > 0 else 0.0
+            _q_consec = int(sync_df[
+                (sync_df['pool_name'] == pool) &
+                (sync_df['quarter'] == _q) &
+                (sync_df['time_delta'] >= 0)
+            ].shape[0])
+            _q_expected = _q_pool_blocks * _w_share
+            _q_lift = round(_q_consec / _q_expected, 3) if _q_expected > 0 else None
+            _quarterly_lift_rows.append({
+                "quarter": str(_q),
+                "pool_blocks": _q_pool_blocks,
+                "pool_consecutive": _q_consec,
+                "window_share": round(_w_share, 4),
+                "expected_consec": round(_q_expected, 2),
+                "lift": _q_lift
+            })
+
         sync_stats.append({
             "pool": pool,
             "avg_strike_delta": round(p_deltas.mean(), 2),
@@ -291,8 +371,128 @@ def main():
             "buckets": buckets,
             "buckets_empty": buckets_empty,
             "total_consecutive": len(p_deltas),
-            "total_blocks": len(p_df_full)
+            "total_blocks": len(p_df_full),
+            "expected_consecutive": round(_expected_consec, 2),
+            "monthly_lift": _monthly_lift_rows,
+            "consec_timing": consec_timing,
+            "quarterly_lift": _quarterly_lift_rows
         })
+
+    # KPI 8: Cross-pool Transition Matrix
+    print("KPI 8: Cross-pool Transition Matrix...")
+    # Only pools with >= 5000 blocks to keep matrix readable (~8-10 pools)
+    _pool_block_counts = df['pool_name'].value_counts()
+    _matrix_pools = [
+        p for p in _pool_block_counts[_pool_block_counts >= 5000].index
+        if p != 'Unknown'
+    ]
+    # Sort descending by block count
+    _matrix_pools = sorted(_matrix_pools, key=lambda p: _pool_block_counts[p], reverse=True)
+
+    # Build consecutive pairs: each row i pairs pool at row i with pool at row i+1
+    _df_sorted = df.sort_values('height').copy()
+    _df_sorted['_next_pool'] = _df_sorted['pool_name'].shift(-1)
+    # Filter both sides to matrix pools
+    _pairs_df = _df_sorted[
+        _df_sorted['pool_name'].isin(_matrix_pools) &
+        _df_sorted['_next_pool'].isin(_matrix_pools)
+    ].copy()
+
+    # Block-weighted expected transitions — mirrors the kpi4_sync methodology:
+    # For each block N mined by pool_A in month M, the expected probability that
+    # pool_B mines block N+1 = pool_B's actual share in month M (not an all-time flat).
+    # This correctly handles pools whose hashrate grew or shrank over the period.
+    #
+    # gateway_month_counts[pool_A][month] = # of blocks where pool_A was block N
+    # and the next block (N+1) was mined by any matrix pool.
+    _gateway_month_counts = (
+        _pairs_df.groupby(['pool_name', 'month'])
+        .size()
+        .reset_index(name='gateway_count')
+    )
+
+    # Pre-compute block-weighted expected transitions for every (A, B) pair.
+    # expected_AB = sum_m( gateway_count_A_m * monthly_share_B_m )
+    _expected_matrix = {}
+    for _pa in _matrix_pools:
+        _expected_matrix[_pa] = {}
+        _pa_gateways = _gateway_month_counts[_gateway_month_counts['pool_name'] == _pa]
+        for _pb in _matrix_pools:
+            _exp = 0.0
+            for _, _grow in _pa_gateways.iterrows():
+                _b_share = monthly_share_lookup.get((_grow['month'], _pb), 0.0)
+                _exp += _grow['gateway_count'] * _b_share
+            _expected_matrix[_pa][_pb] = _exp
+
+    # Count transitions using groupby
+    _trans_counts = (
+        _pairs_df.groupby(['pool_name', '_next_pool'])
+        .size()
+        .reset_index(name='n')
+    )
+    # Pivot to get easy lookup
+    _trans_pivot = _trans_counts.pivot(index='pool_name', columns='_next_pool', values='n').fillna(0)
+    # Row totals (number of times pool_A was block N and pool_B was ANY matrix pool)
+    _row_totals = _pairs_df.groupby('pool_name').size()
+
+    _matrix_data = []
+    _anomalies = []
+    _notable_low_n = []  # High lift pairs that just miss the n>200 threshold
+    for _pa in _matrix_pools:
+        _row_total = int(_row_totals.get(_pa, 0))
+        for _pb in _matrix_pools:
+            _n = int(_trans_pivot.loc[_pa, _pb]) if (_pa in _trans_pivot.index and _pb in _trans_pivot.columns) else 0
+            _obs_rate = _n / _row_total if _row_total > 0 else 0.0
+            _exp_bw = _expected_matrix[_pa].get(_pb, 0.0)  # block-weighted expected count
+            _exp_rate = _exp_bw / _row_total if _row_total > 0 else 0.0
+            _lift = round(_n / _exp_bw, 3) if _exp_bw > 0 else None
+            _matrix_data.append({"from": _pa, "to": _pb, "n": _n, "lift": _lift})
+            if _lift is not None and _lift > 1.15 and _n > 200:
+                _anomalies.append({
+                    "from": _pa,
+                    "to": _pb,
+                    "n": _n,
+                    "observed_rate": round(_obs_rate, 4),
+                    "expected_rate": round(_exp_rate, 4),
+                    "lift": _lift
+                })
+            elif _lift is not None and _lift > 1.3 and 30 <= _n <= 200:
+                # Notable pair: high signal but small sample — surface separately
+                _notable_low_n.append({
+                    "from": _pa,
+                    "to": _pb,
+                    "n": _n,
+                    "observed_rate": round(_obs_rate, 4),
+                    "expected_rate": round(_exp_rate, 4),
+                    "lift": _lift
+                })
+
+    _anomalies = sorted(_anomalies, key=lambda x: x['lift'], reverse=True)
+    _notable_low_n = sorted(_notable_low_n, key=lambda x: x['lift'], reverse=True)
+
+    # Build pool_countries lookup from pools_info.json
+    with open(DASHBOARD_DATA / "lookup" / "pools_info.json") as _f:
+        _pools_info_raw = json.load(_f)
+    _name_to_country = {p['name'].lower(): p.get('country', 'Unknown') for p in _pools_info_raw}
+    # Slug-to-display-name map for the matrix pools
+    _slug_display = {
+        'foundryusa': 'Foundry USA', 'antpool': 'AntPool', 'f2pool': 'F2Pool',
+        'viabtc': 'ViaBTC', 'binancepool': 'Binance Pool', 'poolin': 'Poolin',
+        'btccom': 'BTC.com', 'marapool': 'MARA Pool', 'braiinspool': 'Braiins Pool',
+        'luxor': 'Luxor', 'spiderpool': 'SpiderPool'
+    }
+    _pool_countries = {}
+    for _slug in _matrix_pools:
+        _display = _slug_display.get(_slug, _slug)
+        _pool_countries[_slug] = _name_to_country.get(_display.lower(), 'Unknown')
+
+    kpi8_data = {
+        "pools": _matrix_pools,
+        "pool_countries": _pool_countries,
+        "matrix": _matrix_data,
+        "anomalies": _anomalies[:20],
+        "notable_low_n": _notable_low_n[:10]
+    }
 
     # KPI 5: Empty Block Auditor (Multi-Horizon)
     print("KPI 5: Empty Block Auditor Analysis...")
@@ -456,6 +656,7 @@ def main():
             "efficiency_scatter": efficiency_sample,
             "overhead_bar": overhead_stats
         },
+        "kpi8_transitions": kpi8_data,
         "last_updated": pd.Timestamp.now().isoformat()
     }
     

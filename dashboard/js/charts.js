@@ -965,7 +965,7 @@ export function renderStreaksLeaderboard(poolSummaries) {
       <td style="font-weight: 700; color: var(--text-primary)">
         <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; margin-right: 8px; transition: transform 0.2s;"></i>
         ${p.pool}
-        <span style="font-weight: normal; font-size: 0.75rem; color: var(--text-secondary); margin-left: 6px;">(${p.pool_share}% Share)</span>
+        <span style="font-weight: normal; font-size: 0.75rem; color: var(--text-secondary); margin-left: 6px;" title="Block-weighted average share from this pool's first qualifying streak month through present">(${p.pool_share}% era avg)</span>
       </td>
       <td style="text-align: center;">
          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
@@ -1002,7 +1002,7 @@ export function renderStreaksLeaderboard(poolSummaries) {
           return `
                    <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: var(--text-secondary); line-height:1.5;">
                      <strong style="color: var(--accent); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; display: block; margin-bottom: 5px;">Network Reconnaissance Brief</strong>
-                     <strong>STREAK FREQUENCY ANOMALY:</strong> Foundry USA's 7+ block streaks occur <strong>${p.propensity}× more often</strong> than a memoryless Poisson process at their hash share would predict — this is a streak <em>frequency</em> metric, not a second-block conversion rate. Notably, their Second Block Uplift (KPI4b) sits near baseline (~1.1×), which argues against header-first / spy-mining as the cause. The more likely explanation is <strong>hashrate variance and geographic clustering</strong> of US-based miners consolidating under one pool — producing run-length anomalies without the mempool-skipping fingerprint.
+                     <strong>STREAK COUNT ABOVE EXPECTATION:</strong> Foundry USA's 7+ block streak count is <strong>${p.propensity}× the block-weighted Poisson expectation</strong> at their hash share (${p.pool_share}%, 2022 – present) — but the sample of qualifying events is small, and the excess falls within plausible random variance for a rapidly-growing pool. This is a streak <em>frequency</em> metric, not a second-block conversion rate. Notably, their Second Block Uplift (KPI4b) sits near baseline (~1.0×), which argues against header-first / spy-mining as the cause. The more likely explanation is <strong>hashrate variance and geographic clustering</strong> of US-based miners consolidating under one pool — producing run-length variance without the mempool-skipping fingerprint.
                    </div>
                  `;
         }
@@ -1474,7 +1474,7 @@ export function renderEmptyBlockChart(emptyData) {
                     : '→ Stable';
         const trendColor = trend.startsWith('↑') ? '#ff4d4f' : trend.startsWith('↓') ? '#98C379' : THEME.muted;
         return `<b style="color:${THEME.accent}">${poolName}</b><br/>` +
-          `All-time: <b>${ratioAll}%</b> (${emptyAll} / ${totalAll.toLocaleString()})<br/>` +
+          `Since 2022: <b>${ratioAll}%</b> (${emptyAll} / ${totalAll.toLocaleString()})<br/>` +
           `Last 30d: <b>${ratio30d}%</b> (${empty30d} / ${total30d.toLocaleString()})<br/>` +
           `Trend: <b style="color:${trendColor}">${trend}</b><br/>` +
           `<span style="color:${THEME.muted};font-size:11px;">Network avg: ${networkAvg.toFixed(2)}%</span>`;
@@ -1496,7 +1496,7 @@ export function renderEmptyBlockChart(emptyData) {
     grid: { top: 35, left: 80, right: 35, bottom: 70 },
     xAxis: {
       type: 'value',
-      name: 'All-Time Empty %',
+      name: 'Since 2022 Empty %',
       nameLocation: 'middle',
       nameGap: 32,
       min: 0,
@@ -1668,9 +1668,9 @@ export function renderSyncHistogram(syncData) {
     }).filter(Boolean).join('');
 
     calloutEl.innerHTML = badges
-      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;margin-bottom:10px;background:rgba(255,77,79,0.05);border:1px solid rgba(255,77,79,0.2);border-radius:6px;">
-           <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#ff4d4f;flex-shrink:0;margin-right:4px;">
-             <i class="fa-solid fa-triangle-exclamation"></i> Empty Blocks Within 30s — Skipping Validation
+      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;margin-bottom:10px;background:rgba(226,163,74,0.05);border:1px solid rgba(226,163,74,0.2);border-radius:6px;">
+           <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#E2A34A;flex-shrink:0;margin-right:4px;">
+             <i class="fa-solid fa-circle-info"></i> Of sub-30s consecutive blocks — fraction that were also empty
            </span>
            ${badges}
          </div>`
@@ -1680,7 +1680,7 @@ export function renderSyncHistogram(syncData) {
   // ── Series: split sub_30s into spy (empty) + normal ──────────────────────────
   // Series 0: Empty blocks within <30s → header-first mining signal (pool skipped validation before starting next block)
   const spySeries = {
-    name: '< 30s Empty (Skipping Validation)',
+    name: '< 30s Empty (fast + empty)',
     type: 'bar',
     stack: 'total',
     itemStyle: { color: '#7B1515' },  // deep crimson — distinct from normal <30s
@@ -1755,7 +1755,7 @@ export function renderSyncHistogram(syncData) {
       formatter: (params) => {
         const d = params[0].data;
         const consecRatio = d.totalBlocks > 0 ? (d.totalConsec / d.totalBlocks * 100).toFixed(1) : 0;
-        const spyItem = params.find(p => p.seriesName === '< 30s Empty (Skipping Validation)');
+        const spyItem = params.find(p => p.seriesName === '< 30s Empty (fast + empty)');
         const spyScore = spyItem?.data?.spy_pct ?? 0;
 
         let h = `<div style="margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:5px;">
@@ -1806,7 +1806,7 @@ export function renderSyncHistogram(syncData) {
 
 // ── KPI 4b: Second Block Uplift ───────────────────────────────────────────────
 // Measures how much more likely a pool is to mine block N+1 given it mined
-// block N, vs. what its raw hash share would predict (lift = actual / expected).
+// block N, vs. what its block-weighted hash share would predict (lift = actual / expected).
 export let consecutiveAdvantageChart = null;
 export function renderConsecutiveAdvantage(syncData) {
   const el = document.getElementById('chart-consecutive-advantage');
@@ -1822,8 +1822,12 @@ export function renderConsecutiveAdvantage(syncData) {
   const poolData = syncData.map(p => {
     const hashShare = p.total_blocks / totalAllBlocks * 100;
     const consecRate = p.total_consecutive / Math.max(p.total_blocks - 1, 1) * 100;
-    const lift = consecRate / hashShare;
-    return { pool: p.pool, hashShare, consecRate, lift, totalBlocks: p.total_blocks, totalConsec: p.total_consecutive };
+    // Use block-weighted expected_consecutive when available — correct for pools with
+    // variable hashrate (growing or declining). Falls back to all-time-average method.
+    const expectedConsec = p.expected_consecutive || (p.total_blocks * hashShare / 100);
+    const lift = p.total_consecutive / expectedConsec;
+    const expectedPct = expectedConsec / Math.max(p.total_blocks - 1, 1) * 100;
+    return { pool: p.pool, hashShare, consecRate, lift, expectedPct, totalBlocks: p.total_blocks, totalConsec: p.total_consecutive, expectedConsec, consecTiming: p.consec_timing || null };
   }).sort((a, b) => a.lift - b.lift); // ascending → highest lift at top of horiz chart
 
   // Callout strip: network-wide insight
@@ -1834,9 +1838,9 @@ export function renderConsecutiveAdvantage(syncData) {
     const topColor = topPool.lift > 2 ? '#ff4d4f' : '#E2A34A';
     calloutEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;margin-bottom:10px;background:rgba(226,163,74,0.05);border:1px solid rgba(226,163,74,0.2);border-radius:6px;font-size:0.78rem;color:var(--text-secondary);line-height:1.5;">
       <i class="fa-solid fa-signal" style="color:var(--accent);flex-shrink:0;"></i>
-      <span><b style="color:var(--text-primary)">${aboveParity} of ${poolData.length}</b> pools mine block N+1 at a rate that exceeds their hash share — evidence of a systematic head-start on the next block.&nbsp;
-      Biggest uplift: <b style="color:${topColor}">${topPool.pool}</b> at <b style="color:${topColor}">${topPool.lift.toFixed(1)}×</b> its expected rate
-      <span style="color:var(--text-secondary);font-size:0.7rem;">(${topPool.consecRate.toFixed(1)}% actual vs ${topPool.hashShare.toFixed(1)}% expected)</span>.
+      <span><b style="color:var(--text-primary)">${aboveParity} of ${poolData.length}</b> pools mine block N+1 at a rate above their block-weighted expected rate. After correcting for variable hashrate, all lifts are near 1×.&nbsp;
+      Highest lift: <b style="color:${topColor}">${topPool.pool}</b> at <b style="color:${topColor}">${topPool.lift.toFixed(2)}×</b> its block-weighted expected rate
+      <span style="color:var(--text-secondary);font-size:0.7rem;">(${topPool.consecRate.toFixed(2)}% actual vs ${topPool.expectedPct.toFixed(2)}% block-weighted expected)</span>.
       </span>
     </div>`;
   }
@@ -1862,14 +1866,27 @@ export function renderConsecutiveAdvantage(syncData) {
         const d = poolData.find(x => x.pool === poolName);
         if (!d) return '';
         const liftColor = d.lift > 2 ? '#ff4d4f' : d.lift > 1.0 ? '#E2A34A' : '#56B6C2';
-        const adv = d.consecRate - d.hashShare;
+        const expectedPct = (d.expectedConsec / Math.max(d.totalBlocks - 1, 1) * 100);
+        const adv = d.consecRate - expectedPct;
+        const EXPECTED_MEDIAN_S = 416; // 600 × ln(2), exponential distribution
+        let timingLine = '';
+        if (d.consecTiming) {
+          const ct = d.consecTiming;
+          const flagColor = ct.fast_flag ? '#ff4d4f' : THEME.muted;
+          const delta = ct.median_delta_sec - EXPECTED_MEDIAN_S;
+          const sign = delta > 0 ? '+' : '';
+          timingLine =
+            `<br/><span style="color:${flagColor};font-size:11px;">Consec median: <b>${ct.median_delta_sec}s</b> vs expected ~${EXPECTED_MEDIAN_S}s (${sign}${delta.toFixed(0)}s)${ct.fast_flag ? ' ⚑ fast' : ''}</span>` +
+            `<br/><span style="color:${THEME.muted};font-size:11px;">Sub-30s: ${ct.pct_sub30s}% · Sub-60s: ${ct.pct_sub60s}%</span>`;
+        }
         return `<b style="color:${THEME.accent}">${d.pool}</b><br/>` +
-          `Expected (hash share): <b>${d.hashShare.toFixed(2)}%</b><br/>` +
+          `Expected consecutive (block-weighted): <b>${expectedPct.toFixed(2)}%</b><br/>` +
           `Actual consecutive rate: <b>${d.consecRate.toFixed(2)}%</b><br/>` +
           `<span style="color:${liftColor}">Second Block Lift: <b>${d.lift.toFixed(2)}×</b></span>` +
           (adv > 0
-            ? `<br/><span style="color:${liftColor};font-size:11px;">+${adv.toFixed(2)} pp above hash share</span>`
-            : `<br/><span style="color:${THEME.muted};font-size:11px;">${adv.toFixed(2)} pp vs hash share</span>`) +
+            ? `<br/><span style="color:${liftColor};font-size:11px;">+${adv.toFixed(2)} pp above expected</span>`
+            : `<br/><span style="color:${THEME.muted};font-size:11px;">${adv.toFixed(2)} pp vs expected</span>`) +
+          timingLine +
           `<br/><span style="color:${THEME.muted};font-size:11px;">${d.totalConsec.toLocaleString()} pairs · ${d.totalBlocks.toLocaleString()} blocks</span>`;
       },
     },
@@ -2341,11 +2358,260 @@ export function renderBip110Overhead(overheadData) {
   }, true);
 }
 
+// ── Quarterly Lift Sparklines (below Second Block Uplift chart) ─────────────
+let quarterlyLiftChart = null;
+export function renderQuarterlyLift(syncData) {
+  const el = document.getElementById('chart-quarterly-lift');
+  if (!el || !syncData || syncData.length === 0) return;
+  if (!quarterlyLiftChart) {
+    quarterlyLiftChart = ec().init(el, null, { renderer: 'canvas' });
+    window.addEventListener('resize', () => quarterlyLiftChart.resize());
+  }
+
+  // Pick top 5 pools by lift for sparkline clarity
+  const totalAllBlocks = syncData.reduce((s, p) => s + p.total_blocks, 0);
+  const ranked = syncData.map(p => {
+    const exp = p.expected_consecutive || (p.total_blocks / totalAllBlocks * p.total_blocks);
+    return { pool: p.pool, lift: p.total_consecutive / exp, quarterly_lift: p.quarterly_lift || [] };
+  }).sort((a, b) => b.lift - a.lift).slice(0, 5);
+
+  // Choose the source: quarterly_lift if it has ≥ 4 windows, otherwise use monthly_lift
+  // Build a unified quarter/month label set
+  const poolsToPlot = ranked.map(p => {
+    const ql = p.quarterly_lift;
+    const src = (ql && ql.length >= 4) ? ql.map(q => ({ label: q.quarter, lift: q.lift })) :
+      (syncData.find(s => s.pool === p.pool)?.monthly_lift || []).map(m => ({ label: m.month, lift: m.lift }));
+    return { pool: p.pool, series: src.filter(s => s.lift !== null) };
+  });
+
+  // Collect all labels across all pools for the x-axis
+  const labelSet = new Set();
+  poolsToPlot.forEach(p => p.series.forEach(s => labelSet.add(s.label)));
+  const labels = Array.from(labelSet).sort();
+
+  const series = poolsToPlot.map((p, i) => ({
+    name: p.pool,
+    type: 'bar',
+    barMaxWidth: 12,
+    data: labels.map(l => {
+      const entry = p.series.find(s => s.label === l);
+      return entry ? +entry.lift.toFixed(3) : null;
+    }),
+    itemStyle: { color: POOL_COLORS[i % POOL_COLORS.length] },
+    emphasis: { focus: 'series' },
+  }));
+
+  quarterlyLiftChart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      ...baseTooltip({ confine: true }),
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params) => {
+        const label = params[0].axisValue;
+        let str = `<b style="color:${THEME.accent}">${label}</b>`;
+        params.forEach(p => {
+          if (p.value === null || p.value === undefined) return;
+          const c = p.value > 1.5 ? '#ff4d4f' : p.value > 1.0 ? '#E2A34A' : '#56B6C2';
+          str += `<br/>${p.marker}${p.seriesName}: <b style="color:${c}">${p.value.toFixed(2)}×</b>`;
+        });
+        return str;
+      },
+    },
+    legend: { top: 0, textStyle: { color: THEME.muted, fontSize: 10 }, itemWidth: 10, itemHeight: 10 },
+    grid: { top: 30, left: 40, right: 20, bottom: 45 },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: { color: THEME.muted, fontSize: 9, rotate: 35, interval: Math.max(0, Math.floor(labels.length / 10) - 1) },
+      axisLine: { lineStyle: { color: THEME.border } },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Lift',
+      nameTextStyle: { color: THEME.muted, fontSize: 10 },
+      axisLabel: { color: THEME.muted, fontSize: 10, formatter: v => v.toFixed(1) + '×' },
+      splitLine: { lineStyle: { color: THEME.border, type: 'dashed' } },
+      axisLine: { lineStyle: { color: THEME.border } },
+    },
+    series,
+    markLine: {
+      silent: true,
+      symbol: 'none',
+      data: [{ yAxis: 1.0, lineStyle: { color: 'rgba(139,148,158,0.5)', type: 'dashed' } }],
+    },
+  }, true);
+}
+
+// ── KPI 8: Cross-pool Transition Matrix Heatmap ──────────────────────────────
+export function renderTransitionMatrix(transitionData) {
+  const el = document.getElementById('chart-transition-matrix');
+  if (!el || !transitionData) return;
+
+  const pools = transitionData.pools || [];
+  const matrix = transitionData.matrix || [];
+  const anomalies = transitionData.anomalies || [];
+  const notableLowN = transitionData.notable_low_n || [];
+  const poolCountries = transitionData.pool_countries || {};
+  if (pools.length === 0) return;
+
+  // Country → flag emoji + region color
+  const COUNTRY_FLAG = {
+    'China': '🇨🇳', 'United States': '🇺🇸', 'Czech Republic': '🇨🇿',
+    'Seychelles': '🇸🇨', 'Global': '🌐', 'Unknown': '?'
+  };
+  const COUNTRY_COLOR = {
+    'China': 'rgba(255,100,80,0.18)',
+    'United States': 'rgba(86,182,194,0.15)',
+    'Czech Republic': 'rgba(152,195,121,0.15)',
+    'Seychelles': 'rgba(197,120,221,0.15)',
+    'Global': 'rgba(226,163,74,0.10)',
+  };
+  function countryBadge(slug) {
+    const c = poolCountries[slug] || 'Unknown';
+    const flag = COUNTRY_FLAG[c] || '?';
+    const bg = COUNTRY_COLOR[c] || 'rgba(139,148,158,0.1)';
+    return `<span style="font-size:0.7rem;background:${bg};border-radius:3px;padding:1px 4px;margin-left:3px;" title="${c}">${flag}</span>`;
+  }
+  // Are two pools in the same country (and not "Global"/"Unknown")
+  function sameCountry(a, b) {
+    const ca = poolCountries[a], cb = poolCountries[b];
+    return ca && cb && ca === cb && ca !== 'Global' && ca !== 'Unknown';
+  }
+
+  // Build quick lookup map
+  const liftMap = {};
+  const nMap = {};
+  matrix.forEach(m => {
+    liftMap[`${m.from}||${m.to}`] = m.lift;
+    nMap[`${m.from}||${m.to}`] = m.n;
+  });
+
+  // Confidence threshold: cells below this n are dimmed
+  const LOW_N = 100;
+
+  function liftToColor(lift, n) {
+    if (lift === null || lift === undefined) return 'rgba(30,35,45,0.4)';
+    const alpha = n < LOW_N ? 0.35 : 1.0;  // dim low-sample cells
+    if (lift > 2.0)  return `rgba(255,77,79,${0.75 * alpha})`;
+    if (lift > 1.5)  return `rgba(255,77,79,${0.45 * alpha})`;
+    if (lift > 1.2)  return `rgba(226,163,74,${0.55 * alpha})`;
+    if (lift > 1.0)  return `rgba(226,163,74,${0.18 * alpha})`;
+    if (lift > 0.85) return `rgba(255,255,255,${0.04 * alpha})`;
+    return `rgba(86,182,194,${0.35 * alpha})`;
+  }
+
+  function liftLabel(lift) {
+    if (lift === null || lift === undefined) return '—';
+    return lift.toFixed(2) + '×';
+  }
+
+  // Build header row — column headers show flag badge
+  const thStyle = 'padding:5px 6px;font-size:0.65rem;color:var(--text-secondary);font-weight:700;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(48,54,61,0.8);';
+  const tdBase = 'padding:4px 5px;font-size:0.7rem;text-align:center;border:1px solid rgba(48,54,61,0.4);line-height:1.3;min-width:62px;';
+  const tdLabel = 'padding:5px 8px;font-size:0.72rem;font-weight:600;color:var(--text-primary);white-space:nowrap;border:1px solid rgba(48,54,61,0.4);';
+
+  let thead = `<tr><th style="${thStyle}text-align:left;">Block N →<br><span style="font-weight:400;font-size:0.6rem;">Block N+1 ↓ &nbsp;lift · (n)</span></th>`;
+  pools.forEach(col => {
+    const abbr = col.length > 8 ? col.slice(0, 7) + '…' : col;
+    thead += `<th style="${thStyle}" title="${col} · ${poolCountries[col] || ''}">${abbr}${countryBadge(col)}</th>`;
+  });
+  thead += '</tr>';
+
+  let tbody = '';
+  pools.forEach(rowPool => {
+    const rowCountry = poolCountries[rowPool] || 'Unknown';
+    const rowBg = COUNTRY_COLOR[rowCountry] || 'transparent';
+    let row = `<tr><td style="${tdLabel}background:${rowBg};">${rowPool}${countryBadge(rowPool)}</td>`;
+    pools.forEach(colPool => {
+      const key = `${rowPool}||${colPool}`;
+      const lift = liftMap[key];
+      const n = nMap[key] || 0;
+      const isDiag = rowPool === colPool;
+      const sameCo = !isDiag && sameCountry(rowPool, colPool);
+      const bg = liftToColor(lift, n);
+      const textOpacity = n < LOW_N ? '0.45' : '1';
+      const textColor = (lift !== null && lift > 1.2 && n >= LOW_N) ? 'var(--text-primary)' : `rgba(139,148,158,${textOpacity})`;
+      const diagBorder = isDiag ? 'outline:1px solid rgba(226,163,74,0.4);outline-offset:-2px;' : '';
+      const sameCoBorder = sameCo ? 'outline:1px dotted rgba(255,180,80,0.3);outline-offset:-2px;' : '';
+      const nStr = n > 0 ? `<div style="font-size:0.58rem;color:rgba(139,148,158,0.55);margin-top:1px;">${n < 1000 ? n : (n/1000).toFixed(1)+'k'}</div>` : '';
+      const lowNNote = n > 0 && n < LOW_N ? '<span title="Low sample — treat with caution" style="font-size:0.6rem;color:rgba(226,163,74,0.5);"> ⚠</span>' : '';
+      row += `<td style="${tdBase}background:${bg};color:${textColor};${diagBorder}${sameCoBorder}" title="${rowPool} → ${colPool}: n=${n.toLocaleString()}, lift=${liftLabel(lift)}, ${poolCountries[rowPool]||'?'} → ${poolCountries[colPool]||'?'}">${liftLabel(lift)}${lowNNote}${nStr}</td>`;
+    });
+    row += '</tr>';
+    tbody += row;
+  });
+
+  // Geo summary — count anomalies by country pair
+  const geoTally = {};
+  [...anomalies, ...notableLowN].forEach(a => {
+    const ca = poolCountries[a.from] || 'Unknown';
+    const cb = poolCountries[a.to] || 'Unknown';
+    const k = ca === cb ? `${ca} → ${ca} (same)` : `${ca} → ${cb}`;
+    geoTally[k] = (geoTally[k] || 0) + 1;
+  });
+  const geoEntries = Object.entries(geoTally).sort((a,b) => b[1]-a[1]);
+  const geoHtml = geoEntries.length > 0 ? `
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(226,163,74,0.04);border:1px solid rgba(226,163,74,0.12);border-radius:6px;font-size:0.75rem;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+      <span style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-secondary);font-weight:700;flex-shrink:0;">Geographic pattern:</span>
+      ${geoEntries.map(([k,v]) => `<span style="color:var(--text-primary);">${k} <b style="color:var(--accent)">${v} pair${v>1?'s':''}</b></span>`).join('<span style="color:var(--text-secondary);margin:0 2px;">·</span>')}
+    </div>` : '';
+
+  const tableHtml = `
+    <div style="overflow-x:auto;margin-bottom:10px;">
+      <table style="border-collapse:collapse;width:100%;">
+        <thead>${thead}</thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px;font-size:0.68rem;color:var(--text-secondary);">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,77,79,0.75);vertical-align:middle;margin-right:3px;"></span>&gt;2.0×</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,77,79,0.45);vertical-align:middle;margin-right:3px;"></span>&gt;1.5×</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(226,163,74,0.55);vertical-align:middle;margin-right:3px;"></span>&gt;1.2× elevated</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.04);vertical-align:middle;margin-right:3px;"></span>~1.0× baseline</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(86,182,194,0.35);vertical-align:middle;margin-right:3px;"></span>&lt;0.85× avoidance</span>
+      <span style="margin-left:8px;">⚠ = n&lt;${LOW_N}, low confidence &nbsp;·&nbsp; diagonal = self-transition &nbsp;·&nbsp; dotted border = same country</span>
+    </div>
+    ${geoHtml}`;
+
+  function anomalyRow(a, lowN = false) {
+    const c = a.lift > 2.0 ? '#ff4d4f' : a.lift > 1.5 ? '#E87E51' : '#E2A34A';
+    const caFrom = poolCountries[a.from] || '?';
+    const caTo = poolCountries[a.to] || '?';
+    const flagFrom = COUNTRY_FLAG[caFrom] || '?';
+    const flagTo = COUNTRY_FLAG[caTo] || '?';
+    const caveat = lowN ? `<span style="color:rgba(226,163,74,0.6);font-size:0.65rem;"> ⚠ n=${a.n} (low sample)</span>` : '';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid rgba(48,54,61,0.35);font-size:0.76rem;flex-wrap:wrap;">
+      <span style="color:var(--text-secondary);min-width:180px;">${flagFrom} ${a.from} <span style="color:${THEME.muted};font-size:0.7rem;">→</span> ${flagTo} ${a.to}${caveat}</span>
+      <span style="color:${c};font-weight:700;width:50px;">${a.lift.toFixed(2)}×</span>
+      <span style="color:var(--text-secondary);font-size:0.68rem;">n=${a.n.toLocaleString()} &nbsp;|&nbsp; obs ${(a.observed_rate*100).toFixed(2)}% vs exp ${(a.expected_rate*100).toFixed(2)}%</span>
+    </div>`;
+  }
+
+  let anomalyHtml = '';
+  if (anomalies.length > 0) {
+    anomalyHtml += `
+      <div style="margin-top:12px;">
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary);font-weight:700;padding:6px 10px;border-bottom:1px solid rgba(48,54,61,0.6);">Confirmed Anomalous Pairs (lift &gt; 1.15, n &gt; 200)</div>
+        ${anomalies.slice(0, 10).map(a => anomalyRow(a, false)).join('')}
+      </div>`;
+  }
+  if (notableLowN.length > 0) {
+    anomalyHtml += `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(226,163,74,0.7);font-weight:700;padding:6px 10px;border-bottom:1px solid rgba(48,54,61,0.6);">High-Lift / Insufficient Sample ⚠ (lift &gt; 1.30, n 30–200 — treat as directional only)</div>
+        ${notableLowN.map(a => anomalyRow(a, true)).join('')}
+      </div>`;
+  }
+
+  el.innerHTML = tableHtml + anomalyHtml;
+}
+
 export function resizeAllCharts() {
   const charts = [
     donutChart, countryChart, growthChart, areaChart, hhiChart, concentrationChart,
     zscoreChart, entropyChart, syncChart, consecutiveAdvantageChart, emptyChart, emptyTrendChart,
-    bip110SignalingChart, bip110EfficiencyChart, bip110OverheadChart
+    bip110SignalingChart, bip110EfficiencyChart, bip110OverheadChart, quarterlyLiftChart
   ];
   charts.forEach(c => c && c.resize());
 }

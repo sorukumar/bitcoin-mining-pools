@@ -258,8 +258,8 @@
         <div style="background: rgba(226,163,74,0.07); border: 1px solid rgba(226,163,74,0.2); border-radius: 8px; padding: 14px 20px; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 14px;">
           <i class="fa-solid fa-magnifying-glass-chart" style="color: var(--accent); font-size: 1.1rem; margin-top: 2px; flex-shrink: 0;"></i>
           <div>
-            <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; margin-bottom: 5px;">The Investigative Thesis</div>
-            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">A small group of pools have built structural network advantages that let them win block races, skip transaction validation, and concentrate more hashrate than their public numbers suggest. Three signals reveal it — from incident, to mechanism, to identity.</p>
+            <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; margin-bottom: 5px;">The Investigative Framework</div>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">We tested three hypotheses about whether mining pools hold structural advantages: <strong style="color: var(--text-primary);">anomalous streak frequency</strong>, <strong style="color: var(--text-primary);">header-first (spy) mining</strong>, and <strong style="color: var(--text-primary);">undisclosed hashrate</strong>. The five acts below follow the evidence — from incident, to mechanism test, to behavioral verdict, to coordination signals, and finally to identity fingerprints. Each signal is assessed on its own terms; where the data clears a hypothesis, that finding is stated plainly.</p>
           </div>
         </div>
 
@@ -277,10 +277,9 @@
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                   <div class="horizon-tag hist"><i class="fa-solid fa-clock-rotate-left"></i> Historical Record
-                    (Post-2021)</div>
+                    (2022 – Present)</div>
                   <h4>Consecutive Blocks & Reorg Risk</h4>
-                  <span class="forensic-sub">Pools mining 7+ blocks in a row. High consecutive blocks increase the risk
-                    of blockchain reorganizations.</span>
+                  <span class="forensic-sub">Pools mining 7+ blocks in a row. Long streaks are rare under fair mining — this table records when they occurred and how often, as a starting point for Acts II &amp; III.</span>
                 </div>
                 <button class="info-toggle" data-target="info-streaks"><i class="fa-solid fa-circle-info"></i></button>
               </div>
@@ -290,12 +289,10 @@
                   streak, the exact block height it started, and the total duration it took to mine those blocks.</p>
                 <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
                 <ul style="margin-left: 15px; margin-top: 4px;">
-                  <li><strong>Reorg & Fork Risk:</strong> When a pool mines many blocks right after one another, it
-                    increases the probability of simultaneous blocks (races) and blockchain reorganizations.</li>
-                  <li><strong>Network Dominance:</strong> Extremely fast and frequent streaks by a single pool suggest
-                    outsized short-term hashrate dominance or highly optimized block propagation that outpaces
-                    competitor nodes.</li>
+                  <li><strong>Reorg & Fork Risk:</strong> Long streaks increase the theoretical probability of block races and reorganizations — though in practice, no confirmed reorg has been attributed to pool concentration in the modern era.</li>
+                  <li><strong>Interpreting the propensity score:</strong> A score above 1× means more streaks occurred than the Poisson model predicts. However, the qualifying event count is typically small, so the excess often falls within random variance — especially for pools whose hashrate grew rapidly. Use it as a prompt for further investigation, not a verdict.</li>
                 </ul>
+                <p style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--text-secondary);"><strong>How the numbers are calculated:</strong> The <em>% era avg</em> shown next to each pool is the <strong>block-weighted average share from that pool's first qualifying streak month through present</strong> — so each pool's baseline starts when it first became relevant, not at a common fixed date. This keeps the propensity denominator honest. The <em>“1 in X Yrs”</em> likelihood for each individual streak uses the pool's <strong>actual monthly hash share at the time of that event</strong>, so a streak that happened when Foundry was at 31% uses 31%, not the era average.</p>
               </div>
             </div>
             <div id="forensics-streaks-table"></div>
@@ -315,24 +312,30 @@
               <div class="forensic-header">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                   <div>
-                    <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (Post-2021)</div>
+                    <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (2022 – Present)</div>
                     <h4>Second Block Uplift</h4>
-                    <span class="forensic-sub">How many times more likely a pool is to mine block N+1 after mining block N, vs. what its hash share alone predicts. A value above 1× is a structural advantage — the quantitative fingerprint of header-first mining.</span>
+                    <span class="forensic-sub">How many times more likely a pool is to mine block N+1 after mining block N, vs. its block-weighted average hash share in that same period. Values near 1× mean the data shows no structural second-block advantage.</span>
                   </div>
                   <button class="info-toggle" data-target="info-consecutive"><i class="fa-solid fa-circle-info"></i></button>
                 </div>
                 <div class="info-card" id="info-consecutive">
-                  <p><strong>How to read it:</strong> Under a fair, memoryless mining process, each pool's probability of winning any given block equals its hash share. That means P(same pool mines block N+1 | same pool just mined block N) = hash share exactly — the 1× baseline. Bars longer than 1× mean a pool converts a first block into a second block far more often than chance allows.</p>
+                  <p><strong>How to read it:</strong> Under a fair, memoryless mining process, each pool's probability of winning any given block equals its hash share. That means P(same pool mines block N+1 | same pool just mined block N) = hash share exactly — the 1× baseline. Bars longer than 1× mean a pool converts a first block into a second block more often than chance allows.</p>
+                  <p style="margin-top: 6px;"><strong>Methodology:</strong> The expected baseline uses each pool's <strong>block-weighted average share computed month-by-month</strong>. A pool's share at the time of each block is what sets the fair expectation — not a flat average over a multi-year window where that pool's hashrate was very different. No pool in the dataset exceeds a 1.12× lift on this basis.</p>
                   <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
                   <ul style="margin-left: 15px; margin-top: 4px;">
                     <li><strong>Why pools beat 1×:</strong> Upon mining block N, a pool already holds the header and can begin hashing block N+1 immediately — while every competitor first downloads, validates, and acknowledges block N (~13 s lag). This head-start inflates consecutive win rates above the pure hash-share baseline.</li>
-                    <li><strong>Connecting Acts I & II:</strong> Act I showed these pools produce more 7+ streaks than statistics allow. This chart closes the loop — the same pools are winning the second block at a systemically elevated rate, not through luck but through latency monopoly.</li>
-                    <li><strong>Interpreting magnitude:</strong> A 1.3× lift on a pool with 20% hash share translates to ~6 extra consecutive blocks every 100 mined — thousands of extra block opportunities per year at scale.</li>
+                    <li><strong>Connecting Acts I & II:</strong> Act I showed Foundry producing more 7+ streaks than a Poisson process allows. This chart provides important context: Foundry's second-block uplift sits near 1.0×. That separation — streak frequency anomaly without a second-block signal — points to <em>hashrate clustering</em> (US-based miners consolidating under one pool), not header-first mining. A pool using spy-mining would show both signals simultaneously.</li>
+                    <li><strong>Interpreting magnitude:</strong> No pool in the dataset currently shows the second-block fingerprint of header-first mining. The ~1.11× maximum (Luxor) translates to roughly 2 extra consecutive blocks per 100 mined — within plausible random variance at that sample size.</li>
                   </ul>
                 </div>
               </div>
               <div id="chart-consecutive-callout"></div>
               <div id="chart-consecutive-advantage" style="height: 410px;"></div>
+              <!-- Quarterly / monthly lift persistence sparkline -->
+              <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(48,54,61,0.6);">
+                <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); font-weight: 700; margin-bottom: 6px;">Second Block Lift — Per-Quarter Trend (top pools)</div>
+                <div id="chart-quarterly-lift" style="height: 160px;"></div>
+              </div>
             </div>
 
             <!-- Right: Header-First Mining Evidence -->
@@ -340,25 +343,18 @@
               <div class="forensic-header">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                   <div>
-                    <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (Post-2021)</div>
+                    <div class="horizon-tag hist"><i class="fa-solid fa-database"></i> Aggregate Profile (2022 – Present)</div>
                     <h4>Header-First Mining Evidence</h4>
-                    <span class="forensic-sub">Time gap between consecutive same-pool blocks. Intervals under 30s reveal pools
-                      skipping transaction validation before starting the next block template.</span>
+                    <span class="forensic-sub">Time gap between consecutive same-pool blocks, broken into buckets. The sub-30s bucket is the most sensitive — a pool with an elevated rate there may be starting the next block before fully validating the previous one.</span>
                   </div>
                   <button class="info-toggle" data-target="info-latency"><i class="fa-solid fa-circle-info"></i></button>
                 </div>
                 <div class="info-card" id="info-latency">
-                  <p><strong>How to read it:</strong> This chart breaks down the time duration between consecutive blocks
-                    mined by the same pool into specific time buckets (e.g., &lt; 30s, 30s-60s). The &lt; 30s bucket is
-                    explicitly highlighted in red/orange.</p>
+                  <p><strong>How to read it:</strong> This chart shows the distribution of inter-block time gaps for consecutive same-pool blocks, broken into time buckets. Under a random (memoryless) mining process, inter-block times follow an exponential distribution with mean 600s — implying a natural sub-30s rate of ~4.88% and a median gap of ~416s.</p>
                   <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
                   <ul style="margin-left: 15px; margin-top: 4px;">
-                    <li><strong>The "Danger Zone":</strong> Blocks found within 15 to 30 seconds of the previous block are
-                      highly prone to causing network forks. Other mining pools (who often refresh stratum jobs every 30
-                      seconds) may not have received the previous block yet.</li>
-                    <li><strong>Propagational Advantage:</strong> Pools that consistently dominate the &lt; 30s bucket
-                      often possess significant network latency monopolies, allowing them to win tight block races and
-                      trigger multi-block reorgs.</li>
+                    <li><strong>What elevation would mean:</strong> A pool with a sub-30s rate materially above 4.88% would be starting the next block before fully receiving and validating the previous one — the header-first (spy-mining) pattern. No pool in the current dataset is above the expected baseline.</li>
+                    <li><strong>Timing distribution matters:</strong> Even without sub-30s elevation, an anomalously low <em>median</em> consecutive gap (e.g., 346s vs 416s expected) signals that a pool's second blocks are landing in the statistically fast tail more often than chance allows — a subtler but directionally important signature.</li>
                   </ul>
                 </div>
               </div>
@@ -374,13 +370,13 @@
                 <div>
                   <div class="horizon-tag hist"><i class="fa-solid fa-layer-group"></i> Behavioral Verdict</div>
                   <h4>Empty Block Auditor (Behavioral History)</h4>
-                  <span class="forensic-sub">Reform or persistence — all-time vs. 30-day pattern reveals who cleaned
+                  <span class="forensic-sub">Reform or persistence — since 2022 vs. last 30 days reveals who cleaned
                     up and who doubled down.</span>
                 </div>
                 <button class="info-toggle" data-target="info-empty"><i class="fa-solid fa-circle-info"></i></button>
               </div>
               <div class="info-card" id="info-empty">
-                <p><strong>How to read it:</strong> The quadrant matrix plots each pool's all-time empty block rate
+                <p><strong>How to read it:</strong> The quadrant matrix plots each pool's empty block rate since 2022
                   (X-axis) against their last-30-day rate (Y-axis). The dotted diagonal is the "no change" reference —
                   pools above it are getting worse, pools below it are improving. Threshold lines mark the
                   network-weighted average.</p>
@@ -409,9 +405,54 @@
             </div>
           </div>
 
+          <!-- ── NETWORK VERDICT ─────────────────────────────────────────── -->
+          <div style="grid-column: 1 / -1; margin-top: 10px; margin-bottom: 4px;">
+            <div style="background: rgba(86,182,194,0.07); border: 1px solid rgba(86,182,194,0.25); border-radius: 8px; padding: 14px 20px; display: flex; align-items: flex-start; gap: 14px;">
+              <i class="fa-solid fa-scale-balanced" style="color: #56B6C2; font-size: 1.1rem; margin-top: 2px; flex-shrink: 0;"></i>
+              <div>
+                <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #56B6C2; font-weight: 700; margin-bottom: 6px;">Network Verdict — Acts I &amp; II</div>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                  <strong style="color: var(--text-primary);">Streak counts above expectation, but within plausible variance; spy-mining hypothesis not supported.</strong>
+                  Foundry USA's 7+ block streak count exceeds the block-weighted Poisson expectation — but the number of qualifying events is small, and the excess falls within random variance for a rapidly-growing pool. More importantly, their Second Block Uplift sits at baseline (~1.0×) and no pool shows a sub-30s consecutive-block rate above the expected ~4.9%. The header-first fingerprint requires <em>both</em> signals simultaneously; only one is present. The more likely explanation is <strong style="color: var(--text-primary);">hashrate geographic clustering</strong> — a large proportion of US-based miners routing through a single pool, producing run-length variance without the mempool-skipping signature. Empty block rates across all pools are currently near or below the network average.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- ── ACT III ─────────────────────────────────────────────────── -->
           <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; margin-top: 10px;">
-            <span style="background: rgba(152,195,121,0.12); border: 1px solid rgba(152,195,121,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #98C379; text-transform: uppercase; white-space: nowrap;">Act III</span>
+            <span style="background: rgba(197,120,221,0.12); border: 1px solid rgba(197,120,221,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #C678DD; text-transform: uppercase; white-space: nowrap;">Act III</span>
+            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Coordination Signals — Pool Transition Patterns</span>
+            <div style="flex: 1; height: 1px; background: rgba(197,120,221,0.15);"></div>
+          </div>
+
+          <div class="forensic-box" style="grid-column: 1 / -1;">
+            <div class="forensic-header">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div class="horizon-tag hist"><i class="fa-solid fa-table-cells"></i> Cross-pool Transition Matrix (2022 – Present)</div>
+                  <h4>Who Mines After Whom?</h4>
+                  <span class="forensic-sub">Each cell is the lift of pool B mining block N+1 immediately after pool A mined block N — relative to pool B's baseline hash share. Red (&gt;1.2×) = statistically elevated hand-off; blue (&lt;0.85×) = avoidance pattern.</span>
+                </div>
+                <button class="info-toggle" data-target="info-transition"><i class="fa-solid fa-circle-info"></i></button>
+              </div>
+              <div class="info-card" id="info-transition">
+                <p><strong>How to read it:</strong> The diagonal shows self-transitions (same pool mines both blocks N and N+1) — these are the second-block-uplift values from Act II. Off-diagonal cells reveal whether two distinct pools hand off blocks to each other more or less often than expected by their hash share.</p>
+                <p style="margin-top: 8px;"><strong>Key Insights:</strong></p>
+                <ul style="margin-left: 15px; margin-top: 4px;">
+                  <li><strong>Coordination clusters:</strong> Two pools consistently lifting each other's transitions suggest shared infrastructure, colocation, or merged-mining arrangements.</li>
+                  <li><strong>Avoidance patterns:</strong> Blue cells (lift &lt; 0.85×) can indicate competing pools whose templates differ enough that one rarely solves the next block after the other.</li>
+                  <li><strong>Statistical threshold:</strong> Only pools with ≥ 5,000 blocks are shown. Pairs flagged as anomalies have lift &gt; 1.15× and at least 200 observed transitions.</li>
+                </ul>
+                <p style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--text-secondary);"><strong>Baseline methodology (block-weighted):</strong> Expected transitions use each pool's <em>contemporaneous monthly hash share</em> at the time of each block — the same approach as the Second Block Uplift chart. A pool that grew from 10% → 35% over 4 years does <em>not</em> get a flat 22% baseline; each block pair is weighted by the actual share in that month. This prevents fast-growing pools from appearing artificially anomalous in their early-period transitions.</p>
+              </div>
+            </div>
+            <div id="chart-transition-matrix"></div>
+          </div>
+
+          <!-- ── ACT IV ─────────────────────────────────────────────────── -->
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; margin-top: 10px;">
+            <span style="background: rgba(152,195,121,0.12); border: 1px solid rgba(152,195,121,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #98C379; text-transform: uppercase; white-space: nowrap;">Act IV</span>
             <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Ghost Hashrate — Do the Numbers Add Up?</span>
             <div style="flex: 1; height: 1px; background: rgba(152,195,121,0.15);"></div>
           </div>
@@ -446,9 +487,9 @@
             <div id="chart-zscore-funnel" style="height: 440px;"></div>
           </div>
 
-          <!-- ── ACT IV ──────────────────────────────────────────────────── -->
+          <!-- ── ACT V ──────────────────────────────────────────────────── -->
           <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; margin-top: 10px;">
-            <span style="background: rgba(86,182,194,0.12); border: 1px solid rgba(86,182,194,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #56B6C2; text-transform: uppercase; white-space: nowrap;">Act IV</span>
+            <span style="background: rgba(86,182,194,0.12); border: 1px solid rgba(86,182,194,0.3); border-radius: 4px; padding: 2px 10px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #56B6C2; text-transform: uppercase; white-space: nowrap;">Act V</span>
             <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">The Identity — Block Content & Behavioral Fingerprints</span>
             <div style="flex: 1; height: 1px; background: rgba(86,182,194,0.15);"></div>
           </div>
@@ -516,7 +557,7 @@
             <div class="forensic-header">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                  <div class="horizon-tag hist"><i class="fa-solid fa-chart-line"></i> Behavioral Consistency (Weekly)
+                  <div class="horizon-tag hist"><i class="fa-solid fa-chart-line"></i> Behavioral Consistency (2022 – Present)
                   </div>
                   <h4>Miner Timing Patterns (Entropy Heatmap)</h4>
                   <span class="forensic-sub">Differentiating steady "Corporate" operations (Low Entropy) from irregular
@@ -526,7 +567,7 @@
               </div>
               <div class="info-card" id="info-entropy">
                 <p><strong>How to read it:</strong> Monthly coefficient of variation (CV) of inter-block arrival
-                  times since 2021 — aggregated from ~2,800 weekly snapshots. <span
+                  times since 2022 — aggregated from ~2,800 weekly snapshots. <span
                     style="color:#ff4d4f">🔴 Red = low CV</span> (suspicious: consistent, industrial timing). <span
                     style="color:#74add1">🔵 Blue = high CV</span> (normal: irregular, retail/decentralised). The
                   China mining ban (2021) and 4th Halving (2024) are annotated as structural inflection points.</p>

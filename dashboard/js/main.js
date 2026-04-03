@@ -3,6 +3,7 @@ import {
   renderDonut, renderPoolTable, renderCountryShareChart, renderAreaChart, renderEcosystemGrowthChart, renderHhiChart, renderConcentrationChart, renderTopMinersTable, 
   renderStreaksLeaderboard, renderZScoreFunnel, renderEntropyHeatmap, renderSyncHistogram, renderConsecutiveAdvantage, renderEmptyBlockChart, renderEmptyTrendChart,
   renderBip110Signaling, renderBip110Efficiency, renderBip110Overhead,
+  renderQuarterlyLift, renderTransitionMatrix,
   resizeAllCharts, donutChart, growthChart 
 } from './charts.js?v=14';
 
@@ -304,8 +305,14 @@ function renderAll() {
     renderEntropyHeatmap(forensics.kpi3_entropy);
     renderSyncHistogram(forensics.kpi4_sync);
     renderConsecutiveAdvantage(forensics.kpi4_sync);
+    renderQuarterlyLift(forensics.kpi4_sync);
     renderEmptyBlockChart(forensics.kpi5_empty_blocks);
     renderEmptyTrendChart(forensics.kpi5_empty_blocks.monthly_trend);
+    
+    // KPI 8: Cross-pool Transition Matrix
+    if (forensics.kpi8_transitions) {
+      renderTransitionMatrix(forensics.kpi8_transitions);
+    }
     
     // BIP 110 Battleground
     if (forensics.kpi7_bip110) {
