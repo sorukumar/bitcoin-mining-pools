@@ -1,10 +1,23 @@
 """
 merge_myrp.py
-Reads bitcoin_miners_myrp.parquet, transforms columns, and appends to blocks_post_2021.parquet
-Also regenerates lookup/lookup_slug_to_name.json from pools.json so it never needs to be hardcoded.
+Step 2 of the data pipeline. Feeds recent block identity data into
+blocks_post_2021.parquet from two sources, in priority order:
+
+  1. bitcoin_miners_myrp.parquet  — pre-resolved pool slugs, high accuracy
+                                    but only covers up to its last update date
+  2. bitcoin_blocks_pool.parquet  — has today's data; pool resolved via
+                                    coinbase_tag matching against the enriched
+                                    pools lookup (pools.json + pools_supplement.json)
+
+For any block height that appears in both myrp and bp, myrp wins (it uses
+off-chain attribution that can identify pools whose coinbase tags are absent or
+ambiguous). Blocks beyond myrp's max height are resolved from bp only.
+
+Delegates lookup generation to build_pools_lookup.py so pool/slug logic
+lives in one place.
 """
 
-import json
+import sys
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -14,118 +27,193 @@ ROOT = Path(__file__).parent.parent
 RAW = ROOT / "data" / "raw"
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
 
+# Make build_pools_lookup importable from the same scripts/ directory
+sys.path.insert(0, str(Path(__file__).parent))
+from build_pools_lookup import build as build_lookup, to_slug
 
-def to_slug(s):
-    if pd.isna(s) or s == "":
+
+# ---------------------------------------------------------------------------
+# Pool resolver: coinbase_tag string → canonical slug
+# Uses the merged coinbase_tags from pools_enriched.json.
+# ---------------------------------------------------------------------------
+def make_resolver(enriched: dict):
+    """Return a function (coinbase_tag: str) -> slug|'unknown'."""
+    tags = enriched.get("coinbase_tags", {})
+    sorted_tags = sorted(tags.items(), key=lambda x: len(x[0]), reverse=True)
+
+    def resolve(coinbase_tag) -> str:
+        if not coinbase_tag or (isinstance(coinbase_tag, float)):
+            return "unknown"
+        tag_str = str(coinbase_tag)
+        for tag_key, info in sorted_tags:
+            if tag_key in tag_str:
+                return to_slug(info["name"])
         return "unknown"
-    s = str(s).lower()
-    if s == "unknown":
-        return "unknown"
-    # Project-wide canonical normalization: lowercase, remove spaces/dashes/dots/underscores
-    for char in [" ", "-", "_", "."]:
-        s = s.replace(char, "")
-    return s
+
+    return resolve
 
 
-# Pools that exist in blocks data but are not (yet) in pools.json.
-# Add entries here when a new pool appears that lacks a coinbase tag in pools.json.
-_MANUAL_OVERRIDES = {
-    "carbonnegative":     "Carbon Negative",
-    "futurebitapollosolo": "FutureBit Apollo Solo",
-    "ocean":              "Ocean.xyz",
-    "phoenix":            "Phoenix",
-    "slushpool":          "Slush Pool",
-    "unknown":            "Unknown",
-    "zulupool":           "Zulu Pool",
-    # legacy / low-volume
-    "1m1x":               "1M1X",
-    "btcpoolparty":       "BTCPool Party",
-    "exxbw":              "EXX&BW",
-    "miningkings":        "Mining Kings",
-    "tiger":              "Tiger",
-    "tigerpoolnet":       "TigerPool.net",
-    "trickysbtcpool":     "Tricky's BTC Pool",
-    "wk057":              "Wk057",
-}
-
-
-def generate_lookup():
-    """Build lookup/lookup_slug_to_name.json from pools.json + manual overrides."""
-    with open(RAW / "pools.json") as f:
-        pools_raw = json.load(f)
-
-    slug_to_name = {}
-    # coinbase_tags is the primary source of pool identity
-    for _tag, info in pools_raw.get("coinbase_tags", {}).items():
-        name = info["name"]
-        slug = to_slug(name)
-        if slug and slug != "unknown":
-            slug_to_name[slug] = name
-    # payout_addresses provides additional pools
-    for _addr, info in pools_raw.get("payout_addresses", {}).items():
-        name = info["name"]
-        slug = to_slug(name)
-        if slug and slug != "unknown":
-            slug_to_name[slug] = name
-
-    # Manual overrides for pools not yet in pools.json
-    slug_to_name.update(_MANUAL_OVERRIDES)
-
-    # Sort alphabetically by slug for stable diffs
-    slug_to_name = dict(sorted(slug_to_name.items()))
-
-    out_path = DASHBOARD_DATA / "lookup" / "lookup_slug_to_name.json"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
-        json.dump(slug_to_name, f, indent=2, ensure_ascii=False)
-
-    print(f"  lookup_slug_to_name.json written: {len(slug_to_name)} entries → {out_path}")
-    return slug_to_name
+POST_2021_HEIGHT = 664_063  # first block of 2021
 
 
 def main():
-    print("Loading existing blocks_post_2021.parquet ...")
-    df_post = pd.read_parquet(DASHBOARD_DATA / "blocks_post_2021.parquet")
-    print(f"  Existing post-2021 blocks: {len(df_post)} (heights {df_post['height'].min()} – {df_post['height'].max()})")
+    rebuild = "--rebuild" in sys.argv
 
-    print("Loading bitcoin_miners_myrp.parquet ...")
+    # -------------------------------------------------------------------------
+    # 0. Build enriched lookup — single source of truth for pool/slug mapping
+    # -------------------------------------------------------------------------
+    print("Building enriched pools lookup ...")
+    enriched, _slug_to_name, slug_aliases, supplement_overrides, _pool_types = build_lookup()
+
+    resolve_from_tag = make_resolver(enriched)
+
+    # -------------------------------------------------------------------------
+    # 1. Base: existing blocks_post_2021.parquet (from prepare_data.py)
+    #    Skipped when --rebuild is passed; the full bp.parquet becomes the base.
+    # -------------------------------------------------------------------------
+    post_path = DASHBOARD_DATA / "blocks_post_2021.parquet"
+    if rebuild or not post_path.exists():
+        if rebuild:
+            print("\n--rebuild: skipping existing blocks_post_2021.parquet; "
+                  "will re-resolve all blocks from source")
+        else:
+            print("\nblocks_post_2021.parquet not found; will build from scratch")
+        df_post = pd.DataFrame(columns=["height", "pool_slug", "date"])
+    else:
+        print("\nLoading existing blocks_post_2021.parquet ...")
+        df_post = pd.read_parquet(post_path)
+        df_post["pool_slug"] = df_post["pool_slug"].apply(to_slug)
+        # Apply aliases retroactively to fix slugs written by older pipeline runs
+        df_post["pool_slug"] = df_post["pool_slug"].replace(slug_aliases)
+        print(f"  {len(df_post):,} blocks  "
+              f"(heights {df_post['height'].min()} – {df_post['height'].max()})")
+
+    # -------------------------------------------------------------------------
+    # 2. bitcoin_miners_myrp.parquet — high-accuracy, up to myrp's last date
+    # -------------------------------------------------------------------------
+    print("\nLoading bitcoin_miners_myrp.parquet ...")
     df_myrp = pd.read_parquet(RAW / "bitcoin_miners_myrp.parquet")
-    print(f"  MYRP blocks: {len(df_myrp)} (heights {df_myrp['block_height'].min()} – {df_myrp['block_height'].max()})")
-
-    print("Transforming MYRP data ...")
     df_myrp = df_myrp.rename(columns={
-        'block_height': 'height',
-        'mining_pool': 'pool_slug',
-        'timestamp': 'date'
-    })
-    # Keep only necessary columns: height, pool_slug, date
-    df_myrp = df_myrp[['height', 'pool_slug', 'date']]
+        "block_height": "height",
+        "mining_pool":  "pool_slug",
+        "timestamp":    "date",
+    })[["height", "pool_slug", "date"]]
 
-    print("Normalizing slugs ...")
-    df_post['pool_slug'] = df_post['pool_slug'].apply(to_slug)
-    df_myrp['pool_slug'] = df_myrp['pool_slug'].apply(to_slug)
+    # Normalize myrp slugs and apply aliases (e.g. slushpool → braiinspool)
+    df_myrp["pool_slug"] = df_myrp["pool_slug"].apply(to_slug)
+    df_myrp["pool_slug"] = df_myrp["pool_slug"].replace(slug_aliases)
 
-    print("Appending MYRP to post-2021 ...")
-    df_post_merged = pd.concat([df_post, df_myrp], ignore_index=True)
-    # Ensure newly identified miners replace old entries for the same height
-    df_post_merged = df_post_merged.drop_duplicates(subset=['height'], keep='last')
-    df_post_merged = df_post_merged.sort_values('height').reset_index(drop=True)
-    print(f"  Merged post-2021 blocks: {len(df_post_merged)} (heights {df_post_merged['height'].min()} – {df_post_merged['height'].max()})")
+    myrp_max_height = int(df_myrp["height"].max())
+    print(f"  {len(df_myrp):,} blocks  "
+          f"(heights {df_myrp['height'].min()} – {myrp_max_height})")
 
-    print("Writing updated blocks_post_2021.parquet ...")
-    table_post = pa.Table.from_pandas(df_post_merged, preserve_index=False)
+    # -------------------------------------------------------------------------
+    # 3. bitcoin_blocks_pool.parquet — has data through today
+    #    Normal mode:  append only blocks beyond the current frontier.
+    #    Rebuild mode: re-resolve ALL post-2021 blocks from coinbase_tag.
+    # -------------------------------------------------------------------------
+    post_max_height = int(df_post["height"].max()) if len(df_post) else 0
+    bp_cutoff = max(post_max_height, myrp_max_height) if not rebuild else (POST_2021_HEIGHT - 1)
+
+    print("\nLoading bitcoin_blocks_pool.parquet ...")
+    df_bp = pd.read_parquet(
+        RAW / "bitcoin_blocks_pool.parquet",
+        columns=["block_height", "coinbase_tag", "block_time"],
+    )
+    df_bp = df_bp.rename(columns={"block_height": "height", "block_time": "date"})
+    print(f"  bitcoin_blocks_pool.parquet covers heights "
+          f"{df_bp['height'].min()} – {df_bp['height'].max()}")
+
+    # Resolve pool slug from coinbase_tag using enriched lookup
+    df_bp["pool_slug"] = df_bp["coinbase_tag"].apply(resolve_from_tag)
+    df_bp = df_bp[["height", "pool_slug", "date"]]
+
+    # Slice bp to only the blocks we need
+    df_bp_new = df_bp[df_bp["height"] > bp_cutoff].copy()
+    if len(df_bp_new):
+        resolved_new = (df_bp_new["pool_slug"] != "unknown").sum()
+        print(f"  {'Blocks to process' if rebuild else 'New blocks to append'} "
+              f"(height > {bp_cutoff}): {len(df_bp_new):,} "
+              f"({df_bp_new['height'].min()} – {df_bp_new['height'].max()})")
+        print(f"  Resolved pool in these blocks: {resolved_new:,} / {len(df_bp_new):,} "
+              f"({resolved_new / len(df_bp_new) * 100:.1f}%)")
+    else:
+        print(f"  blocks_post_2021 is already up to date (max height {post_max_height})")
+
+    # -------------------------------------------------------------------------
+    # 4. Also check if myrp has new blocks beyond blocks_post_2021's current max
+    # -------------------------------------------------------------------------
+    df_myrp_new = df_myrp[df_myrp["height"] > post_max_height].copy() if not rebuild else df_myrp.copy()
+    if len(df_myrp_new):
+        print(f"\n  myrp has {len(df_myrp_new):,} blocks {'(full range, rebuild)' if rebuild else f'beyond post_max ({post_max_height})'}: "
+              f"heights {df_myrp_new['height'].min()} – {df_myrp_new['height'].max()}")
+
+    # -------------------------------------------------------------------------
+    # 5. Merge — concat in priority order (last wins on dedup):
+    #      df_post (current state)
+    #      < df_bp_new (coinbase-tag resolved, beyond both myrp and post frontiers)
+    #      < df_myrp_new (high-accuracy off-chain attribution, beyond post frontier)
+    #    myrp_new beats bp_new for any overlap since it's added last.
+    #    Exceptions:
+    #      a) myrp "unknown" blocks: bp wins (any attribution > no attribution)
+    #      b) supplement_overrides: a specific supplement slug (e.g. braiinssolo)
+    #         beats a more generic myrp slug (e.g. ckpool) — defined in
+    #         data/raw/pools_supplement.json under "supplement_overrides".
+    # -------------------------------------------------------------------------
+
+    # Build reverse lookup: myrp_slug -> set of bp slugs that beat it
+    # e.g. {"ckpool": {"braiinssolo", "noderunners"}, "unknown": {"publicpool", ...}}
+    myrp_overrideable: dict[str, set] = {}
+    for bp_slug, myrp_slugs in supplement_overrides.items():
+        for ms in myrp_slugs:
+            myrp_overrideable.setdefault(ms, set()).add(bp_slug)
+
+    # Remove myrp rows that can be overridden by bp's more specific resolution:
+    #   a) myrp_slug == "unknown" → bp always wins
+    #   b) myrp_slug in overrideable AND the corresponding bp block resolves to
+    #      one of the override slugs
+    if len(myrp_overrideable) and len(df_bp_new) and len(df_myrp_new):
+        bp_slug_map = df_bp_new.set_index("height")["pool_slug"]
+        def should_bp_win(row):
+            ms = row["pool_slug"]
+            if ms == "unknown":
+                return True
+            overrides = myrp_overrideable.get(ms, set())
+            if overrides:
+                bp_s = bp_slug_map.get(row["height"])
+                return bp_s in overrides
+            return False
+        mask_bp_wins = df_myrp_new.apply(should_bp_win, axis=1)
+        n_overridden = mask_bp_wins.sum()
+        if n_overridden:
+            print(f"  Supplement overrides: bp resolution wins for {n_overridden} myrp blocks")
+        df_myrp_new = df_myrp_new[~mask_bp_wins]
+
+    print("\nMerging all sources ...")
+    df_merged = pd.concat([df_post, df_bp_new, df_myrp_new], ignore_index=True)
+    df_merged = (
+        df_merged
+        .drop_duplicates(subset=["height"], keep="last")
+        .sort_values("height")
+        .reset_index(drop=True)
+    )
+    print(f"  Final blocks_post_2021: {len(df_merged):,}  "
+          f"(heights {df_merged['height'].min()} – {df_merged['height'].max()})")
+
+    # -------------------------------------------------------------------------
+    # 5. Write blocks_post_2021.parquet
+    # -------------------------------------------------------------------------
+    out_path = DASHBOARD_DATA / "blocks_post_2021.parquet"
+    print(f"\nWriting {out_path} ...")
+    table = pa.Table.from_pandas(df_merged, preserve_index=False)
     pq.write_table(
-        table_post,
-        DASHBOARD_DATA / "blocks_post_2021.parquet",
+        table,
+        out_path,
         compression="snappy",
         use_dictionary=["pool_slug"],
         write_statistics=True,
     )
-
-    print(f"  Merged post-2021 blocks: {len(df_post_merged)}")
-
-    print("Regenerating lookup_slug_to_name.json ...")
-    generate_lookup()
+    print(f"  Done — {out_path.stat().st_size / 1_048_576:.2f} MB")
 
 
 if __name__ == "__main__":

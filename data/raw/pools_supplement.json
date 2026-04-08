@@ -1,0 +1,87 @@
+{
+  "_comment": "Supplemental pool data to extend the upstream bitcoin-data/mining-pools pools.json. Add entries here when a pool uses a coinbase signature not yet in the upstream. Also defines slug_aliases to canonicalize slugs from other data sources (e.g. bitcoin_miners_myrp.parquet) to match the canonical slug derived from pools.json name resolution.",
+  "coinbase_tags": {
+    "Mined by Secpool": {
+      "name": "SecPool",
+      "link": "https://www.secpool.com/"
+    },
+    "GDPool": {
+      "name": "DPOOL",
+      "link": "https://www.dpool.top"
+    },
+    "0x783c3f003f172c6Ac5AC700218a357d2D66Ee2a2": {
+      "name": "Mining Squared",
+      "link": "https://pool.bsquared.network/"
+    },
+    "FutureBit": {
+      "name": "FutureBit Apollo Solo",
+      "type": "solo",
+      "link": ""
+    },
+    "Zulu Pool": {
+      "name": "Zulu Pool",
+      "link": ""
+    },
+    "Carbon Negative": {
+      "name": "Carbon Negative",
+      "link": "https://github.com/bitcoin-data/mining-pools/issues/48"
+    },
+    "/Phoenix/": {
+      "name": "Phoenix",
+      "link": ""
+    },
+    "/Noderunners/": {
+      "name": "Noderunners",
+      "type": "solo",
+      "link": ""
+    },
+    "/braiinssolo/": {
+      "name": "Braiins Solo",
+      "type": "solo",
+      "link": "https://braiins.com/bitcoin-mining-software"
+    },
+    "Public Pool": {
+      "name": "Public Pool",
+      "type": "solo",
+      "link": "https://public-pool.io/"
+    },
+    "Public-Pool": {
+      "name": "Public Pool",
+      "type": "solo",
+      "link": "https://public-pool.io/"
+    },
+    "/letsmine.it/": {
+      "name": "LetsMine.it",
+      "type": "solo",
+      "link": "https://letsmine.it/"
+    },
+    "RedRock Pool": {
+      "name": "RedRock Pool",
+      "link": ""
+    },
+    "SoloPool.Com": {
+      "name": "SoloPool.com",
+      "type": "solo",
+      "link": "https://solopool.org/"
+    }
+  },
+  "slug_aliases": {
+    "_comment": "Maps alternative slugs (as found in bitcoin_miners_myrp.parquet or legacy data) to canonical slugs derived from pools.json name resolution. Canonical slug = to_slug(official_name_from_pools_json).",
+    "slushpool": "braiinspool",
+    "ocean": "oceanxyz",
+    "carbonnegative(unidentified)": "carbonnegative"
+  },
+  "pool_types": {
+    "_comment": "Type overrides for slugs from upstream pools.json where we cannot add a type inline. Values: solo, pool.",
+    "solock": "solo",
+    "futurebitapollosolo": "solo"
+  },
+  "supplement_overrides": {
+    "_comment": "When bitcoin_blocks_pool.parquet resolves a block to one of these slugs (via coinbase_tag), it beats myrp's more generic attribution. Format: supplement_slug -> list of myrp slugs it overrides.",
+    "braiinssolo": ["ckpool"],
+    "noderunners": ["ckpool"],
+    "publicpool": ["unknown"],
+    "letsmineit": ["unknown"],
+    "redrockpool": ["unknown"]
+  }
+}

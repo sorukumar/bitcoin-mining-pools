@@ -1,48 +1,13 @@
 import json
+import sys
 import pandas as pd
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
 
-def to_slug_canonical(s):
-    if pd.isna(s) or s == "": return "unknown"
-    s = str(s).lower()
-    if s == "unknown": return "unknown"
-    for char in [" ", "-", "_", "."]:
-        s = s.replace(char, "")
-    return s
-
-def generate_master_lookup(pools_raw, df_slugs):
-    """
-    Creates lookup_slug_to_name.json using:
-    1. Official pool names from pools.json (Priority)
-    2. Title-cased slugs found in the data as a fallback
-    """
-    slug_to_name = {}
-    
-    # 1. Official names from pools.json
-    for section in ("payout_addresses", "coinbase_tags"):
-        for entry in pools_raw.get(section, {}).values():
-            name = entry.get("name", "")
-            if name:
-                slug = to_slug_canonical(name)
-                slug_to_name[slug] = name
-    
-    # 2. Add fallback for any slugs found in data but not in pools.json
-    for slug in df_slugs:
-        if slug not in slug_to_name and slug != "unknown":
-            # "mara-pool" -> "Mara Pool"
-            fallback_name = slug.replace("-", " ").replace("_", " ").title()
-            slug_to_name[slug] = fallback_name
-            
-    slug_to_name["unknown"] = "Unknown"
-    
-    lookup_path = DASHBOARD_DATA / "lookup" / "lookup_slug_to_name.json"
-    with open(lookup_path, "w") as f:
-        json.dump(slug_to_name, f, separators=(",", ":"), indent=2)
-    print(f"  Master lookup written to {lookup_path} ({len(slug_to_name)} entries)")
-    return slug_to_name
+sys.path.insert(0, str(Path(__file__).parent))
+from build_pools_lookup import to_slug
 
 def main():
     RAW = ROOT / "data" / "raw"
@@ -55,23 +20,24 @@ def main():
     # Convert date column to datetime
     df["date"] = pd.to_datetime(df["date"])
 
-    # Load pooled identity data
-    print("Loading links from pools.json ...")
-    with open(RAW / "pools.json") as f:
-        pools_raw = json.load(f)
-    
-    # Generate the lookup JSON first, using unique slugs from data + official list
-    unique_slugs = df["pool_slug"].unique()
-    slug_to_name = generate_master_lookup(pools_raw, unique_slugs)
-    
-    name_to_link = {}
+    # Load enriched pools lookup (built by build_pools_lookup.py)
+    print("Loading enriched pools lookup ...")
+    lookup_path = DASHBOARD_DATA / "lookup" / "lookup_slug_to_name.json"
+    with open(lookup_path) as f:
+        slug_to_name = json.load(f)
+
+    enriched_path = DASHBOARD_DATA / "lookup" / "pools_enriched.json"
+    with open(enriched_path) as f:
+        enriched = json.load(f)
+
+    name_to_link: dict[str, str] = {}
     for section in ("payout_addresses", "coinbase_tags"):
-        for entry in pools_raw.get(section, {}).values():
+        for entry in enriched.get(section, {}).values():
             name = entry.get("name", "")
             link = entry.get("link", "")
             if name:
                 name_to_link[name] = link
-    
+
     pool_meta = {name: {"link": link} for name, link in name_to_link.items()}
 
     print("Calculating pool metrics ...")

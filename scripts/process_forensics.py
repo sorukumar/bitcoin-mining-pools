@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import numpy as np
 import json
@@ -6,34 +7,6 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 RAW = ROOT / "data" / "raw"
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
-
-def load_pool_mapping():
-    with open(RAW / "pools.json") as f:
-        pools_raw = json.load(f)
-    
-    tags = pools_raw.get("coinbase_tags", {})
-    # Sort tags by length desc to match longest tag first
-    # Also include payout addresses as fallback if needed, but for forensics tag is primary
-    sorted_tags = sorted(tags.items(), key=lambda x: len(x[0]), reverse=True)
-    return sorted_tags
-
-def resolve_pool(coinbase_tag, sorted_tags):
-    if not coinbase_tag or pd.isna(coinbase_tag):
-        return "Unknown"
-    
-    # handle bytes if they arrive as such, or hex strings
-    try:
-        if isinstance(coinbase_tag, bytes):
-            tag_str = coinbase_tag.decode('utf-8', errors='ignore')
-        else:
-            tag_str = str(coinbase_tag)
-    except:
-        tag_str = str(coinbase_tag)
-    
-    for tag_key, info in sorted_tags:
-        if tag_key in tag_str:
-            return info["name"]
-    return "Unknown"
 
 def main():
     print("Loading datasets for synchronization...")

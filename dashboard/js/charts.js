@@ -22,6 +22,44 @@ const THEME = {
   accent: '#E2A34A',
 };
 
+const COUNTRY_FLAG = {
+  'China': '🇨🇳',
+  'United States': '🇺🇸',
+  'Czech Republic': '🇨🇿',
+  'Seychelles': '🇸🇨',
+  'Japan': '🇯🇵',
+  'Switzerland': '🇨🇭',
+  'Global': '🌐',
+  'Unknown': '?',
+};
+
+const COUNTRY_COLOR = {
+  'China': 'rgba(255,100,80,0.18)',
+  'United States': 'rgba(86,182,194,0.15)',
+  'Czech Republic': 'rgba(152,195,121,0.15)',
+  'Seychelles': 'rgba(197,120,221,0.15)',
+  'Japan': 'rgba(255,180,80,0.15)',
+  'Switzerland': 'rgba(189,51,64,0.15)',
+  'Global': 'rgba(226,163,74,0.10)',
+};
+
+const COUNTRY_SLICE_COLOR = {
+  'China': '#E63946',
+  'United States': '#457B9D',
+  'Czech Republic': '#2A9D8F',
+  'Seychelles': '#9D4EDD',
+  'Japan': '#F4A261',
+  'Switzerland': '#D62828',
+  'Global': '#F4A261',
+  'Unknown': '#6C757D',
+};
+
+function countryBadge(country) {
+  const flag = COUNTRY_FLAG[country] || '?';
+  const bg = COUNTRY_COLOR[country] || 'rgba(139,148,158,0.1)';
+  return `<span style="font-size:0.7rem;background:${bg};border-radius:3px;padding:1px 4px;margin-left:3px;" title="${country}">${flag}</span>`;
+}
+
 function baseTooltip(extra = {}) {
   return {
     backgroundColor: THEME.bg2,
@@ -179,7 +217,7 @@ export function renderCountryShareChart(countryAgg) {
     ...top.map((c, i) => ({
       name: c.country,
       value: c.count,
-      itemStyle: { color: POOL_COLORS[(i + 3) % POOL_COLORS.length] },
+      itemStyle: { color: COUNTRY_SLICE_COLOR[c.country] || POOL_COLORS[(i + 3) % POOL_COLORS.length] },
     })),
     ...(other > 0 ? [{ name: 'Other', value: other, itemStyle: { color: '#444c56' } }] : []),
   ];
@@ -190,8 +228,9 @@ export function renderCountryShareChart(countryAgg) {
       ...baseTooltip({ confine: true }),
       trigger: 'item',
       formatter: (p) => {
-        const pct = (p.value / total * 100).toFixed(2);
-        return `<b>${p.name}</b><br/>${p.value.toLocaleString()} blocks · <b>${pct}%</b>`;
+        const rawPct = Number(p.value) / total * 100;
+        const pctLabel = rawPct >= 2 ? Math.round(rawPct) : rawPct.toFixed(2);
+        return `<b>${COUNTRY_FLAG[p.name] || ''} ${p.name}</b><br/>${Number(p.value).toLocaleString()} blocks · <b>${pctLabel}%</b>`;
       },
     },
     series: [{
@@ -200,9 +239,22 @@ export function renderCountryShareChart(countryAgg) {
       center: ['50%', '50%'],
       avoidLabelOverlap: true,
       itemStyle: { borderColor: THEME.bg, borderWidth: 2 },
-      label: { show: false },
+      label: {
+        show: true,
+        position: 'outside',
+        color: THEME.text,
+        fontSize: 14,
+        formatter: (p) => `${COUNTRY_FLAG[p.name] || ''}`,
+      },
+      labelLine: { show: true, length: 18, length2: 8, lineStyle: { color: 'rgba(255,255,255,0.25)' } },
       emphasis: {
-        label: { show: false },
+        label: {
+          show: true,
+          fontSize: 16,
+          fontWeight: 'bold',
+          color: THEME.text,
+          formatter: (p) => `${COUNTRY_FLAG[p.name] || ''}`,
+        },
         itemStyle: { shadowBlur: 16, shadowColor: 'rgba(226,163,74,0.4)' },
       },
       data: items,
@@ -564,6 +616,7 @@ export function renderEcosystemGrowthChart({ months, cumulativePools }, poolMeta
 
   growthChart.setOption({
     backgroundColor: 'transparent',
+    animation: false,
     tooltip: {
       ...baseTooltip(),
       trigger: 'item',
@@ -620,6 +673,9 @@ export function renderEcosystemGrowthChart({ months, cumulativePools }, poolMeta
       createScatterSeries(CAT_OLD, '#6b7280', scatterBuckets[CAT_OLD]) // Handled by override, base color ignored 
     ],
   }, true);
+
+  // Force a layout refresh after the chart option is applied, especially on tab-load.
+  window.requestAnimationFrame(() => growthChart.resize());
 }
 
 // ── HHI Trend Chart ───────────────────────────────────────────────────────────
@@ -774,7 +830,7 @@ export function renderConcentrationChart({ months, top3, top5 }) {
 }
 
 // ── Top 30 Mining Pools Table ────────────────────────────────────────────────
-export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugToName = {}) {
+export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugToName = {}, topPoolsRange = '1M') {
   const el = document.getElementById('top-miners-table-container');
   if (!el) return;
 
@@ -785,6 +841,10 @@ export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugT
   const emptyByName = {};  // display name → kpi5 entry
   const densityByName = {}; // display name → kpi6 entry
 
+  let rangeEmptyByName = {};
+  const rangeMonthsMap = { '1M': 1, '3M': 3, '1Y': 12, '3Y': 36 };
+  const rangeMonths = rangeMonthsMap[topPoolsRange] || 12;
+
   if (forensics) {
     (forensics.kpi5_empty_blocks?.leaderboard || []).forEach(e => {
       const displayName = slugToName[e.pool] || e.pool;
@@ -794,6 +854,21 @@ export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugT
       const displayName = slugToName[e.pool] || e.pool;
       densityByName[displayName] = e;
     });
+
+    const monthlyTrend = forensics.kpi5_empty_blocks?.monthly_trend || [];
+    if (monthlyTrend.length > 0) {
+      const months = Array.from(new Set(monthlyTrend.map(item => item.month))).sort();
+      const selectedMonths = new Set(months.slice(-rangeMonths));
+      monthlyTrend.forEach(item => {
+        if (!selectedMonths.has(item.month)) return;
+        const displayName = slugToName[item.pool_name] || item.pool_name;
+        if (!rangeEmptyByName[displayName]) {
+          rangeEmptyByName[displayName] = { total: 0, empty: 0 };
+        }
+        rangeEmptyByName[displayName].total += Number(item.total || 0);
+        rangeEmptyByName[displayName].empty += Number(item.empty || 0);
+      });
+    }
   }
 
   const rows = poolAgg.slice(0, 30).map((p, i) => {
@@ -810,14 +885,25 @@ export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugT
     // Match forensics data by display name directly
     const emptyData   = emptyByName[p.name];
     const densityData = densityByName[p.name];
+    const rangeEmpty  = rangeEmptyByName[p.name];
 
-    // Empty block % — prefer 30-day, fall back to all-time
+    // Empty block % — use the selected top-pools time range when available,
+    // otherwise fall back to the existing KPI5 leaderboard value.
     let emptyCell = '<span style="color:var(--text-secondary);opacity:0.4;">—</span>';
-    if (emptyData) {
-      const ratio = emptyData.ratio_30d != null ? emptyData.ratio_30d : emptyData.ratio_all;
+    if (rangeEmpty && rangeEmpty.total > 0) {
+      const ratio = rangeEmpty.empty / rangeEmpty.total * 100;
       let dotColor = '#98C379';  // green ≤ 0.3%
       if (ratio > 1.5)      dotColor = '#ff4d4f';    // red
       else if (ratio > 0.5) dotColor = '#ffe066';    // yellow
+      emptyCell = `<span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
+        ${ratio.toFixed(1)}%
+      </span>`;
+    } else if (emptyData) {
+      const ratio = emptyData.ratio_30d != null ? emptyData.ratio_30d : emptyData.ratio_all;
+      let dotColor = '#98C379';
+      if (ratio > 1.5)      dotColor = '#ff4d4f';
+      else if (ratio > 0.5) dotColor = '#ffe066';
       emptyCell = `<span style="display:inline-flex;align-items:center;gap:5px;">
         <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
         ${ratio.toFixed(1)}%
@@ -835,8 +921,7 @@ export function renderTopMinersTable(poolAgg, poolsInfo, forensics = null, slugT
         <td style="width: 40px; color: var(--text-secondary); font-size: 0.8rem;">${i + 1}</td>
         <td style="font-weight: 600; color: var(--text-primary); min-width: 180px;">${p.name}</td>
         <td style="color: var(--text-secondary); font-size: 0.85rem; min-width: 150px;">
-          <i class="fa-solid fa-earth-americas" style="font-size: 0.75rem; margin-right: 6px; opacity: 0.5;"></i>
-          ${country}
+          ${countryBadge(country)} ${country}
         </td>
         <td style="text-align: right; font-weight: 600; color: var(--accent); padding-right: 20px;">${p.pct.toFixed(2)}%</td>
         <td style="text-align: right; font-size: 0.85rem; padding-right: 20px;">${emptyCell}</td>
@@ -1003,6 +1088,15 @@ export function renderStreaksLeaderboard(poolSummaries) {
                    <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: var(--text-secondary); line-height:1.5;">
                      <strong style="color: var(--accent); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; display: block; margin-bottom: 5px;">Network Reconnaissance Brief</strong>
                      <strong>STREAK COUNT ABOVE EXPECTATION:</strong> Foundry USA's 7+ block streak count is <strong>${p.propensity}× the block-weighted Poisson expectation</strong> at their hash share (${p.pool_share}%, 2022 – present) — but the sample of qualifying events is small, and the excess falls within plausible random variance for a rapidly-growing pool. This is a streak <em>frequency</em> metric, not a second-block conversion rate. Notably, their Second Block Uplift (KPI4b) sits near baseline (~1.0×), which argues against header-first / spy-mining as the cause. The more likely explanation is <strong>hashrate variance and geographic clustering</strong> of US-based miners consolidating under one pool — producing run-length variance without the mempool-skipping fingerprint.
+                   </div>
+                 `;
+        }
+        if (name === 'f2pool') {
+          const streakMonthShare = p.events?.[0]?.pool_share || null;
+          return `
+                   <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: var(--text-secondary); line-height:1.5;">
+                     <strong style="color: var(--accent); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; display: block; margin-bottom: 5px;">Network Reconnaissance Brief</strong>
+                     <strong>STREAK CONTEXT:</strong> F2Pool's 7-block streak occurred when its share in the streak month was ${streakMonthShare}%, higher than its long-run average. The wider forensics do not show a sustained second-block uplift signal for F2Pool, so this appears more like a high-share variance outlier than a persistent header-first or mempool-skipping pattern.
                    </div>
                  `;
         }
@@ -2455,23 +2549,8 @@ export function renderTransitionMatrix(transitionData) {
   const poolCountries = transitionData.pool_countries || {};
   if (pools.length === 0) return;
 
-  // Country → flag emoji + region color
-  const COUNTRY_FLAG = {
-    'China': '🇨🇳', 'United States': '🇺🇸', 'Czech Republic': '🇨🇿',
-    'Seychelles': '🇸🇨', 'Global': '🌐', 'Unknown': '?'
-  };
-  const COUNTRY_COLOR = {
-    'China': 'rgba(255,100,80,0.18)',
-    'United States': 'rgba(86,182,194,0.15)',
-    'Czech Republic': 'rgba(152,195,121,0.15)',
-    'Seychelles': 'rgba(197,120,221,0.15)',
-    'Global': 'rgba(226,163,74,0.10)',
-  };
-  function countryBadge(slug) {
-    const c = poolCountries[slug] || 'Unknown';
-    const flag = COUNTRY_FLAG[c] || '?';
-    const bg = COUNTRY_COLOR[c] || 'rgba(139,148,158,0.1)';
-    return `<span style="font-size:0.7rem;background:${bg};border-radius:3px;padding:1px 4px;margin-left:3px;" title="${c}">${flag}</span>`;
+  function poolBadge(slug) {
+    return countryBadge(poolCountries[slug] || 'Unknown');
   }
   // Are two pools in the same country (and not "Global"/"Unknown")
   function sameCountry(a, b) {
@@ -2514,7 +2593,7 @@ export function renderTransitionMatrix(transitionData) {
   let thead = `<tr><th style="${thStyle}text-align:left;">Block N →<br><span style="font-weight:400;font-size:0.6rem;">Block N+1 ↓ &nbsp;lift · (n)</span></th>`;
   pools.forEach(col => {
     const abbr = col.length > 8 ? col.slice(0, 7) + '…' : col;
-    thead += `<th style="${thStyle}" title="${col} · ${poolCountries[col] || ''}">${abbr}${countryBadge(col)}</th>`;
+    thead += `<th style="${thStyle}" title="${col} · ${poolCountries[col] || ''}">${abbr}${poolBadge(col)}</th>`;
   });
   thead += '</tr>';
 
@@ -2522,7 +2601,7 @@ export function renderTransitionMatrix(transitionData) {
   pools.forEach(rowPool => {
     const rowCountry = poolCountries[rowPool] || 'Unknown';
     const rowBg = COUNTRY_COLOR[rowCountry] || 'transparent';
-    let row = `<tr><td style="${tdLabel}background:${rowBg};">${rowPool}${countryBadge(rowPool)}</td>`;
+    let row = `<tr><td style="${tdLabel}background:${rowBg};">${rowPool}${poolBadge(rowPool)}</td>`;
     pools.forEach(colPool => {
       const key = `${rowPool}||${colPool}`;
       const lift = liftMap[key];
@@ -2576,10 +2655,10 @@ export function renderTransitionMatrix(transitionData) {
 
   function anomalyRow(a, lowN = false) {
     const c = a.lift > 2.0 ? '#ff4d4f' : a.lift > 1.5 ? '#E87E51' : '#E2A34A';
-    const caFrom = poolCountries[a.from] || '?';
-    const caTo = poolCountries[a.to] || '?';
-    const flagFrom = COUNTRY_FLAG[caFrom] || '?';
-    const flagTo = COUNTRY_FLAG[caTo] || '?';
+    const caFrom = poolCountries[a.from] || 'Unknown';
+    const caTo = poolCountries[a.to] || 'Unknown';
+    const flagFrom = countryBadge(caFrom);
+    const flagTo = countryBadge(caTo);
     const caveat = lowN ? `<span style="color:rgba(226,163,74,0.6);font-size:0.65rem;"> ⚠ n=${a.n} (low sample)</span>` : '';
     return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid rgba(48,54,61,0.35);font-size:0.76rem;flex-wrap:wrap;">
       <span style="color:var(--text-secondary);min-width:180px;">${flagFrom} ${a.from} <span style="color:${THEME.muted};font-size:0.7rem;">→</span> ${flagTo} ${a.to}${caveat}</span>

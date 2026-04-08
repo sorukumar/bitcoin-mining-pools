@@ -293,7 +293,7 @@ function renderAll() {
   // 3. Top Mining Pools Table (Independent range filter)
   const topPoolsFiltered = filterBlocks(snapshotBlocks, { range: activeTopPoolsRange });
   const topPoolsAgg = aggregateByPool(topPoolsFiltered);
-  renderTopMinersTable(topPoolsAgg, poolsInfo, forensics, slugToName);
+  renderTopMinersTable(topPoolsAgg, poolsInfo, forensics, slugToName, activeTopPoolsRange);
 
   // 4. Ecosystem chart uses entirely global data (spanning from genesis to present)
   renderEcosystemGrowthChart(ecosystem, poolMeta);
