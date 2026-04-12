@@ -49,9 +49,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="https://sorukumar.github.io/Bitcoin-Data-Labs/styles/styles.css">
+  <link rel="stylesheet" href="https://bitcoindatalabs.org/styles/styles.css" onerror="this.href='https://sorukumar.github.io/Bitcoin-Data-Labs/styles/styles.css'">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="icon" type="image/png" href="https://sorukumar.github.io/Bitcoin-Data-Labs/favicon.png">
+  <link rel="icon" type="image/png" href="https://bitcoindatalabs.org/favicon.png" onerror="this.onerror=null;this.href='https://sorukumar.github.io/Bitcoin-Data-Labs/favicon.png'">
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -611,17 +611,21 @@
       const { initApp } = await import('./js/main.js?v=25');
 
       // Initialize shared components (Header, Nav)
-      if (typeof BitcoinLabsAppComponents !== 'undefined') {
-        BitcoinLabsAppComponents.init({
-          isApp: true,
-          appName: 'bitcoin-mining-pools',
-          appHomeUrl: './index.html',
-          navLinks: [
-            { name: 'Overview', url: '#overview' },
-            { name: 'Ecosystem & History', url: '#ecosystem' },
-            { name: 'Mining Forensics', url: '#forensics' }
-          ]
-        });
+      const appShellConfig = {
+        isApp: true,
+        appName: 'bitcoin-mining-pools',
+        appHomeUrl: './index.html',
+        navLinks: [
+          { name: 'Overview', url: '#overview' },
+          { name: 'Ecosystem & History', url: '#ecosystem' },
+          { name: 'Mining Forensics', url: '#forensics' }
+        ]
+      };
+
+      if (typeof BitcoinLabsApp !== 'undefined') {
+        BitcoinLabsApp.init(appShellConfig);
+      } else if (typeof BitcoinLabsAppComponents !== 'undefined') {
+        BitcoinLabsAppComponents.init(appShellConfig);
       }
 
       // Initialize App logic
@@ -635,7 +639,7 @@
     }
   </script>
 
-  <script src="https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js"></script>
+  <script src="https://bitcoindatalabs.org/components/app-components.js" onerror="this.onerror=null;this.src='https://sorukumar.github.io/Bitcoin-Data-Labs/components/app-components.js';"></script>
 </body>
 
 </html>

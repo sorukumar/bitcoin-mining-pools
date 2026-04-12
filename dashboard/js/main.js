@@ -539,7 +539,7 @@ function initTabs() {
     });
 
     // Update Header Nav active state
-    // Use a small delay to ensure BitcoinLabsAppComponents has finished rendering
+    // Use a small delay to ensure the shared app shell has finished rendering
     setTimeout(() => {
       document.querySelectorAll('.app-nav a, .nav-links a').forEach(a => {
         const href = a.getAttribute('href') || '';
