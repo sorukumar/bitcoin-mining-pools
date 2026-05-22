@@ -1,7 +1,7 @@
 /* ── Reset & base ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
+[data-theme="dark"] {
   --bg-primary: #0B0E14;
   --bg-secondary: #121A26;
   --text-primary: #F8FAFC;
